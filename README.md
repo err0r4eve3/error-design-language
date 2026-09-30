@@ -28,11 +28,15 @@
 | [任务工作流](references/task-workflows.md) | 评审、修复、打磨、新建及工具受限处理 |
 | [交互契约](references/interaction-contracts.md) | 控件语义、键盘、异步状态、失败恢复和中文压力 |
 | [数值与材料](references/visual-system.md) | 灰阶、排版、圆角、玻璃与降级 |
+| [排版与界面细节](references/craft-details.md) | 中文、数字、图标、密度、重排与动效 |
+| [界面模式](references/interface-patterns.md) | 输入法、筛选、表格、选择范围、URL 隐私与反馈 |
+| [调研与取舍](references/research-2026-10-01.md) | 3 个同类 Skill 与官方产品模式、标准；说明采纳和不采纳 |
+| [服务清单样张](assets/patterns.html) | 本地数值排序、筛选、选择范围和详情 |
 | [项目适配](references/product-profiles.md) | 按已知项目的任务组织选择相关语境 |
 | [验收与证据](references/verification.md) | 选取检查、区分证据层级与验证边界 |
 | [依据与边界](references/evidence.md) | 私人偏好来源，仅在追溯或处理冲突时读 |
 | [交互样张](assets/preview.html) | 离线演示，不是真实业务数据 |
-| [行为评测](evals/README.md) | 14 个回归场景与配对比较方法；不是已通过结果 |
+| [行为评测](evals/README.md) | 24 个回归场景与配对比较方法；不是已通过结果 |
 
 普通执行只读相关参考文件，不一次加载全部历史和维护测试。分享此个人 Skill 前检查来源文档是否适合公开。
 
@@ -54,6 +58,7 @@ node --test tests/*.test.cjs
 
 ```sh
 node tests/preview.cjs
+node tests/patterns.cjs
 ```
 
 `PLAYWRIGHT_MODULE` 可指向现有 Playwright 包；`CHROME_CHANNEL=chrome` 选择已安装 Chrome，或用 `CHROME_EXECUTABLE_PATH` 指定浏览器，两者不要同时设置。`DESIGN_QA_DIR` 可设为仓库外的截图和 JSON 结果目录。`DESIGN_PREVIEW_DIR` 仅供维护时对比另一套同结构样张资源。
@@ -62,10 +67,21 @@ node tests/preview.cjs
 
 ```sh
 DESIGN_QA_MODE=inline node tests/preview.cjs
+DESIGN_QA_MODE=inline node tests/patterns.cjs
 ```
 
 它把样张的三个本地 CSS 嵌入 HTML，通过 `setContent` 运行；**不验证 URL 导航或真实资源加载**。默认仍为 `file` 模式。
 
 浏览器检查涵盖 24 组主题／材质／宽度、39 项受控实色文字对比、6 项键盘焦点、4 项输入边界，以及单选、模态背景隔离和焦点返回、空结果、提交防重与失败恢复。另检查控件独立复用、长标签、系统偏好，并用反例确认检查器能拒绝消失的焦点环和不支持的渐变测色。
 
-自动测试不能代替截图审阅、真实设备、接口验收或整站无障碍审核。玻璃上的复杂背景不在该对比度算法范围内。行为场景必须另行运行模型；结构测试通过不代表 14 个场景通过。参见 [本次验证记录](evals/validation-2026-09-30.md)。
+自动测试不能代替截图审阅、真实设备、接口验收或整站无障碍审核。玻璃上的复杂背景不在该对比度算法范围内。行为场景必须另行运行模型；结构测试通过不代表 24 个场景通过。参见 [上一轮验证](evals/validation-2026-09-30.md) 与 [本轮验证](evals/validation-2026-10-01.md)。
+
+## 本轮增加的细节
+
+来源见 [2026-10-01 调研](references/research-2026-10-01.md)。`SKILL.md` 只增加按需入口，不把全部资料变成每次执行的必读项。
+
+`patterns.html` 直接打开即可使用，同目录需要 `tokens.css`、`components.css`、`patterns.css`。`patterns.css` 是可选补充，不影响仅复用基础控件的项目。服务清单样张不发请求、不写 URL、不存储筛选或敏感输入；未知月费保持“未读取”，只演示单币种排序。
+
+`tests/patterns.cjs` 使用与原样张相同的环境变量；在受限环境可显式使用 `DESIGN_QA_MODE=inline`。它检查数值升降序、未知末位、选择范围、合成输入法事件、空结果恢复、详情焦点返回、键盘局部滚动和文字间距压力。它不验证生产路由、真实输入法或完整无障碍合规。
+
+24 个行为场景仍须单独运行模型。静态检查和浏览器样张通过，不是模型生成效果已经提升的证据。

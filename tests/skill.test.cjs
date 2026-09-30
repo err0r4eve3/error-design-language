@@ -66,7 +66,8 @@ test('CSS references defined variables', () => {
   }
 });
 test('sample has local stylesheets and syntactically valid inline scripts', () => {
-  const html = read('assets/preview.html');
+  for (const name of ['preview.html', 'patterns.html']) {
+  const html = read('assets/' + name);
   for (const [, href] of html.matchAll(/<link\b[^>]*href="([^"]+)"/g)) {
     assert.ok(!/^(?:\w+:|\/)/.test(href), `Nonlocal stylesheet: ${href}`);
     assert.ok(fs.existsSync(path.join(root, 'assets', href)));
@@ -74,6 +75,7 @@ test('sample has local stylesheets and syntactically valid inline scripts', () =
   const scripts = [...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)];
   assert.ok(scripts.length > 0);
   scripts.forEach(([, source]) => new vm.Script(source));
+  }
 });
 test('behavior cases have unique IDs, modes, assertions, and evidence requirements', () => {
   const suite = JSON.parse(read('evals/cases.json'));

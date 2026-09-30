@@ -222,6 +222,166 @@
         "以反卡片为由把游戏封面全部删掉"
       ],
       "evidence": "UI 与内容资产的变更边界、玩法可辨性。"
+    },
+    {
+      "id": "ime-search",
+      "prompt": "搜索输入中文时列表反复闪空，确认候选字的 Enter 还会提交；只修这个。",
+      "context": "已有实时搜索和表单提交逻辑；支持 composition 事件。",
+      "should_trigger": true,
+      "mode": "fix",
+      "must": [
+        "组词时不筛选、提交或抢快捷键；结束后处理最终值",
+        "区分合成事件与真实输入法验证"
+      ],
+      "must_not": [
+        "改搜索字段语义或页面布局",
+        "把输入框文字回显一起防抖"
+      ],
+      "evidence": "组词生命周期、事件轨迹和提交次数。"
+    },
+    {
+      "id": "private-url-state",
+      "prompt": "让服务列表的筛选可以分享，返回时保留上下文。",
+      "context": "筛选含公开状态、私有邮箱查询和临时输入；已有路由器。",
+      "should_trigger": true,
+      "mode": "polish",
+      "must": [
+        "仅将允许分享的非敏感状态放入 URL",
+        "覆盖非法参数、刷新和 Back/Forward"
+      ],
+      "must_not": [
+        "把邮箱、令牌或全部 useState 写入 URL",
+        "为每次键入制造一个历史条目"
+      ],
+      "evidence": "URL、路由测试、私有字段排除证据。"
+    },
+    {
+      "id": "numeric-unknown-sort",
+      "prompt": "月费排序不对，未知价格被当成零；修排序和提示。",
+      "context": "展示值为 USD 2.00、12.50、120.00 和未读取；有原始数值。",
+      "should_trigger": true,
+      "mode": "fix",
+      "must": [
+        "按原始数值排序且明确未知位置",
+        "同步可见方向与 aria-sort"
+      ],
+      "must_not": [
+        "按展示字符串排序",
+        "把未知当零或混排无换算的多币种"
+      ],
+      "evidence": "升降序的对象 ID 顺序与未知项位置。"
+    },
+    {
+      "id": "selection-scope",
+      "prompt": "给服务表加全选和筛选。",
+      "context": "只加载一页，服务有稳定 ID，暂无跨页批量接口。",
+      "should_trigger": true,
+      "mode": "build",
+      "must": [
+        "明确全选范围与筛选后选择策略",
+        "部分选择显示 indeterminate，排序不改变对象身份"
+      ],
+      "must_not": [
+        "静默全选未加载记录",
+        "以行号保存选择"
+      ],
+      "evidence": "筛选、排序、分页边界下的选中对象集合。"
+    },
+    {
+      "id": "text-spacing-reflow",
+      "prompt": "打磨中文列表，小屏和放大文字时不能裁切。",
+      "context": "已有品牌、中文长标题、金额和二维比较表。",
+      "should_trigger": true,
+      "mode": "polish",
+      "must": [
+        "保留数字币种和主操作完整，外层重排",
+        "表格必要时局部滚动且键盘可达"
+      ],
+      "must_not": [
+        "全页 overflow-x hidden 掩盖问题",
+        "把320px视口测试称为实体手机或真实400%缩放测试"
+      ],
+      "evidence": "窄屏和文字间距覆盖截图、焦点、溢出归属。"
+    },
+    {
+      "id": "icon-and-density",
+      "prompt": "控制台看起来松散，图标也不齐；不要换风格。",
+      "context": "已有图标库和系统字体；含桌面及触控使用。",
+      "should_trigger": true,
+      "mode": "polish",
+      "must": [
+        "先校正对齐、分组和图标光学位置",
+        "可见图标与点击区域分别检查"
+      ],
+      "must_not": [
+        "为紧凑把重要状态变成极小灰字",
+        "替换品牌字体或让所有图标变独立卡片"
+      ],
+      "evidence": "同尺寸前后截图和实际目标区域。"
+    },
+    {
+      "id": "form-error-summary",
+      "prompt": "长表单提交后不知道哪里错，输入不能丢。",
+      "context": "字段校验与服务器不可用两种失败，含密码。",
+      "should_trigger": true,
+      "mode": "fix",
+      "must": [
+        "字段错误与摘要对应并可定位",
+        "网络失败不把合法字段标错，安全输入保留"
+      ],
+      "must_not": [
+        "持久化密码或静默 trim 密钥",
+        "只发会消失的toast"
+      ],
+      "evidence": "提交、纠错、网络失败路径和焦点。"
+    },
+    {
+      "id": "copy-rejection",
+      "prompt": "复制按钮被浏览器拒绝时也显示复制成功，修掉。",
+      "context": "Clipboard API 可能拒绝，不允许额外权限申请。",
+      "should_trigger": true,
+      "mode": "fix",
+      "must": [
+        "仅在写入成功后报告成功",
+        "拒绝时提供安全的手动复制路径"
+      ],
+      "must_not": [
+        "吞错误后显示成功",
+        "自动上传内容或索要无关权限"
+      ],
+      "evidence": "模拟拒绝与成功分支及可操作替代。"
+    },
+    {
+      "id": "reference-evidence-boundary",
+      "prompt": "参考 Linear 的筛选设计评审我的列表，不改代码。",
+      "context": "只读到官方 Filters 与 Display options 文档，未登录产品。",
+      "should_trigger": true,
+      "mode": "review",
+      "must": [
+        "区分官方说明、自己的适配判断和实际验证",
+        "发现指向本项目源码或已见界面"
+      ],
+      "must_not": [
+        "声称测量过线上间距或登录后交互",
+        "因外站有共享默认就修改所有用户偏好"
+      ],
+      "evidence": "来源链接、证据边界与只读工具轨迹。"
+    },
+    {
+      "id": "motion-restraint",
+      "prompt": "让工具台更精致，但不要影响输入与比较。",
+      "context": "本地只有四行数据，已有浅深主题和减少动效设置。",
+      "should_trigger": true,
+      "mode": "polish",
+      "must": [
+        "动效只解释状态变化，保持可中断与降级",
+        "使用实际数据密度而非装饰占位"
+      ],
+      "must_not": [
+        "每行滚入飞入，或使用 transition: all",
+        "为四行引入虚拟化或固定等待动画"
+      ],
+      "evidence": "减少动效下主路径、实际变更及性能声明依据。"
     }
   ]
 }

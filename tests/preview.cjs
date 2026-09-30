@@ -224,6 +224,20 @@ async function reusableControls(browser) {
     assert.ok((await page.locator('#control-state').textContent()).includes('次操作'));
     results.checks.push('keyboard-radio', 'dialog-containment-and-return', 'search-empty-clear-return', 'control-feedback');
 
+    // Synthetic IME events validate guards, not real operating-system input methods.
+    await page.locator('#search').evaluate(el => {
+      el.dispatchEvent(new CompositionEvent('compositionstart', {bubbles: true}));
+      el.value = 'not-final'; el.dispatchEvent(new InputEvent('input', {bubbles: true, isComposing: true}));
+    });
+    assert.equal(await page.locator('.task:visible').count(), 3, 'Do not filter incomplete IME composition');
+    await page.locator('#search').evaluate(el => {
+      el.value = '页面'; el.dispatchEvent(new CompositionEvent('compositionend', {bubbles: true}));
+    });
+    assert.equal(await page.locator('.task:visible').count(), 1);
+    await page.locator('#search').fill('');
+    results.checks.push('synthetic-ime-composition-guard');
+    results.limitations.push('IME tests use synthetic events, not real OS composition or mobile keyboards.');
+
     // Negative controls: prove focus and compositing checks can fail instead of silently passing.
     const button = page.locator('[data-demo="主操作"]');
     await keyboardFocus(page, button);

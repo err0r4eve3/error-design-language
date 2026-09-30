@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>服务清单 · 界面模式样张</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="components.css">
+<link rel="stylesheet" href="patterns.css">
+</head>
+<body data-design="error" data-theme="neutral" class="dl-pattern-body">
+<main class="dl-pattern-page">
+  <header class="dl-cluster dl-pattern-header">
+    <div class="dl-stack"><h1>服务清单</h1><p class="dl-muted">本地交互样张。记录、金额和状态均为演示，不读取真实服务。</p></div>
+    <div class="dl-field"><label for="theme">主题</label><select id="theme" class="dl-select"><option value="neutral">浅色</option><option value="dark">深色</option></select></div>
+  </header>
+  <div class="dl-pattern-layout">
+    <section class="dl-panel dl-stack" aria-labelledby="services-title">
+      <h2 id="services-title">服务记录</h2>
+      <div class="dl-cluster dl-filterbar" role="search" aria-label="筛选演示服务">
+        <div class="dl-field dl-search-field"><label for="query">服务名称或编号</label><input id="query" class="dl-input" type="search" autocomplete="off" placeholder="例如：文档或 demo-01" aria-describedby="filter-help"></div>
+        <div class="dl-field"><label for="status">状态</label><select id="status" class="dl-select"><option value="all">全部状态</option><option value="running">运行中</option><option value="stopped">已停止</option><option value="unknown">未读取</option></select></div>
+      </div>
+      <p id="filter-help" class="dl-muted">修改筛选会清除选择；排序保留选择。清单仅含下列 4 条演示记录。</p>
+      <div class="dl-cluster"><p id="result-count" role="status">当前筛选 4 条</p><button id="reset" type="button" class="dl-button quiet" hidden>清除筛选</button></div>
+      <p class="dl-muted" id="scroll-help">窄屏可横向滚动比较；也可聚焦表格区域后使用方向键。</p>
+      <div class="dl-scroll" id="table-scroll" role="region" tabindex="0" aria-label="服务记录横向滚动区" aria-describedby="scroll-help">
+        <table class="dl-table">
+          <caption>月费统一为 USD，按原始数值排序；未知值始终位于末尾。</caption>
+          <thead><tr>
+            <th scope="col"><label class="dl-check"><input id="select-visible" type="checkbox" aria-label="选择本次筛选的全部记录"></label></th>
+            <th scope="col">服务与编号</th>
+            <th scope="col" id="price-heading" class="dl-number" aria-sort="ascending"><button class="dl-sort" id="sort-price" type="button">月费（USD）<span id="sort-direction"> · 升序</span></button></th>
+            <th scope="col">状态</th><th scope="col">操作</th>
+          </tr></thead>
+          <tbody id="records">
+            <tr data-id="demo-01" data-name="文档预览" data-price="2" data-status="running"><td><label class="dl-check"><input type="checkbox" aria-label="选择文档预览"></label></td><th scope="row" class="dl-break">文档预览<small translate="no">demo-01</small></th><td class="dl-number">2.00</td><td>运行中</td><td><button class="dl-button quiet" type="button" data-detail aria-label="查看文档预览详情">查看详情</button></td></tr>
+            <tr data-id="demo-02" data-name="长内容回归与教学工作区" data-price="12.5" data-status="stopped"><td><label class="dl-check"><input type="checkbox" aria-label="选择长内容回归与教学工作区"></label></td><th scope="row" class="dl-break">长内容回归与教学工作区<small translate="no">demo-02</small></th><td class="dl-number">12.50</td><td>已停止</td><td><button class="dl-button quiet" type="button" data-detail aria-label="查看长内容回归与教学工作区详情">查看详情</button></td></tr>
+            <tr data-id="demo-03" data-name="计算任务" data-price="120" data-status="running"><td><label class="dl-check"><input type="checkbox" aria-label="选择计算任务"></label></td><th scope="row" class="dl-break">计算任务<small translate="no">demo-03</small></th><td class="dl-number">120.00</td><td>运行中</td><td><button class="dl-button quiet" type="button" data-detail aria-label="查看计算任务详情">查看详情</button></td></tr>
+            <tr data-id="demo-04" data-name="待核验记录" data-price="" data-status="unknown"><td><label class="dl-check"><input type="checkbox" aria-label="选择待核验记录"></label></td><th scope="row" class="dl-break">待核验记录<small translate="no">demo-04</small></th><td class="dl-number">未读取</td><td>未读取</td><td><button class="dl-button quiet" type="button" data-detail aria-label="查看待核验记录详情">查看详情</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div id="empty" class="dl-empty dl-stack" hidden><h2>没有匹配的服务</h2><p>当前筛选没有匹配，不代表全部服务为空。</p><button id="empty-reset" class="dl-button" type="button">清除筛选并返回搜索</button></div>
+      <p id="selection-count" role="status">本次筛选已选择 0 条</p>
+    </section>
+    <aside class="dl-stack" aria-labelledby="scope-title"><h2 id="scope-title">当前范围</h2><p>筛选决定出现哪些记录，排序只改变它们的顺序。</p><p class="dl-muted">勾选用于演示选择范围，没有批量删除、真实账单或后台任务。</p><p class="dl-muted">名称允许换行，金额保持完整。状态用文字表达，不只依赖颜色。</p></aside>
+  </div>
+</main>
+<dialog id="record-dialog" class="dl-pattern-dialog" aria-labelledby="record-title"><div class="dl-stack"><h2 id="record-title"></h2><p id="record-description" class="dl-break"></p><p>仅展示演示记录，不读取账户或执行操作。</p><button id="close-detail" class="dl-button" type="button">关闭详情</button></div></dialog>
+<noscript>该样张的筛选、排序和详情需要 JavaScript；静态表格仍可阅读。</noscript>
+<script>
+'use strict';
+const find = selector => document.querySelector(selector);
+const rows = [...document.querySelectorAll('#records tr')];
+let composing = false;
+let lastFilter = null;
+let direction = 'ascending';
+const visibleRows = () => rows.filter(row => !row.hidden);
+function syncSelection() {
+  const visible = visibleRows();
+  const count = visible.filter(row => row.querySelector('input').checked).length;
+  const all = find('#select-visible');
+  all.checked = visible.length > 0 && count === visible.length;
+  all.indeterminate = count > 0 && count < visible.length;
+  all.disabled = visible.length === 0;
+  for (const row of rows) row.dataset.selected = String(row.querySelector('input').checked);
+  find('#selection-count').textContent = `本次筛选已选择 ${count} 条`;
+}
+function filterRows() {
+  const query = find('#query').value.trim().toLocaleLowerCase('zh-CN');
+  const status = find('#status').value;
+  const signature = JSON.stringify([query, status]);
+  if (signature === lastFilter) return; // compositionend may be followed by input for the same value.
+  lastFilter = signature;
+  for (const row of rows) {
+    row.hidden = !`${row.dataset.name} ${row.dataset.id}`.toLocaleLowerCase('zh-CN').includes(query) ||
+      (status !== 'all' && row.dataset.status !== status);
+    row.querySelector('input').checked = false;
+  }
+  const count = visibleRows().length;
+  find('#result-count').textContent = `当前筛选 ${count} 条`;
+  find('#table-scroll').hidden = count === 0;
+  find('#scroll-help').hidden = count === 0;
+  find('#empty').hidden = count > 0;
+  find('#reset').hidden = !query && status === 'all';
+  syncSelection();
+}
+function resetFilters() {
+  composing = false;
+  find('#query').value = '';
+  find('#status').value = 'all';
+  filterRows();
+  find('#query').focus();
+}
+find('#query').addEventListener('compositionstart', () => { composing = true; });
+find('#query').addEventListener('compositionend', () => { composing = false; filterRows(); });
+find('#query').addEventListener('input', event => { if (!composing && !event.isComposing) filterRows(); });
+find('#status').addEventListener('change', filterRows);
+find('#reset').addEventListener('click', resetFilters);
+find('#empty-reset').addEventListener('click', resetFilters);
+find('#select-visible').addEventListener('change', event => {
+  for (const row of visibleRows()) row.querySelector('input').checked = event.target.checked;
+  syncSelection();
+});
+for (const row of rows) row.querySelector('input').addEventListener('change', syncSelection);
+find('#sort-price').addEventListener('click', () => {
+  direction = direction === 'ascending' ? 'descending' : 'ascending';
+  const sorted = [...rows].sort((a, b) => {
+    const x = a.dataset.price === '' ? null : Number(a.dataset.price);
+    const y = b.dataset.price === '' ? null : Number(b.dataset.price);
+    if (x === null || y === null) return x === y ? 0 : x === null ? 1 : -1;
+    return (direction === 'ascending' ? x - y : y - x) || rows.indexOf(a) - rows.indexOf(b);
+  });
+  for (const row of sorted) find('#records').append(row); // Move nodes; preserve stable row identity and checks.
+  find('#price-heading').setAttribute('aria-sort', direction);
+  find('#sort-direction').textContent = direction === 'ascending' ? ' · 升序' : ' · 降序';
+});
+for (const button of document.querySelectorAll('[data-detail]')) button.addEventListener('click', () => {
+  const row = button.closest('tr');
+  find('#record-title').textContent = row.dataset.name;
+  find('#record-description').textContent = `编号：${row.dataset.id}。月费：${row.dataset.price === '' ? '未读取' : Number(row.dataset.price).toFixed(2) + ' USD'}`;
+  find('#record-dialog').showModal();
+});
+find('#close-detail').addEventListener('click', () => find('#record-dialog').close());
+find('#theme').addEventListener('change', event => { document.body.dataset.theme = event.target.value; });
+filterRows();
+</script>
+</body>
+</html>

@@ -12,7 +12,7 @@
 <a class="skip" href="#main">跳到内容</a>
 <header class="topbar"><div class="top-inner"><span class="wordmark">设计语言</span><small>交互样张 · 演示数据</small><label class="theme" for="theme">主题 <select class="dl-select" id="theme"><option value="neutral">浅色</option><option value="dark">深色</option></select></label><label class="theme" for="material">材质 <select class="dl-select" id="material"><option value="liquid">液态玻璃</option><option value="frosted">毛玻璃</option><option value="solid">实色</option></select></label></div></header>
 <main class="shell" id="main">
-<div class="intro"><div><h1>层级与状态</h1><p>统一黑白灰与玻璃材质。切换主题、选择条目，再试一次失败后的恢复。</p></div><span class="edition">01 / REFERENCE</span></div>
+<div class="intro"><div><h1>层级与状态</h1><p>统一黑白灰与玻璃材质。切换主题、选择条目，再试一次失败后的恢复。</p></div></div>
 <div class="layout"><div>
 <section class="workspace" aria-labelledby="list-title">
 <div class="section-head"><h2 id="list-title">检查记录</h2><small id="count" aria-live="polite">3 条</small></div>
@@ -45,7 +45,10 @@ function sync(){const shown=tasks.filter(x=>!x.hidden);const checked=shown.find(
 function filter(){const q=$('#search').value.trim();tasks.forEach(x=>x.hidden=forceEmpty||!x.dataset.name.includes(q));$('#empty-toggle').setAttribute('aria-pressed',String(forceEmpty));$('#empty-toggle').textContent=forceEmpty?'恢复记录':'模拟空结果';sync();}
 $('#theme').addEventListener('change',e=>document.body.dataset.theme=e.target.value);
 $('#material').addEventListener('change',e=>document.body.dataset.material=e.target.value);
-$('#search').addEventListener('input',()=>{forceEmpty=false;filter();});
+let searchComposing=false;
+$('#search').addEventListener('compositionstart',()=>{searchComposing=true;});
+$('#search').addEventListener('compositionend',()=>{searchComposing=false;forceEmpty=false;filter();});
+$('#search').addEventListener('input',e=>{if(searchComposing||e.isComposing)return;forceEmpty=false;filter();});
 $('#empty-toggle').addEventListener('click',()=>{forceEmpty=!forceEmpty;filter();});
 $('#clear').addEventListener('click',()=>{forceEmpty=false;$('#search').value='';filter();$('#search').focus();});
 tasks.forEach(x=>x.querySelector('input').addEventListener('change',sync));
