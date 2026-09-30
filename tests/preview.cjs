@@ -82,8 +82,8 @@ const evidence=process.env.DESIGN_QA_DIR;
    fs.mkdirSync(evidence,{recursive:true});
    for(const theme of ['neutral','dark']){
     await page.selectOption('#theme',theme);await page.selectOption('#material','liquid');await page.mouse.move(1,1);await page.locator('#email').blur();
-    await page.setViewportSize({width:1440,height:1080});await page.screenshot({path:path.join(evidence,theme+'-desktop.png'),fullPage:true});
-    await page.setViewportSize({width:390,height:844});await page.screenshot({path:path.join(evidence,theme+'-mobile.png'),fullPage:true});
+    await page.setViewportSize({width:1440,height:1080});await page.evaluate(()=>new Promise(resolve=>{scrollTo(0,0);requestAnimationFrame(()=>requestAnimationFrame(resolve))}));await page.screenshot({path:path.join(evidence,theme+'-desktop.png'),fullPage:true});
+    await page.setViewportSize({width:390,height:844});await page.evaluate(()=>new Promise(resolve=>{scrollTo(0,0);requestAnimationFrame(()=>requestAnimationFrame(resolve))}));await page.screenshot({path:path.join(evidence,theme+'-mobile.png'),fullPage:true});
    }
   }
   await page.emulateMedia({reducedMotion:'reduce'});assert.equal(await page.locator('#detail').evaluate(e=>getComputedStyle(e).transitionDuration),'0s');
