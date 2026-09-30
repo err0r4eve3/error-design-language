@@ -71,12 +71,12 @@ dialog p { margin-top:14px; }
 dialog .dialog-footer { display:flex; justify-content:flex-end; margin-top:24px; }
 #detail-meta { color:var(--dl-muted); font-size:14px; }
 noscript { display:block; padding:16px; }
-@supports(backdrop-filter:blur(1px)) {
-  :is([data-material="frosted"],[data-material="liquid"]) :is(.topbar,.aside) { background:var(--dl-glass); backdrop-filter:blur(14px); }
+@supports (backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px)) {
+  :is([data-material="frosted"],[data-material="liquid"]) :is(.topbar,.aside) { background:var(--dl-glass); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); }
 }
 [data-material="liquid"] .aside { border-color:var(--dl-glass-line); box-shadow:inset 0 1px 0 var(--dl-glass-highlight),inset 1px 0 0 var(--dl-glass-highlight),var(--dl-shadow); }
 [data-material="liquid"] .topbar { box-shadow:inset 0 -1px 0 var(--dl-glass-highlight); }
-[data-material="solid"] :is(.topbar,.aside) { backdrop-filter:none; background:var(--dl-surface); box-shadow:none; }
+[data-material="solid"] :is(.topbar,.aside) { -webkit-backdrop-filter:none; backdrop-filter:none; background:var(--dl-surface); box-shadow:none; }
 @media(max-width:900px) {
   .layout { grid-template-columns:minmax(0,1fr); }
   .aside { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
@@ -107,4 +107,15 @@ noscript { display:block; padding:16px; }
   .selection-note { max-width:55%; }
 }
 @media(prefers-reduced-motion:reduce) { * { scroll-behavior:auto!important; transition:none!important; } }
-@media(prefers-reduced-transparency:reduce) { .topbar,.aside { backdrop-filter:none!important; background:var(--dl-surface)!important; box-shadow:none!important; } }
+@media(prefers-reduced-transparency:reduce) { .topbar,.aside { -webkit-backdrop-filter:none!important; backdrop-filter:none!important; background:var(--dl-surface)!important; box-shadow:none!important; } }
+
+@media (forced-colors:active) {
+  .topbar,.aside {
+    -webkit-backdrop-filter:none!important;
+    backdrop-filter:none!important;
+    background:Canvas!important;
+    border-color:CanvasText!important;
+    box-shadow:none!important;
+  }
+  .task:has(input:focus-visible) { outline-color:Highlight; }
+}
