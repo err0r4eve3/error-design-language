@@ -1,0 +1,67 @@
+/* Reusable controls; load after tokens.css. No global opacity or brightness filter. */
+:where([data-design="error"]) .dl-button {
+  --button-bg: var(--dl-secondary);
+  --button-fg: var(--dl-on-secondary);
+  --button-line: var(--dl-secondary-border);
+  --button-hover: var(--dl-secondary-hover);
+  --button-pressed: var(--dl-secondary-pressed);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid var(--button-line);
+  border-radius: var(--dl-radius-control);
+  background: var(--button-bg);
+  color: var(--button-fg);
+  font: 600 14px/1.4 var(--dl-font);
+  text-align: center;
+  cursor: pointer;
+  /* Foreground and background switch atomically, including theme changes. */
+}
+:where([data-design="error"]) .dl-button.primary {
+  --button-bg: var(--dl-primary);
+  --button-fg: var(--dl-on-primary);
+  --button-line: transparent;
+  --button-hover: var(--dl-primary-hover);
+  --button-pressed: var(--dl-primary-pressed);
+}
+:where([data-design="error"]) .dl-button.quiet {
+  --button-bg: transparent;
+  --button-fg: var(--dl-text);
+  --button-line: transparent;
+  --button-hover: var(--dl-hover);
+  --button-pressed: var(--dl-selected);
+}
+@media (hover: hover) {
+  :where([data-design="error"]) .dl-button:hover:not(:disabled) { background: var(--button-hover); }
+}
+:where([data-design="error"]) .dl-button:active:not(:disabled) { background: var(--button-pressed); }
+:where([data-design="error"]) .dl-button:disabled:not([aria-busy="true"]) {
+  background: var(--dl-disabled);
+  color: var(--dl-on-disabled);
+  border-color: var(--dl-disabled-border);
+  cursor: not-allowed;
+}
+:where([data-design="error"]) .dl-button[aria-busy="true"] { cursor: wait; }
+:where([data-design="error"]) :is(.dl-button,.dl-input,.dl-select):focus-visible {
+  outline: 2px solid var(--dl-focus);
+  outline-offset: 3px;
+}
+:where([data-design="error"]) :is(.dl-input,.dl-select) {
+  min-height: 44px;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--dl-control-border);
+  border-radius: var(--dl-radius-control);
+  background: var(--dl-input);
+  color: var(--dl-input-text);
+  font: 400 15px/1.4 var(--dl-font);
+}
+:where([data-design="error"]) .dl-input::placeholder { color: var(--dl-placeholder); opacity: 1; }
+:where([data-design="error"]) .dl-select { cursor: pointer; }
+:where([data-design="error"]) .dl-input[aria-invalid="true"] { border-width: 2px; border-color: var(--dl-strong); }
+@media (max-width:540px) {
+  :where([data-design="error"]) :is(.dl-input,.dl-select) { font-size: 16px; }
+}

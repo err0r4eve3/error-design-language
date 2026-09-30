@@ -1,0 +1,4 @@
+interface:
+  display_name: "项目设计语言"
+  short_description: "跨项目统一黑白灰、液态与毛玻璃，完善层级、文案与操作体验"
+  default_prompt: "使用 $error-design-language，统一黑白灰与液态／毛玻璃，检查并改进页面层级、圆角、文案和关键操作流程，完成适用的浏览器验证。"

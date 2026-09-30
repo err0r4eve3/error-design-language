@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>设计语言</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="components.css">
+<link rel="stylesheet" href="preview.css">
+</head>
+<body data-design="error" data-theme="neutral" data-material="liquid">
+<a class="skip" href="#main">跳到内容</a>
+<header class="topbar"><div class="top-inner"><span class="wordmark">设计语言</span><small>交互样张 · 演示数据</small><label class="theme" for="theme">主题 <select class="dl-select" id="theme"><option value="neutral">浅色</option><option value="dark">深色</option></select></label><label class="theme" for="material">材质 <select class="dl-select" id="material"><option value="liquid">液态玻璃</option><option value="frosted">毛玻璃</option><option value="solid">实色</option></select></label></div></header>
+<main class="shell" id="main">
+<div class="intro"><div><h1>层级与状态</h1><p>统一黑白灰与玻璃材质。切换主题、选择条目，再试一次失败后的恢复。</p></div><span class="edition">01 / REFERENCE</span></div>
+<div class="layout"><div>
+<section class="workspace" aria-labelledby="list-title">
+<div class="section-head"><h2 id="list-title">检查记录</h2><small id="count" aria-live="polite">3 条</small></div>
+<div class="toolbar"><div class="search"><label for="search">搜索</label><input class="dl-input" id="search" type="search" placeholder="按名称筛选" autocomplete="off"></div><button class="dl-button" id="empty-toggle" type="button" aria-pressed="false">模拟空结果</button></div>
+<div class="rows" role="radiogroup" aria-label="选择检查记录">
+<label class="task" data-name="页面层级"><input type="radio" name="record" value="页面层级" checked><span><strong>页面层级</strong><small>画布、内容面与主操作</small></span><span class="state">已检查</span></label>
+<label class="task" data-name="选中状态"><input type="radio" name="record" value="选中状态"><span><strong>选中状态</strong><small>同一组选项只保留一个选中项</small></span><span class="state">待检查</span></label>
+<label class="task" data-name="失败恢复"><input type="radio" name="record" value="失败恢复"><span><strong>失败恢复</strong><small>保留输入，在原处继续</small></span><span class="state">待检查</span></label>
+</div>
+<div class="empty" hidden><h3>没有匹配记录</h3><p class="muted">可以清除筛选后继续。</p><button class="dl-button" id="clear" type="button">清除筛选</button></div>
+<div class="list-footer"><p class="selection-note" aria-live="polite">已选择：页面层级</p><button class="dl-button primary" id="detail" type="button">查看详情</button></div>
+</section>
+<section class="form-section" aria-labelledby="form-title"><h2 id="form-title">错误恢复</h2><p>仅模拟一次失败与重试，不发送请求或保存输入。</p><form id="demo-form"><div class="form-grid"><div class="field"><label for="email">接收邮箱</label><input class="dl-input" id="email" type="email" required value="preview@example.com" autocomplete="off" aria-describedby="feedback"></div><button class="dl-button primary" id="submit" type="submit">模拟提交</button></div><p class="feedback" id="feedback" role="status" aria-live="polite"></p></form></section>
+</div><aside class="aside" aria-label="设计规则">
+<section><h2>材料</h2><p>壳层可轻透，内容保持稳定。</p><div class="legend"><div><span class="swatch" style="background:var(--dl-canvas)"></span>画布</div><div><span class="swatch" style="background:var(--dl-workspace)"></span>工作区</div><div><span class="swatch" style="background:var(--dl-surface)"></span>内容面</div><div><span class="swatch" style="background:var(--dl-selected)"></span>选中层</div></div></section>
+<section><h2>按钮</h2><div class="control-samples"><button class="dl-button primary" data-demo="主操作" type="button">主操作</button><button class="dl-button" data-demo="次操作" type="button">次操作</button><button class="dl-button quiet" data-demo="轻操作" type="button">轻操作</button><button class="dl-button" disabled type="button">不可用</button></div><p id="control-state" role="status">同一尺寸，不同优先级。</p></section>
+<section><h2>形状</h2><ul class="rules"><li>相连内容用平直结构。</li><li>控件用小圆角。</li><li>浮层用较大圆角。</li><li>分组先靠对齐与间距。</li></ul></section>
+
+</aside></div>
+<footer class="foot">统一视觉，按任务调整布局与密度。全部记录均为演示数据。</footer>
+</main>
+<dialog id="dialog" aria-labelledby="detail-title"><h2 id="detail-title">页面层级</h2><p id="detail-body"></p><p id="detail-meta">演示内容 · 非实际项目状态</p><div class="dialog-footer"><button class="dl-button" id="close" type="button">关闭</button></div></dialog>
+<noscript>交互样张需要 JavaScript；配色和布局仍可阅读。</noscript>
+<script>
+const $=s=>document.querySelector(s);
+const tasks=[...document.querySelectorAll('.task')];
+const descriptions={'页面层级':'列表与正文使用连续内容面；选中项通过底色、指示线和单选控件共同表达。','选中状态':'选择不同条目时，旧选择取消。焦点与选中状态分别表达，避免两个按钮都像被选中。','失败恢复':'失败提示保留在操作附近，输入不会清空，并提供明确的重试动作。'};
+let forceEmpty=false;
+function sync(){const shown=tasks.filter(x=>!x.hidden);const checked=shown.find(x=>x.querySelector('input').checked);$('.selection-note').textContent=checked?'已选择：'+checked.dataset.name:'请选择一条记录';$('#detail').disabled=!checked;$('#count').textContent=shown.length+' 条';$('.empty').hidden=shown.length>0;$('.rows').hidden=shown.length===0;$('.list-footer').hidden=shown.length===0;}
+function filter(){const q=$('#search').value.trim();tasks.forEach(x=>x.hidden=forceEmpty||!x.dataset.name.includes(q));$('#empty-toggle').setAttribute('aria-pressed',String(forceEmpty));$('#empty-toggle').textContent=forceEmpty?'恢复记录':'模拟空结果';sync();}
+$('#theme').addEventListener('change',e=>document.body.dataset.theme=e.target.value);
+$('#material').addEventListener('change',e=>document.body.dataset.material=e.target.value);
+$('#search').addEventListener('input',()=>{forceEmpty=false;filter();});
+$('#empty-toggle').addEventListener('click',()=>{forceEmpty=!forceEmpty;filter();});
+$('#clear').addEventListener('click',()=>{forceEmpty=false;$('#search').value='';filter();$('#search').focus();});
+tasks.forEach(x=>x.querySelector('input').addEventListener('change',sync));
+$('#detail').addEventListener('click',()=>{const selected=tasks.find(x=>!x.hidden&&x.querySelector('input').checked);if(!selected)return;$('#detail-title').textContent=selected.dataset.name;$('#detail-body').textContent=descriptions[selected.dataset.name];$('#dialog').showModal();});
+$('#close').addEventListener('click',()=>$('#dialog').close());
+document.querySelectorAll('[data-demo]').forEach(button=>button.addEventListener('click',()=>{$('#control-state').textContent='已触发：'+button.dataset.demo+'（演示）';}));
+let attempt=0;let pending=false;
+$('#demo-form').addEventListener('submit',e=>{e.preventDefault();if(pending)return;pending=true;$('#submit').disabled=true;$('#submit').setAttribute('aria-busy','true');$('#submit').textContent='处理中…';$('#feedback').className='feedback';$('#feedback').textContent='正在模拟提交…';setTimeout(()=>{attempt++;pending=false;$('#submit').disabled=false;$('#submit').removeAttribute('aria-busy');if(attempt%2===1){$('#feedback').className='feedback error';$('#feedback').textContent='未完成：模拟连接失败，输入已保留。请重试。';$('#submit').textContent='重试';}else{$('#feedback').className='feedback success';$('#feedback').textContent='已完成：模拟处理成功，未发送任何数据。';$('#submit').textContent='重新演示';}},450);});
+</script>
+</body>
+</html>
