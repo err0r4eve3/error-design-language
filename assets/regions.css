@@ -31,7 +31,7 @@
 }
 :where([data-design="error"]) .dl-choice-body {
   display: grid; align-content: start; gap: 8px; min-block-size: 112px;
-  padding: 18px 18px 18px 48px; border: 2px solid var(--dl-line);
+  padding-block: 18px; padding-inline: 48px 18px; border: 2px solid var(--dl-line);
   border-radius: var(--dl-radius-control); background: var(--dl-surface); color: var(--dl-text);
   overflow-wrap: anywhere;
 }

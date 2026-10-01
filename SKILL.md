@@ -64,4 +64,4 @@ description: "设计、实现、修复或只读评审产品前端 UI/UX；适用
 | 验证与完成标准 | [验收与证据](references/verification.md) |
 | 历史项目背景 | [项目适配](references/product-profiles.md)，仅相关行，不是当前授权 |
 | 可选 CSS／样张 | [tokens](assets/tokens.css)、[控件](assets/components.css)、[样张](assets/preview.html) |
-| 维护本 Skill | [本轮调研](references/research-2026-10-02-round13.md)、[行为评测](evals/README.md)；追溯才读 [历史依据](references/evidence.md) |
+| 维护本 Skill | [调研与记录](README.md)、[行为评测](evals/README.md)；追溯才读 [历史依据](references/evidence.md) |

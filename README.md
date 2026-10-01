@@ -34,11 +34,12 @@
 | [页面综合](references/design-synthesis.md) | 内容骨架、构图和跨模块口径 |
 | [产品文案](references/product-copy.md) | 不把开发说明写进产品标题；保留必要条件 |
 | [数值与材料](references/visual-system.md) | 灰阶、字号、形状、玻璃与降级起点 |
-| [界面细节](references/craft-details.md) | 中文、数字、图标、密度与内容压力 |
+| [界面细节](references/craft-details.md) | 中文、数字、图标、方向边界、容器尺寸与内容压力 |
 | [交互契约](references/interaction-contracts.md)／[界面模式](references/interface-patterns.md) | 表单、组合浮层、分阶段异步、键盘、输入法与集合状态 |
 | [项目适配](references/product-profiles.md) | 历史任务组织；不是当前实现证据或写入授权 |
 | [验收与证据](references/verification.md) | 按风险选检查，区分页面、工具与模型证据 |
 | [行为评测](evals/README.md) | 46 个待执行场景、配对方法和离线准备器 |
+| [第十四轮调研](references/research-2026-10-02-round14.md) | Radix 方向上下文、React Aria 与技术短语隔离 |
 | [第十二轮调研](references/research-2026-10-02-round12.md) | TanStack Query、React Router 与确定性竞态探针 |
 | [第十一轮调研](references/research-2026-10-01-round11.md) | Primer、Radix 与 React Spectrum 的源码规则与检验场景 |
 | [第八轮调研](references/research-2026-10-01-round8.md) | Cloudflare、Supabase、Vercel 与 Cloudscape 的对照 |
@@ -76,6 +77,7 @@ node tests/preview.cjs
 node tests/patterns.cjs
 node tests/regions.cjs
 node tests/style-composition.cjs
+node tests/choice-layout.cjs
 ```
 
 `PLAYWRIGHT_MODULE` 可指定现有包。`CHROME_CHANNEL=chrome` 或 `CHROME_EXECUTABLE_PATH` 选择浏览器，两者不要同时设置。`DESIGN_QA_DIR` 指向仓库外新证据目录，父目录须存在；`DESIGN_PREVIEW_DIR` 仅用于维护时对照同结构资源。
@@ -89,6 +91,8 @@ DESIGN_QA_MODE=inline node tests/regions.cjs
 ```
 
 `style-composition.cjs` 固定使用内存组合样例，从现有页面抽取节点，并对照不同 CSS 顺序及局部主题；它不测试 URL 导航。
+
+`choice-layout.cjs` 同样只使用内存样例，读取真实选择卡节点，检查局部方向、窄容器、数字单位的可见顺序和原生键盘。可选 `DESIGN_BASELINE_DIR` 指向已核对的旧 `assets` 目录，增加同条件 LTR 几何／内容对照；未指定时不报告此项通过。不表示整个应用已经支持 RTL。
 
 内存模式把本地 CSS 嵌入 HTML，使用 `setContent`；不验证 URL 或真实资源加载。默认仍为 `file`。对比度工具只覆盖受控实色与支持的合成；未知背景拒绝判断，不冒充复杂玻璃像素验证。合成 composition 事件、窄视口和模拟系统偏好也不替代真实设备。
 
@@ -120,5 +124,6 @@ node evals/prepare.cjs --out /tmp/edl-run-01 \
 | 11 | 开源实现提炼：行内槽位、组合浮层、分阶段异步 | [第十一轮](evals/validation-2026-10-01-round11.md) |
 | 12 | 异步身份／占位语义与可控竞态探针 | [第十二轮](evals/validation-2026-10-02-round12.md) |
 | 13 | 状态样式所有权、局部主题边界与组合回归 | [第十三轮](evals/validation-2026-10-02-round13.md) |
+| 14 | 选择卡方向边界、技术短语与窄容器回归 | [第十四轮](evals/validation-2026-10-02-round14.md) |
 
 自动断言、截图审阅、真实路径和模型配对是不同证据；测试通过不证明平均生成质量、全站无障碍合规或相对其他工具的优势。
