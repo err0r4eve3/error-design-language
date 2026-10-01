@@ -64,12 +64,23 @@
   border-style: dashed; border-radius: 50%; background: transparent;
 }
 :where([data-design="error"]) .dl-state > span:last-child { min-inline-size: 0; overflow-wrap: anywhere; }
-/* Color is opt-in; strict grayscale does not depend on a filter that alters assets. */
-:where([data-design="error"][data-status-color="semantic"]) .dl-state[data-state="maintenance"] {
-  --state-fg: #805100; --state-bg: #fff2d8;
+/* Resolve the opt-in at each design boundary, not on every matching ancestor.
+   A nested data-design scope defaults to monochrome unless it explicitly opts in. */
+:where([data-design="error"]) {
+  --dl-region-maintenance-fg: var(--dl-text);
+  --dl-region-maintenance-bg: var(--dl-feedback);
 }
-:where([data-design="error"][data-status-color="semantic"][data-theme="dark"]) .dl-state[data-state="maintenance"] {
-  --state-fg: #f4c975; --state-bg: #34280f;
+:where([data-design="error"][data-status-color="semantic"]) {
+  --dl-region-maintenance-fg: #805100;
+  --dl-region-maintenance-bg: #fff2d8;
+}
+:where([data-design="error"][data-status-color="semantic"][data-theme="dark"]) {
+  --dl-region-maintenance-fg: #f4c975;
+  --dl-region-maintenance-bg: #34280f;
+}
+:where([data-design="error"]) .dl-state[data-state="maintenance"] {
+  --state-fg: var(--dl-region-maintenance-fg);
+  --state-bg: var(--dl-region-maintenance-bg);
 }
 :where([data-design="error"]) .dl-request {
   padding: 16px; background: var(--dl-feedback); color: var(--dl-text); border-radius: var(--dl-radius-control);

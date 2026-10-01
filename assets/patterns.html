@@ -52,28 +52,28 @@
               <td><label class="dl-check"><input type="checkbox" aria-label="选择文档预览"></label></td>
               <th scope="row" class="dl-break">文档预览<small class="dl-mono" translate="no">demo-01</small></th>
               <td class="dl-number">2.00</td>
-              <td><span class="dl-state" data-state="running">运行中</span></td>
+              <td><span class="dl-collection-state" data-state="running">运行中</span></td>
               <td class="dl-row-action"><button type="button" data-detail aria-expanded="false" aria-controls="inspector" aria-label="查看文档预览详情">查看详情</button></td>
             </tr>
             <tr data-id="demo-02" data-name="课程资料与协作工作区" data-price="12.5" data-status="stopped">
               <td><label class="dl-check"><input type="checkbox" aria-label="选择课程资料与协作工作区"></label></td>
               <th scope="row" class="dl-break">课程资料与协作工作区<small class="dl-mono" translate="no">demo-02</small></th>
               <td class="dl-number">12.50</td>
-              <td><span class="dl-state" data-state="stopped">已停止</span></td>
+              <td><span class="dl-collection-state" data-state="stopped">已停止</span></td>
               <td class="dl-row-action"><button type="button" data-detail aria-expanded="false" aria-controls="inspector" aria-label="查看课程资料与协作工作区详情">查看详情</button></td>
             </tr>
             <tr data-id="demo-03" data-name="计算任务" data-price="120" data-status="running">
               <td><label class="dl-check"><input type="checkbox" aria-label="选择计算任务"></label></td>
               <th scope="row" class="dl-break">计算任务<small class="dl-mono" translate="no">demo-03</small></th>
               <td class="dl-number">120.00</td>
-              <td><span class="dl-state" data-state="running">运行中</span></td>
+              <td><span class="dl-collection-state" data-state="running">运行中</span></td>
               <td class="dl-row-action"><button type="button" data-detail aria-expanded="false" aria-controls="inspector" aria-label="查看计算任务详情">查看详情</button></td>
             </tr>
             <tr data-id="demo-04" data-name="待核验记录" data-price="" data-status="unknown">
               <td><label class="dl-check"><input type="checkbox" aria-label="选择待核验记录"></label></td>
               <th scope="row" class="dl-break">待核验记录<small class="dl-mono" translate="no">demo-04</small></th>
               <td class="dl-number">未读取</td>
-              <td><span class="dl-state" data-state="unknown">状态待确认</span></td>
+              <td><span class="dl-collection-state" data-state="unknown">状态待确认</span></td>
               <td class="dl-row-action"><button type="button" data-detail aria-expanded="false" aria-controls="inspector" aria-label="查看待核验记录详情">查看详情</button></td>
             </tr>
           </tbody>
@@ -86,7 +86,7 @@
       <header><div class="dl-inspector-header"><p class="dl-inspector-label">服务详情</p><button id="close-detail" class="dl-button quiet" type="button" aria-label="关闭服务详情"><svg class="dl-back-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M19 12H5m6-6-6 6 6 6"/></svg><span id="close-detail-label">关闭</span></button></div><h2 id="record-title" tabindex="-1"></h2><p id="record-id" class="dl-inspector-id dl-mono" translate="no"></p></header>
       <div class="dl-detail-context" id="detail-context" hidden><p id="detail-scope"></p><button id="compare-list" class="dl-button quiet" type="button">同时查看清单</button></div>
       <dl class="dl-keyvalues">
-        <div><dt>服务状态</dt><dd><span id="record-state" class="dl-state"></span></dd></div>
+        <div><dt>服务状态</dt><dd><span id="record-state" class="dl-collection-state"></span></dd></div>
         <div><dt>月费</dt><dd id="record-price" class="dl-mono"></dd></div>
       </dl>
       <p id="record-note" class="dl-inspector-note" hidden></p>

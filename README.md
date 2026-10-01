@@ -57,6 +57,8 @@
 
 [分组与状态样例](assets/regions.html) 另加载可选的 [regions.css](assets/regions.css)：提供静态指标组、原生单选变体，以及独立的服务状态／读取反馈。无新框架或运行依赖；默认灰阶，显式 `data-status-color="semantic"` 才启用局部语义色。它是组件文档，不是产品页面模板；不把其中演示说明复制到业务标题。
 
+清单的紧凑状态样式使用 `dl-collection-state`；带图标的独立状态保留 `dl-state`。从旧清单片段升级需同步 HTML 和 CSS。嵌套 `data-design="error"` 建立新的主题边界：状态色省略或 `mono` 为灰阶，`semantic` 为该边界显式启用语义色，不从外层越界套用。
+
 ## 维护检查
 
 普通使用不需要测试依赖。结构、颜色数学、本地工具和只读列表契约检查使用 Node.js 内置运行器：
@@ -73,6 +75,7 @@ node --test tests/*.test.cjs
 node tests/preview.cjs
 node tests/patterns.cjs
 node tests/regions.cjs
+node tests/style-composition.cjs
 ```
 
 `PLAYWRIGHT_MODULE` 可指定现有包。`CHROME_CHANNEL=chrome` 或 `CHROME_EXECUTABLE_PATH` 选择浏览器，两者不要同时设置。`DESIGN_QA_DIR` 指向仓库外新证据目录，父目录须存在；`DESIGN_PREVIEW_DIR` 仅用于维护时对照同结构资源。
@@ -84,6 +87,8 @@ DESIGN_QA_MODE=inline node tests/preview.cjs
 DESIGN_QA_MODE=inline node tests/patterns.cjs
 DESIGN_QA_MODE=inline node tests/regions.cjs
 ```
+
+`style-composition.cjs` 固定使用内存组合样例，从现有页面抽取节点，并对照不同 CSS 顺序及局部主题；它不测试 URL 导航。
 
 内存模式把本地 CSS 嵌入 HTML，使用 `setContent`；不验证 URL 或真实资源加载。默认仍为 `file`。对比度工具只覆盖受控实色与支持的合成；未知背景拒绝判断，不冒充复杂玻璃像素验证。合成 composition 事件、窄视口和模拟系统偏好也不替代真实设备。
 
@@ -114,5 +119,6 @@ node evals/prepare.cjs --out /tmp/edl-run-01 \
 | 10 | 稳定选择工具区与连续查看焦点 | [第十轮](evals/validation-2026-10-01-round10.md) |
 | 11 | 开源实现提炼：行内槽位、组合浮层、分阶段异步 | [第十一轮](evals/validation-2026-10-01-round11.md) |
 | 12 | 异步身份／占位语义与可控竞态探针 | [第十二轮](evals/validation-2026-10-02-round12.md) |
+| 13 | 状态样式所有权、局部主题边界与组合回归 | [第十三轮](evals/validation-2026-10-02-round13.md) |
 
 自动断言、截图审阅、真实路径和模型配对是不同证据；测试通过不证明平均生成质量、全站无障碍合规或相对其他工具的优势。

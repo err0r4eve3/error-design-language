@@ -65,11 +65,11 @@
 :where([data-design="error"]) .dl-check { display:inline-flex; align-items:center; justify-content:center; min-inline-size:44px; min-block-size:44px; cursor:pointer; }
 :where([data-design="error"]) .dl-check input { inline-size:17px; block-size:17px; margin:0; accent-color:var(--dl-selected-indicator); }
 :where([data-design="error"]) .dl-sort { font:inherit; color:var(--dl-text); background:transparent; border:0; padding:8px 4px; min-block-size:44px; cursor:pointer; }
-:where([data-design="error"]) .dl-state { display:inline-flex; align-items:center; gap:7px; white-space:nowrap; color:var(--dl-text); font-size:12px; }
-:where([data-design="error"]) .dl-state::before { content:""; display:inline-block; box-sizing:border-box; inline-size:9px; block-size:9px; flex-shrink:0; border-radius:50%; border:1.5px solid currentColor; }
-:where([data-design="error"]) .dl-state[data-state="running"]::before { background:currentColor; }
-:where([data-design="error"]) .dl-state[data-state="stopped"]::before { border-radius:1px; }
-:where([data-design="error"]) .dl-state[data-state="unknown"]::before { border-style:dashed; }
+:where([data-design="error"]) .dl-collection-state { display:inline-flex; align-items:center; gap:7px; white-space:nowrap; color:var(--dl-text); font-size:12px; }
+:where([data-design="error"]) .dl-collection-state::before { content:""; display:inline-block; box-sizing:border-box; inline-size:9px; block-size:9px; flex-shrink:0; border-radius:50%; border:1.5px solid currentColor; }
+:where([data-design="error"]) .dl-collection-state[data-state="running"]::before { background:currentColor; }
+:where([data-design="error"]) .dl-collection-state[data-state="stopped"]::before { border-radius:1px; }
+:where([data-design="error"]) .dl-collection-state[data-state="unknown"]::before { border-style:dashed; }
 :where([data-design="error"]) .dl-collection-footer { padding:14px 24px 20px; color:var(--dl-muted); font-size:12px; display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px; }
 :where([data-design="error"]) .dl-empty { margin:12px 24px 24px; padding:32px 20px; background:var(--dl-canvas); border-radius:8px; }
 :where([data-design="error"]) .dl-empty .dl-button { justify-self:start; }
