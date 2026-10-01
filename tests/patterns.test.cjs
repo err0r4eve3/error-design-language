@@ -55,3 +55,18 @@ for (const destination of ['source', 'existing']) test(`QA rejects ${destination
     else assert.deepEqual(fs.readFileSync(report),before);
   } finally {fs.rmSync(temp,{recursive:true,force:true});}
 });
+
+const keyGuardSource=script.match(/function inputOwnsKey\(event\) \{[\s\S]*?\n\}/)[0];
+const keyGuard=vm.runInNewContext('let composing=false, detailComposing=false;('+keyGuardSource+')');
+const keyEvent=overrides=>({defaultPrevented:false,isComposing:false,keyCode:27,ctrlKey:false,metaKey:false,shiftKey:false,target:{closest:()=>null},...overrides});
+test('detail key guard yields to IME, editors, modifiers and consumed events',()=>{
+  for(const override of [{isComposing:true},{keyCode:229},{defaultPrevented:true},{ctrlKey:true},{metaKey:true},{shiftKey:true},{target:{closest:()=>({})}}])
+    assert.equal(keyGuard(keyEvent(override)),true);
+  assert.equal(keyGuard(keyEvent({})),false);
+});
+test('composition lifecycle also blocks navigation when event flag is absent',()=>{
+  for(const state of ['composing','detailComposing']) {
+    const guard=vm.runInNewContext(`let composing=false,detailComposing=false;${state}=true;(${keyGuardSource})`);
+    assert.equal(guard(keyEvent({})),true);
+  }
+});

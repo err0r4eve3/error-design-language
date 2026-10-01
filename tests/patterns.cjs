@@ -22,7 +22,13 @@ function inline() {
   });
 }
 const save = () => { if(out) fs.writeFileSync(path.join(out,'patterns-validation.json'),JSON.stringify(result,null,2)); };
+async function settle(page) {
+  // Viewport changes deliver matchMedia/ResizeObserver callbacks asynchronously.
+  await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  await page.evaluate(() => Promise.all(document.getAnimations().filter(a => a.effect?.getComputedTiming().iterations !== Infinity).map(a => a.finished.catch(() => {}))));
+}
 async function noOverflow(page) {
+  await settle(page);
   const s = await page.evaluate(() => ({width:innerWidth,root:document.documentElement.scrollWidth,body:document.body.scrollWidth}));
   assert.ok(s.root <= s.width && s.body <= s.width,JSON.stringify(s));
 }
@@ -58,8 +64,9 @@ async function peerLayout(page) {
   const s=await page.evaluate(() => {
     const a=document.querySelector('.dl-panel').getBoundingClientRect();
     const b=document.querySelector('#inspector').getBoundingClientRect();
-    return {desktop:innerWidth>=1180,gap:b.left-a.right,dy:b.top-a.top,below:b.top-a.bottom};
+    return {desktop:innerWidth>=1180,compact:innerWidth<720,hidden:document.querySelector('#service-collection').hidden,gap:b.left-a.right,dy:b.top-a.top,below:b.top-a.bottom,detailTop:b.top};
   });
+  if(s.compact && s.hidden) { assert.ok(s.detailTop>=0 && s.detailTop<1000); return; }
   if(s.desktop) { assert.ok(s.gap>=20 && s.gap<=32,JSON.stringify(s));assert.ok(Math.abs(s.dy)<2); }
   else assert.ok(s.below>=20,JSON.stringify(s));
 }
@@ -231,8 +238,9 @@ async function peerLayout(page) {
       await row('demo-02').locator('[data-detail]').click();
       const css=await page.addStyleTag({content:'.dl-pattern-page :is(h1,h2,p,small,label,button,th,td,input,select,dt,dd){line-height:1.5!important;letter-spacing:.12em!important;word-spacing:.16em!important}.dl-pattern-page p{margin-block-end:2em!important}'});
       await noOverflow(page);
-      for(const s of ['#record-title','#record-price','#query','#close-detail']) assert.ok(await page.locator(s).evaluate(el=>el.scrollHeight<=el.clientHeight+1),s);
+      for(const s of ['#record-title','#record-price','#close-detail']) assert.ok(await page.locator(s).evaluate(el=>el.scrollHeight<=el.clientHeight+1),s);
       await css.evaluate(el=>el.remove());
+      await page.locator('#compare-list').click();
       await page.locator('#query').fill('超长搜索条件'.repeat(30));await noOverflow(page);
       await page.locator('#empty-reset').click();
     });
@@ -275,12 +283,122 @@ async function peerLayout(page) {
       await load();await page.locator('#sort-price').click();assert.equal(await page.locator('#price-heading').getAttribute('aria-sort'),'descending');
       await page.locator('#sort-price').click();
     });
+
+    await check('compact-navigation-preserves-query-selection-order-and-scroll',async()=>{
+      await load(); await page.setViewportSize({width:390,height:844});
+      await page.selectOption('#status','running');await page.locator('#query').fill('demo');
+      await row('demo-01').locator('input').check();await page.locator('#sort-price').click();
+      const button=row('demo-03').locator('[data-detail]');
+      await button.focus();
+      const before=await page.evaluate(()=>({y:scrollY,left:document.querySelector('#table-scroll').scrollLeft}));
+      await page.keyboard.press('Enter');
+      assert.ok(await page.locator('#service-collection').isHidden());
+      assert.ok(await page.locator('#detail-scope').innerText().then(t=>t.includes('当前结果 2 项 · 已选择 1 项')));
+      assert.equal(await page.locator('#close-detail-label').textContent(),'返回清单');
+      assert.equal(await page.locator('dialog[open],[aria-modal="true"]').count(),0);
+      for(let i=0;i<9;i++) {
+        await page.keyboard.press('Tab');
+        assert.ok(!(await page.evaluate(()=>document.querySelector('#service-collection').contains(document.activeElement))));
+      }
+      await page.locator('#close-detail').click();
+      assert.ok(await page.locator('#service-collection').isVisible());
+      assert.equal(await page.locator('#query').inputValue(),'demo');
+      assert.equal(await page.locator('#status').inputValue(),'running');
+      assert.equal(await page.locator('#price-heading').getAttribute('aria-sort'),'descending');
+      assert.ok(await row('demo-01').locator('input').isChecked());
+      assert.ok(await button.evaluate(el=>el===document.activeElement));
+      const after=await page.evaluate(()=>({y:scrollY,left:document.querySelector('#table-scroll').scrollLeft}));
+      assert.ok(Math.abs(after.y-before.y)<=2,JSON.stringify({before,after}));
+      assert.ok(Math.abs(after.left-before.left)<=2,JSON.stringify({before,after}));
+      await button.click();await page.locator('#compare-list').click();
+      assert.ok(await page.locator('#service-collection').isVisible());
+      assert.ok(await page.locator('#inspector').isVisible());
+      assert.ok(await row('demo-01').locator('input').isChecked());
+      assert.equal(await page.locator('#record-id').textContent(),'demo-03');
+      await page.locator('#close-detail').click();
+    });
+    await check('escape-and-navigation-respect-ime-editors-and-consumed-keys',async()=>{
+      await load();await page.setViewportSize({width:1440,height:1000});
+      await row('demo-02').locator('[data-detail]').click();
+      await page.locator('#record-title').dispatchEvent('keydown',{key:'Escape',isComposing:true});
+      assert.ok(await page.locator('#inspector').isVisible());
+      await page.locator('#record-title').evaluate(el=>{
+        el.addEventListener('keydown',e=>e.preventDefault(),{once:true});
+        el.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true,cancelable:true}));
+      });
+      assert.ok(await page.locator('#inspector').isVisible());
+      await page.locator('#record-title').dispatchEvent('compositionstart');
+      await page.locator('#record-title').dispatchEvent('keydown',{key:'Escape',isComposing:false});
+      assert.ok(await page.locator('#inspector').isVisible());
+      await page.locator('#record-title').dispatchEvent('compositionend');
+      await page.locator('#inspector').evaluate(el=>{const input=document.createElement('input');input.id='qa-editor';el.append(input);input.focus();});
+      await page.keyboard.press('Escape');assert.ok(await page.locator('#inspector').isVisible());
+      await page.keyboard.press('Alt+ArrowDown');assert.equal(await page.locator('#record-id').textContent(),'demo-02');
+      await page.locator('#qa-editor').evaluate(el=>el.remove());await page.locator('#record-title').focus();
+      await page.keyboard.press('Control+Alt+ArrowDown');assert.equal(await page.locator('#record-id').textContent(),'demo-02');
+      await page.keyboard.press('Alt+ArrowDown');assert.equal(await page.locator('#record-id').textContent(),'demo-03');
+      await page.keyboard.press('Alt+ArrowUp');assert.equal(await page.locator('#record-id').textContent(),'demo-02');
+      await page.keyboard.press('Escape');assert.ok(await page.locator('#inspector').isHidden());
+    });
+    await check('resizing-keeps-object-and-moves-only-hidden-focus',async()=>{
+      await row('demo-01').locator('input').check();await row('demo-02').locator('[data-detail]').click();
+      await page.locator('#query').focus();await page.setViewportSize({width:390,height:844});
+      await page.waitForFunction(()=>document.querySelector('#service-collection').hidden);
+      assert.equal(await page.evaluate(()=>document.activeElement.id),'record-title');
+      assert.equal(await page.locator('#record-id').textContent(),'demo-02');
+      await page.setViewportSize({width:1440,height:1000});
+      await page.waitForFunction(()=>!document.querySelector('#service-collection').hidden);
+      assert.ok(await row('demo-01').locator('input').isChecked());
+      assert.equal(await page.locator('#record-id').textContent(),'demo-02');
+      await page.locator('#theme').focus();await page.setViewportSize({width:390,height:844});
+      await page.waitForFunction(()=>document.querySelector('#service-collection').hidden);
+      assert.equal(await page.evaluate(()=>document.activeElement.id),'theme','Visible global control keeps focus');
+      await page.locator('#close-detail').click();
+    });
+    await check('current-object-marker-and-motion-have-noncolor-fallbacks',async()=>{
+      await page.setViewportSize({width:1440,height:1000});await row('demo-02').locator('[data-detail]').click();
+      const marker=await row('demo-02').locator('th').evaluate(el=>getComputedStyle(el,'::before').width);
+      assert.equal(marker,'3px');
+      assert.ok(await row('demo-01').locator('input').isChecked());
+      assert.ok(!(await row('demo-02').locator('input').isChecked()));
+      await page.emulateMedia({reducedMotion:'reduce'});await page.setViewportSize({width:390,height:844});
+      await page.waitForFunction(()=>document.querySelector('#service-collection').hidden);
+      assert.equal(await page.locator('#inspector').evaluate(el=>getComputedStyle(el).animationName),'none');
+      await page.locator('#compare-list').click();await page.emulateMedia({forcedColors:'active'});
+      assert.equal(await row('demo-02').locator('th').evaluate(el=>getComputedStyle(el,'::before').width),'3px');
+      await page.emulateMedia({forcedColors:'none',reducedMotion:'no-preference'});
+      await page.locator('#close-detail').click();await load();await page.setViewportSize({width:1440,height:1000});
+    });
+
+    await check('long-list-return-restores-scroll-and-offscreen-anchor-remains-reachable',async()=>{
+      const html=inline();
+      const template=html.match(/<tr data-id="demo-03"[\s\S]*?<\/tr>/)[0];
+      const extra=Array.from({length:32},(_,i)=>template.replaceAll('demo-03',`stress-${i}`).replaceAll('计算任务',`测试服务 ${i}`)).join('\n');
+      await page.setContent(html.replace('</tbody>',extra+'</tbody>'));
+      await page.setViewportSize({width:390,height:640});
+      const button=page.locator('[data-id="stress-31"] [data-detail]');
+      await button.focus();
+      const before=await page.evaluate(()=>({y:scrollY,left:document.querySelector('#table-scroll').scrollLeft}));
+      assert.ok(before.y>1000,'Exercise real document scroll, not only a top-of-page fixture');
+      await page.keyboard.press('Enter');await page.locator('#close-detail').click();
+      const after=await page.evaluate(()=>({y:scrollY,left:document.querySelector('#table-scroll').scrollLeft}));
+      assert.ok(Math.abs(before.y-after.y)<=2,JSON.stringify({before,after}));
+      assert.ok(Math.abs(before.left-after.left)<=2,JSON.stringify({before,after}));
+      assert.ok(await button.evaluate(el=>el===document.activeElement));
+      await button.click();
+      await page.locator('[data-id="demo-01"] th').evaluate(el=>el.style.paddingBlock='600px');
+      await page.locator('#close-detail').click();
+      assert.ok(await button.evaluate(el=>{const r=el.getBoundingClientRect();return el===document.activeElement&&r.top>=0&&r.bottom<=innerHeight;}));
+      await load();await page.setViewportSize({width:1440,height:1000});
+    });
     if(out) for(const theme of ['neutral','dark']) {
+      await page.setViewportSize({width:1440,height:1000});
       await page.selectOption('#theme',theme);
       await row('demo-02').locator('[data-detail]').click();
       for(const [name,width,height] of [['desktop',1440,1000],['mobile',390,844]]) {
         await page.setViewportSize({width,height});
         await page.evaluate(()=>{document.querySelector('#table-scroll').scrollLeft=0;document.activeElement.blur();scrollTo(0,0);});
+        await settle(page);
         await page.screenshot({path:path.join(out,`patterns-${theme}-${name}.png`),fullPage:true});
       }
     }
@@ -288,6 +406,7 @@ async function peerLayout(page) {
       await page.selectOption('#theme','neutral');await page.setViewportSize({width:1440,height:1000});
       await row('demo-01').locator('input').check();await row('demo-04').locator('input').check();await row('demo-04').locator('[data-detail]').click();
       await page.evaluate(()=>{document.activeElement.blur();scrollTo(0,0);});
+      await settle(page);
       await page.screenshot({path:path.join(out,'patterns-selection-unknown.png'),fullPage:true});
     }
     assert.deepEqual(errors,[]);assert.deepEqual(external,[]);

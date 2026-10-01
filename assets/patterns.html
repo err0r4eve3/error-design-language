@@ -16,7 +16,7 @@
     <div class="dl-cluster"><span class="dl-environment">演示数据 · 不连接真实服务</span><div class="dl-field"><label for="theme">主题</label><select id="theme" class="dl-select"><option value="neutral">浅色</option><option value="dark">深色</option></select></div></div>
   </header>
   <div class="dl-pattern-layout" id="collection-layout" data-inspecting="false">
-    <section class="dl-panel" aria-labelledby="services-title">
+    <section class="dl-panel" id="service-collection" aria-labelledby="services-title">
       <header class="dl-collection-heading"><h2 id="services-title">全部服务</h2><span class="dl-collection-meta">月费单位 USD</span></header>
       <div class="dl-filterbar" role="search" aria-label="筛选服务">
         <div class="dl-field dl-search-field"><label for="query">服务名称或编号</label><input id="query" class="dl-input" type="search" autocomplete="off" placeholder="搜索服务…"></div>
@@ -77,13 +77,14 @@
       <footer class="dl-collection-footer"><span>修改筛选将清除当前选择</span><span id="scroll-help">可横向滚动比较各列</span></footer>
     </section>
     <aside class="dl-inspector" id="inspector" aria-labelledby="record-title" hidden>
-      <header><div class="dl-inspector-header"><p class="dl-inspector-label">服务详情</p><button id="close-detail" class="dl-button quiet" type="button" aria-label="关闭服务详情">×</button></div><h2 id="record-title" tabindex="-1"></h2><p id="record-id" class="dl-inspector-id dl-mono" translate="no"></p></header>
+      <header><div class="dl-inspector-header"><p class="dl-inspector-label">服务详情</p><button id="close-detail" class="dl-button quiet" type="button" aria-label="关闭服务详情"><svg class="dl-back-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M19 12H5m6-6-6 6 6 6"/></svg><span id="close-detail-label">关闭</span></button></div><h2 id="record-title" tabindex="-1"></h2><p id="record-id" class="dl-inspector-id dl-mono" translate="no"></p></header>
+      <div class="dl-detail-context" id="detail-context" hidden><p id="detail-scope"></p><button id="compare-list" class="dl-button quiet" type="button">同时查看清单</button></div>
       <dl class="dl-keyvalues">
         <div><dt>服务状态</dt><dd><span id="record-state" class="dl-state"></span></dd></div>
         <div><dt>月费</dt><dd id="record-price" class="dl-mono"></dd></div>
       </dl>
       <p id="record-note" class="dl-inspector-note" hidden></p>
-      <div class="dl-stack"><p id="record-position"></p><div class="dl-inspector-nav"><button id="previous-record" class="dl-button" type="button">上一项</button><button id="next-record" class="dl-button" type="button">下一项</button></div></div>
+      <div class="dl-stack"><p id="record-position"></p><div class="dl-inspector-nav"><button id="previous-record" class="dl-button" type="button" aria-keyshortcuts="Alt+ArrowUp" title="上一项（Alt+↑）">上一项</button><button id="next-record" class="dl-button" type="button" aria-keyshortcuts="Alt+ArrowDown" title="下一项（Alt+↓）">下一项</button></div></div>
     </aside>
   </div>
   <p id="action-feedback" class="dl-action-feedback" role="status" aria-atomic="true"></p>
@@ -92,6 +93,8 @@
 <script>
 (() => {
 'use strict';
+const cleanupKey = Symbol.for('error-design-language.collection-demo.cleanup');
+window[cleanupKey]?.();
 const find = selector => document.querySelector(selector);
 const rows = [...document.querySelectorAll('#records tr')];
 const labels = {running:'运行中', stopped:'已停止', unknown:'状态待确认'};
@@ -100,6 +103,43 @@ let committedQuery = '';
 let lastFilter = null;
 let direction = 'ascending';
 let inspectedRow = null;
+const compactViewport = matchMedia('(max-width: 719px)');
+let keepCollectionVisible = false;
+let returnContext = null;
+let detailComposing = false;
+// Only navigation state is retained in memory. No query or selection is persisted.
+function syncPane() {
+  const collection = find('#service-collection');
+  const focusDetail = Boolean(compactViewport.matches && inspectedRow && !keepCollectionVisible);
+  if (focusDetail && !collection.hidden) {
+    returnContext = {x:scrollX, y:scrollY, tableLeft:find('#table-scroll').scrollLeft};
+  }
+  collection.hidden = focusDetail;
+  find('#collection-layout').dataset.pane = focusDetail ? 'detail' : 'collection';
+  find('#detail-context').hidden = !focusDetail;
+  find('#detail-scope').textContent = `当前结果 ${visibleRows().length} 项 · 已选择 ${selectedRows().length} 项`;
+  find('#close-detail-label').textContent = focusDetail ? '返回清单' : '关闭';
+  find('#close-detail').setAttribute('aria-label', focusDetail ? '返回服务清单' : '关闭服务详情');
+}
+function restoreContext(target) {
+  if (returnContext) {
+    const position = returnContext;
+    returnContext = null;
+    find('#table-scroll').scrollLeft = position.tableLeft;
+    window.scrollTo({left:position.x, top:position.y, behavior:'instant'});
+  }
+  if (!target) return;
+  target.focus({preventScroll:true});
+  // Preserve the old viewport when possible; never leave the returned focus off-screen.
+  const rect = target.getBoundingClientRect();
+  if (rect.top < 0 || rect.bottom > innerHeight || rect.left < 0 || rect.right > innerWidth)
+    target.scrollIntoView({block:'nearest', inline:'nearest', behavior:'instant'});
+}
+function inputOwnsKey(event) {
+  return event.defaultPrevented || event.isComposing || composing || detailComposing || event.keyCode === 229
+    || event.ctrlKey || event.metaKey || event.shiftKey
+    || Boolean(event.target.closest?.('input,textarea,select,[contenteditable]:not([contenteditable="false"]),[role="combobox"],[role="menu"],[role="listbox"],dialog'));
+}
 const visibleRows = () => [...find('#records').children].filter(row => !row.hidden);
 const selectedRows = () => visibleRows().filter(row => row.querySelector('input').checked);
 const note = text => { find('#action-feedback').textContent = text; };
@@ -119,10 +159,14 @@ function syncSelection() {
   find('#selection-total').textContent = priced.length
     ? `已知月费合计 ${(cents / 100).toFixed(2)} USD · ${priced.length}/${selected.length} 项有价格`
     : '月费尚未读取';
+  if (inspectedRow) syncPane();
 }
 function closeInspector(returnFocus = false) {
   const previous = inspectedRow;
   inspectedRow = null;
+  keepCollectionVisible = false;
+  detailComposing = false;
+  syncPane();
   find('#inspector').hidden = true;
   find('#collection-layout').dataset.inspecting = 'false';
   for (const row of rows) {
@@ -131,7 +175,7 @@ function closeInspector(returnFocus = false) {
     row.querySelector('[data-detail]').textContent = '查看详情';
   }
   for (const id of ['record-title','record-id','record-price','record-state','record-note','record-position']) find('#'+id).textContent = '';
-  if (returnFocus) (previous && !previous.hidden ? previous.querySelector('[data-detail]') : find('#query')).focus();
+  restoreContext(returnFocus ? (previous && !previous.hidden ? previous.querySelector('[data-detail]') : find('#query')) : null);
 }
 function inspect(row, focus = true) {
   if (!row || row.hidden) return;
@@ -157,6 +201,7 @@ function inspect(row, focus = true) {
   find('#next-record').disabled = index === visible.length - 1;
   find('#inspector').hidden = false;
   find('#collection-layout').dataset.inspecting = 'true';
+  syncPane();
   if (focus) find('#record-title').focus();
 }
 function filterRows() {
@@ -233,7 +278,33 @@ find('#sort-price').addEventListener('click', () => {
 });
 for (const row of rows) row.querySelector('[data-detail]').addEventListener('click', () => inspect(row));
 find('#close-detail').addEventListener('click', () => closeInspector(true));
-find('#inspector').addEventListener('keydown', event => { if (event.key === 'Escape') { event.preventDefault(); closeInspector(true); } });
+find('#inspector').addEventListener('compositionstart', () => { detailComposing = true; });
+find('#inspector').addEventListener('compositionend', () => { detailComposing = false; });
+find('#inspector').addEventListener('keydown', event => {
+  if (inputOwnsKey(event) || event.repeat) return;
+  if (event.key === 'Escape' && !event.altKey) {
+    event.preventDefault(); event.stopPropagation(); closeInspector(true);
+  } else if (event.altKey && ['ArrowUp','ArrowDown'].includes(event.key)) {
+    const button = find(event.key === 'ArrowUp' ? '#previous-record' : '#next-record');
+    if (!button.disabled) { event.preventDefault(); event.stopPropagation(); button.click(); }
+  }
+});
+find('#compare-list').addEventListener('click', () => {
+  keepCollectionVisible = true; syncPane();
+  restoreContext(inspectedRow?.querySelector('[data-detail]'));
+});
+function onCompactChange() {
+  const hadHiddenFocus = find('#service-collection').contains(document.activeElement);
+  const wasHidden = find('#service-collection').hidden;
+  syncPane();
+  if (wasHidden && !find('#service-collection').hidden) {
+    // A different width has different geometry; do not replay old document coordinates.
+    if (returnContext) find('#table-scroll').scrollLeft = returnContext.tableLeft;
+    returnContext = null;
+  }
+  if (hadHiddenFocus && find('#service-collection').hidden) find('#record-title').focus();
+}
+compactViewport.addEventListener('change', onCompactChange);
 for (const [selector, step] of [['#previous-record',-1],['#next-record',1]]) find(selector).addEventListener('click', () => {
   const visible = visibleRows(); inspect(visible[visible.indexOf(inspectedRow) + step]);
 });
@@ -258,7 +329,12 @@ function syncScrollHint() {
   find('#scroll-help').hidden = !overflow;
   table.tabIndex = overflow ? 0 : -1;
 }
-if (typeof ResizeObserver !== 'undefined') new ResizeObserver(syncScrollHint).observe(find('#table-scroll'));
+const scrollObserver = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(syncScrollHint) : null;
+scrollObserver?.observe(find('#table-scroll'));
+window[cleanupKey] = () => {
+  compactViewport.removeEventListener('change', onCompactChange);
+  scrollObserver?.disconnect();
+};
 syncScrollHint();
 })();
 </script>

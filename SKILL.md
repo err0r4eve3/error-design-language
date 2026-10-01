@@ -35,7 +35,7 @@ description: "设计、实现、修复或只读评审产品前端 UI/UX；适用
 
 “太平／太乱／没有区分”先按 [视觉校准](references/visual-calibration.md) 判断是主次、同级边界、状态含义还是操作线索，再选增强或降噪。新建／整页打磨按 [页面综合](references/design-synthesis.md) 组织内容；反模板不是禁用某种字体、颜色或已确认布局。
 
-先修主任务阻塞，再调层级与排版，最后才考虑材质和动效。复用现有框架、字体、组件与语义 token，不并建第二套主题。局部问题修局部，共享变体或 token 失配检查受影响使用处；不以打磨扩大迁移。抽取组件先核对同义角色、操作范围与状态维度，见 [组件契约](references/component-contracts.md)。集合页区分筛选结果、批量选择与当前查看对象，并保留返回位置。
+先修主任务阻塞，再调层级与排版，最后才考虑材质和动效。复用现有框架、字体、组件与语义 token，不并建第二套主题。局部问题修局部，共享变体或 token 失配检查受影响使用处；不以打磨扩大迁移。抽取组件先核对同义角色、操作范围与状态维度，见 [组件契约](references/component-contracts.md)。集合页区分筛选结果、批量选择与当前查看对象；分栏切换不重置业务状态，返回须恢复可见焦点和阅读位置，键盘先让输入法与当前控件处理。
 
 按改动选择 [验收与证据](references/verification.md)：同数据、尺寸与状态记录改前 → 实现 → 查看实际渲染 → 走主路径及相关恢复 → 修复。整页检查包括下半页、同级对象和文案，不只看标题比例。必要时去色或隐藏装饰线观察分组，但保留焦点、输入边界、必要对象轮廓及数据线。确认稿按结构、文字、字体、颜色和行为对照，偏离需说明。
 
@@ -60,7 +60,8 @@ description: "设计、实现、修复或只读评审产品前端 UI/UX；适用
 | 表单、异步、键盘及焦点 | [交互契约](references/interaction-contracts.md) |
 | 搜索、表格、选择、URL、反馈 | [界面模式](references/interface-patterns.md) |
 | 集合工具栏、非模态详情与连续查看 | [集合工作流](references/collection-workflows.md) |
+| 分栏返回、滚动上下文与键盘层级 | [连续导航](references/continuous-navigation.md) |
 | 验证与完成标准 | [验收与证据](references/verification.md) |
 | 历史项目背景 | [项目适配](references/product-profiles.md)，仅相关行，不是当前授权 |
 | 可选 CSS／样张 | [tokens](assets/tokens.css)、[控件](assets/components.css)、[样张](assets/preview.html) |
-| 维护本 Skill | [本轮调研](references/research-2026-10-01-round8.md)、[行为评测](evals/README.md)；追溯才读 [历史依据](references/evidence.md) |
+| 维护本 Skill | [本轮调研](references/research-2026-10-01-round9.md)、[行为评测](evals/README.md)；追溯才读 [历史依据](references/evidence.md) |

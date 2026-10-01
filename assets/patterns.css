@@ -48,7 +48,7 @@
 :where([data-design="error"]) .dl-table tbody tr[data-selected="true"] { background:var(--dl-selected); }
 :where([data-design="error"]) .dl-table .dl-number { font-variant-numeric:tabular-nums; text-align:end; white-space:nowrap; }
 :where([data-design="error"]) .dl-table .dl-row-action { text-align:end; }
-:where([data-design="error"]) .dl-table [data-detail] { min-block-size:44px; padding:8px 10px; border:1px solid transparent; border-radius:6px; background:transparent; color:var(--dl-strong); font:500 12px/1.5 var(--dl-font); cursor:pointer; }
+:where([data-design="error"]) .dl-table [data-detail] { scroll-margin:8px; min-block-size:44px; padding:8px 10px; border:1px solid transparent; border-radius:6px; background:transparent; color:var(--dl-strong); font:500 12px/1.5 var(--dl-font); cursor:pointer; }
 :where([data-design="error"]) .dl-table [data-detail][aria-expanded="true"] { background:var(--dl-primary); color:var(--dl-on-primary); }
 :where([data-design="error"]) .dl-check { display:inline-flex; align-items:center; justify-content:center; min-inline-size:44px; min-block-size:44px; cursor:pointer; }
 :where([data-design="error"]) .dl-check input { inline-size:17px; block-size:17px; margin:0; accent-color:var(--dl-selected-indicator); }
@@ -104,3 +104,29 @@
   :where([data-design="error"]) .dl-table [data-detail][aria-expanded="true"] { border-color:Highlight; text-decoration:underline; }
   :where([data-design="error"]) .dl-pattern-page :is(button,input,select,[tabindex]):focus-visible { outline-color:Highlight; }
 }
+
+/* Compact drill-down is a navigation state, not a modal or a second data copy. */
+:where([data-design="error"]) .dl-detail-context { display:grid; gap:8px; padding:12px; background:var(--dl-canvas); border-radius:8px; }
+:where([data-design="error"]) #detail-scope { font-size:12px; color:var(--dl-muted); }
+:where([data-design="error"]) #compare-list { justify-self:start; padding-inline:0; font-size:12px; }
+:where([data-design="error"]) .dl-table tbody th[scope="row"] { position:relative; padding-inline-start:16px; }
+:where([data-design="error"]) .dl-table tr[data-inspected="true"] th[scope="row"]::before { content:""; position:absolute; inset-inline-start:3px; inset-block:16px; inline-size:3px; border-radius:2px; background:var(--dl-selected-indicator); }
+:where([data-design="error"]) .dl-pattern-layout[data-pane="detail"] .dl-inspector { animation:dl-detail-enter var(--dl-fast) var(--dl-ease); }
+@keyframes dl-detail-enter { from { transform:translateX(10px); opacity:.7; } to { transform:none; opacity:1; } }
+@media (min-width:1180px) {
+  :where([data-design="error"]) .dl-inspector { position:sticky; inset-block-start:24px; max-block-size:calc(100dvh - 48px); overflow:auto; overscroll-behavior:contain; scrollbar-gutter:stable; }
+}
+@media (max-width:719px) {
+  :where([data-design="error"]) .dl-pattern-layout[data-pane="detail"] .dl-inspector { min-block-size:0; }
+  :where([data-design="error"]) .dl-pattern-layout[data-pane="detail"] .dl-inspector-header { flex-direction:row-reverse; margin-inline-start:-8px; }
+  :where([data-design="error"]) .dl-pattern-layout[data-pane="detail"] #close-detail { padding-inline:10px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  :where([data-design="error"]) .dl-pattern-layout[data-pane="detail"] .dl-inspector { animation:none; }
+}
+@media (forced-colors:active) {
+  :where([data-design="error"]) .dl-table tr[data-inspected="true"] th[scope="row"]::before { background:CanvasText; forced-color-adjust:none; }
+}
+
+:where([data-design="error"]) .dl-back-icon { display:none; inline-size:18px; block-size:18px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+:where([data-design="error"]) [data-pane="detail"] .dl-back-icon { display:block; }
