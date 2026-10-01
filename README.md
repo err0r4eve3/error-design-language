@@ -39,6 +39,7 @@
 | [项目适配](references/product-profiles.md) | 历史任务组织；不是当前实现证据或写入授权 |
 | [验收与证据](references/verification.md) | 按风险选检查，区分页面、工具与模型证据 |
 | [行为评测](evals/README.md) | 46 个待执行场景、配对方法和离线准备器 |
+| [第十二轮调研](references/research-2026-10-02-round12.md) | TanStack Query、React Router 与确定性竞态探针 |
 | [第十一轮调研](references/research-2026-10-01-round11.md) | Primer、Radix 与 React Spectrum 的源码规则与检验场景 |
 | [第八轮调研](references/research-2026-10-01-round8.md) | Cloudflare、Supabase、Vercel 与 Cloudscape 的对照 |
 | [第七轮调研](references/research-2026-10-01-round7.md) | Impeccable Extract、Carbon、W3C 与采用边界 |
@@ -58,11 +59,13 @@
 
 ## 维护检查
 
-普通使用不需要测试依赖。结构、颜色数学及本地工具检查使用 Node.js 内置运行器：
+普通使用不需要测试依赖。结构、颜色数学、本地工具和只读列表契约检查使用 Node.js 内置运行器：
 
 ```sh
 node --test tests/*.test.cjs
 ```
+
+只读列表契约可单独运行 `node --test tests/async-contract.test.cjs`。它使用受控 Promise 和测试参考模型，不联网、不调用模型，也不是数据层运行依赖。接入真实应用前须实现适配并核对策略，见 [契约范围](evals/README.md)。
 
 可选浏览器检查复用已有 Playwright 与 Chromium：
 
@@ -110,5 +113,6 @@ node evals/prepare.cjs --out /tmp/edl-run-01 \
 | 9 | Telegram 分栏返回与键盘归属 | [第九轮](evals/validation-2026-10-01-round9.md) |
 | 10 | 稳定选择工具区与连续查看焦点 | [第十轮](evals/validation-2026-10-01-round10.md) |
 | 11 | 开源实现提炼：行内槽位、组合浮层、分阶段异步 | [第十一轮](evals/validation-2026-10-01-round11.md) |
+| 12 | 异步身份／占位语义与可控竞态探针 | [第十二轮](evals/validation-2026-10-02-round12.md) |
 
 自动断言、截图审阅、真实路径和模型配对是不同证据；测试通过不证明平均生成质量、全站无障碍合规或相对其他工具的优势。
