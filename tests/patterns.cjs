@@ -44,6 +44,7 @@ async function reach(page, selector) {
   throw Error('Not keyboard reachable: '+selector);
 }
 async function sampleContrast(page, selector, theme) {
+  assert.ok(await page.locator(selector).first().isVisible(), `Contrast target is hidden: ${selector}`);
   const sample = await page.locator(selector).first().evaluate(el => {
     const colors=[];
     for(let p=el;p;p=p.parentElement) {
@@ -249,7 +250,10 @@ async function peerLayout(page) {
       await row('demo-01').locator('input').check();await row('demo-04').locator('[data-detail]').click();
       for(const theme of ['neutral','dark']) {
         await page.selectOption('#theme',theme);
-        for(const s of ['h1','#services-title','.dl-page-context','.dl-environment','#query','#status','.dl-collection-meta','#result-count','#selection-count','#selection-total','#export-selected','#sort-price','[data-id="demo-01"] th','[data-id="demo-02"] th','[data-id="demo-02"] small','[data-id="demo-04"] [data-detail]','#record-title','#record-state','#record-price','#record-note','#record-position']) await sampleContrast(page,s,theme);
+        await page.locator('#clear-selection').click();
+        for(const s of ['#result-count','#result-total']) await sampleContrast(page,s,theme);
+        await row('demo-01').locator('input').check();
+        for(const s of ['h1','#services-title','.dl-page-context','.dl-environment','#query','#status','.dl-collection-meta','#selection-count','#selection-scope','#selection-total','#export-selected','#sort-price','[data-id="demo-01"] th','[data-id="demo-02"] th','[data-id="demo-02"] small','[data-id="demo-04"] [data-detail]','#record-title','#record-state','#record-price','#record-note','#record-position']) await sampleContrast(page,s,theme);
       }
     });
     await check('inspected-row-hover-keeps-its-own-color-pair',async()=>{
@@ -389,6 +393,60 @@ async function peerLayout(page) {
       await page.locator('[data-id="demo-01"] th').evaluate(el=>el.style.paddingBlock='600px');
       await page.locator('#close-detail').click();
       assert.ok(await button.evaluate(el=>{const r=el.getBoundingClientRect();return el===document.activeElement&&r.top>=0&&r.bottom<=innerHeight;}));
+      await load();await page.setViewportSize({width:1440,height:1000});
+    });
+    await check('stable-context-toolbar-and-inactive-controls',async()=>{
+      for(const theme of ['neutral','dark']) for(const width of [320,390,768,1440]) {
+        await load();await page.setViewportSize({width,height:1200});await page.selectOption('#theme',theme);await settle(page);
+        const first=row('demo-01').locator('input');
+        const top=(await first.boundingBox()).y;
+        assert.equal(await page.getByRole('button',{name:'导出已选 CSV',exact:true}).count(),0);
+        assert.ok(await page.locator('#selection-bar').evaluate(el=>el.inert));
+        await page.locator('#export-selected').evaluate(el=>el.focus());
+        assert.notEqual(await page.evaluate(()=>document.activeElement.id),'export-selected');
+        for(const action of [()=>first.check(),()=>row('demo-04').locator('input').check(),()=>page.locator('#select-visible').check(),()=>page.locator('#clear-selection').click()]) {
+          await action();await settle(page);await noOverflow(page);
+          assert.ok(Math.abs((await first.boundingBox()).y-top)<=1, `${theme}/${width}: selection moved the first target`);
+        }
+        assert.equal(await page.locator('#result-total').textContent(),'已知月费合计 134.50 USD · 3/4 项有价格');
+        await first.check();
+        assert.ok(await page.locator('#result-summary').evaluate(el=>el.inert && el.getAttribute('aria-hidden')==='true'));
+        assert.ok(await page.locator('#result-summary').isHidden());
+        assert.ok(await page.locator('#selection-summary').isVisible());
+        assert.ok((await page.locator('#selection-announcement').textContent()).includes('1 项服务'));
+        assert.equal(await page.locator('#selection-scope').textContent(),' · 当前结果 4 项');
+        assert.ok(await first.evaluate(el=>el===document.activeElement),'Selection must not move focus into its toolbar');
+      }
+      await load();await page.setViewportSize({width:390,height:1200});await settle(page);
+      const first=row('demo-01').locator('input');
+      const broken=await page.addStyleTag({content:'.dl-context-toolbar [aria-hidden="true"]{display:none!important}'});
+      await settle(page);const brokenTop=(await first.boundingBox()).y;await first.check();await settle(page);
+      assert.ok(Math.abs((await first.boundingBox()).y-brokenTop)>20,'Negative probe must detect removal of reserved inactive layout');
+      await broken.evaluate(el=>el.remove());await load();
+    });
+    await check('continuous-keyboard-navigation-retains-trigger-without-reversing-at-boundaries',async()=>{
+      for(const width of [390,1440]) {
+        await load();await page.setViewportSize({width,height:1000});
+        await row('demo-01').locator('[data-detail]').click();await page.locator('#next-record').focus();
+        for(const id of ['demo-02','demo-03']) {
+          await page.keyboard.press('Enter');
+          assert.equal(await page.locator('#record-id').textContent(),id);
+          assert.equal(await page.evaluate(()=>document.activeElement.id),'next-record');
+          assert.ok((await page.locator('#record-announcement').textContent()).includes(await row(id).getAttribute('data-name')));
+        }
+        await page.keyboard.press('Enter');assert.equal(await page.locator('#record-id').textContent(),'demo-04');
+        assert.equal(await page.evaluate(()=>document.activeElement.id),'record-title');
+        await page.keyboard.press('Enter');assert.equal(await page.locator('#record-id').textContent(),'demo-04','Repeated activation at the last item must not reverse direction');
+        await page.locator('#previous-record').focus();
+        for(const id of ['demo-03','demo-02']) {await page.keyboard.press('Space');assert.equal(await page.locator('#record-id').textContent(),id);assert.equal(await page.evaluate(()=>document.activeElement.id),'previous-record');}
+        await page.keyboard.press('Space');assert.equal(await page.locator('#record-id').textContent(),'demo-01');
+        assert.equal(await page.evaluate(()=>document.activeElement.id),'record-title');
+      }
+      const original=inline();assert.ok(original.includes('inspect(next, false);'));
+      await page.setContent(original.replace('inspect(next, false);','inspect(next, true);'));
+      await page.setViewportSize({width:1440,height:1000});await row('demo-01').locator('[data-detail]').click();
+      await page.locator('#next-record').focus();await page.keyboard.press('Enter');
+      assert.notEqual(await page.evaluate(()=>document.activeElement.id),'next-record','Negative focus-stealing probe should be detected');
       await load();await page.setViewportSize({width:1440,height:1000});
     });
     if(out) for(const theme of ['neutral','dark']) {

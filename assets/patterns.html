@@ -26,11 +26,17 @@
         <button class="dl-filter-chip" id="clear-query" type="button" hidden><span id="query-chip"></span><span aria-hidden="true">×</span></button>
         <button class="dl-filter-chip" id="clear-status" type="button" hidden><span id="status-chip"></span><span aria-hidden="true">×</span></button>
       </div>
-      <div class="dl-toolbar"><p id="result-count" role="status">显示 4 / 4 项服务</p><button id="reset" type="button" class="dl-button quiet" hidden>清除全部筛选</button></div>
-      <div id="selection-bar" class="dl-selection-bar" hidden>
-        <div class="dl-selection-copy"><strong id="selection-count">已选择 0 项</strong><p id="selection-total"></p></div>
-        <div class="dl-cluster"><button id="clear-selection" class="dl-button quiet" type="button">取消选择</button><button id="export-selected" class="dl-button primary" type="button">导出已选 CSV</button></div>
+      <div class="dl-context-toolbar" id="context-toolbar" data-selection-active="false">
+        <div class="dl-context-copy">
+          <div id="result-summary"><p id="result-count" role="status">显示 4 / 4 项服务</p><p id="result-total"></p></div>
+          <div id="selection-summary" aria-hidden="true" inert><strong id="selection-count">已选择 0 项</strong><span id="selection-scope"></span><p id="selection-total"></p></div>
+        </div>
+        <div class="dl-context-actions">
+          <div id="result-actions"><button id="reset" type="button" class="dl-button quiet" hidden>清除全部筛选</button></div>
+          <div id="selection-bar" class="dl-cluster" role="group" aria-label="已选服务操作" aria-hidden="true" inert><button id="clear-selection" class="dl-button quiet" type="button">取消选择</button><button id="export-selected" class="dl-button primary" type="button">导出已选 CSV</button></div>
+        </div>
       </div>
+      <p id="selection-announcement" class="dl-visually-hidden" role="status" aria-atomic="true"></p>
       <div class="dl-scroll" id="table-scroll" role="region" tabindex="0" aria-label="服务清单" aria-describedby="scroll-help">
         <table class="dl-table">
           <colgroup><col class="dl-col-check"><col><col class="dl-col-price"><col class="dl-col-state"><col class="dl-col-action"></colgroup>
@@ -87,6 +93,7 @@
       <div class="dl-stack"><p id="record-position"></p><div class="dl-inspector-nav"><button id="previous-record" class="dl-button" type="button" aria-keyshortcuts="Alt+ArrowUp" title="上一项（Alt+↑）">上一项</button><button id="next-record" class="dl-button" type="button" aria-keyshortcuts="Alt+ArrowDown" title="下一项（Alt+↓）">下一项</button></div></div>
     </aside>
   </div>
+  <p id="record-announcement" class="dl-visually-hidden" role="status" aria-atomic="true"></p>
   <p id="action-feedback" class="dl-action-feedback" role="status" aria-atomic="true"></p>
 </main>
 <noscript>交互需要 JavaScript；静态清单仍可阅读。</noscript>
@@ -143,7 +150,20 @@ function inputOwnsKey(event) {
 const visibleRows = () => [...find('#records').children].filter(row => !row.hidden);
 const selectedRows = () => visibleRows().filter(row => row.querySelector('input').checked);
 const note = text => { find('#action-feedback').textContent = text; };
-function syncSelection() {
+function knownTotal(items) {
+  const priced = items.filter(row => row.dataset.price !== '');
+  // Fixture prices have at most two decimal places; unknown amounts are excluded explicitly.
+  const cents = priced.reduce((sum, row) => sum + Math.round(Number(row.dataset.price) * 100), 0);
+  return !items.length ? '当前结果没有服务' : priced.length
+    ? `已知月费合计 ${(cents / 100).toFixed(2)} USD · ${priced.length}/${items.length} 项有价格`
+    : '月费尚未读取';
+}
+function showContextGroup(id, active) {
+  const group = find('#' + id);
+  group.setAttribute('aria-hidden', String(!active));
+  group.inert = !active;
+}
+function syncSelection(announce = false) {
   const visible = visibleRows();
   const selected = selectedRows();
   const all = find('#select-visible');
@@ -151,14 +171,19 @@ function syncSelection() {
   all.indeterminate = selected.length > 0 && selected.length < visible.length;
   all.disabled = visible.length === 0;
   for (const row of rows) row.dataset.selected = String(row.querySelector('input').checked);
-  find('#selection-bar').hidden = selected.length === 0;
+  const active = selected.length > 0;
+  find('#context-toolbar').dataset.selectionActive = String(active);
+  showContextGroup('result-summary', !active);
+  showContextGroup('result-actions', !active);
+  showContextGroup('selection-summary', active);
+  showContextGroup('selection-bar', active);
+  find('#result-total').textContent = knownTotal(visible);
   find('#selection-count').textContent = `已选择 ${selected.length} 项`;
-  const priced = selected.filter(row => row.dataset.price !== '');
-  // Sum in cents for this fixture, whose amounts have at most two decimal places.
-  const cents = priced.reduce((sum,row) => sum + Math.round(Number(row.dataset.price) * 100), 0);
-  find('#selection-total').textContent = priced.length
-    ? `已知月费合计 ${(cents / 100).toFixed(2)} USD · ${priced.length}/${selected.length} 项有价格`
-    : '月费尚未读取';
+  find('#selection-scope').textContent = ` · 当前结果 ${visible.length} 项`;
+  find('#selection-total').textContent = selected.length ? knownTotal(selected) : '月费尚未读取';
+  if (announce) find('#selection-announcement').textContent = selected.length
+    ? `已选择 ${selected.length} 项服务。${knownTotal(selected)}` : '已取消选择。';
+  else if (!active) find('#selection-announcement').textContent = '';
   if (inspectedRow) syncPane();
 }
 function closeInspector(returnFocus = false) {
@@ -166,6 +191,7 @@ function closeInspector(returnFocus = false) {
   inspectedRow = null;
   keepCollectionVisible = false;
   detailComposing = false;
+  find('#record-announcement').textContent = '';
   syncPane();
   find('#inspector').hidden = true;
   find('#collection-layout').dataset.inspecting = 'false';
@@ -256,9 +282,9 @@ find('#clear-query').addEventListener('click', () => { composing = false; commit
 find('#clear-status').addEventListener('click', () => { find('#status').value = 'all'; filterRows(); find('#status').focus(); });
 find('#select-visible').addEventListener('change', event => {
   for (const row of visibleRows()) row.querySelector('input').checked = event.target.checked;
-  syncSelection(); note('');
+  syncSelection(true); note('');
 });
-for (const row of rows) row.querySelector('input').addEventListener('change', () => { syncSelection(); note(''); });
+for (const row of rows) row.querySelector('input').addEventListener('change', () => { syncSelection(true); note(''); });
 find('#clear-selection').addEventListener('click', () => {
   for (const row of rows) row.querySelector('input').checked = false;
   syncSelection(); find('#select-visible').focus(); note('已取消选择。');
@@ -306,7 +332,19 @@ function onCompactChange() {
 }
 compactViewport.addEventListener('change', onCompactChange);
 for (const [selector, step] of [['#previous-record',-1],['#next-record',1]]) find(selector).addEventListener('click', () => {
-  const visible = visibleRows(); inspect(visible[visible.indexOf(inspectedRow) + step]);
+  const visible = visibleRows();
+  const next = visible[visible.indexOf(inspectedRow) + step];
+  if (!inspectedRow || !next) return;
+  const origin = document.activeElement;
+  inspect(next, false);
+  // Keep a still-usable navigation trigger focused. At an endpoint, do not jump to
+  // the opposite action: repeated Enter must not silently reverse direction.
+  if (origin?.disabled || !find('#inspector').contains(origin)) {
+    find('#record-title').focus();
+    find('#record-announcement').textContent = '';
+  } else {
+    find('#record-announcement').textContent = `${next.dataset.name}，${find('#record-position').textContent}`;
+  }
 });
 find('#export-selected').addEventListener('click', () => {
   const selected = selectedRows();

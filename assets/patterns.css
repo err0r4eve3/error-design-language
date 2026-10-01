@@ -27,12 +27,24 @@
 :where([data-design="error"]) .dl-filterbar .dl-select { min-inline-size:144px; }
 :where([data-design="error"]) .dl-active-filters { display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:0 24px 12px; }
 :where([data-design="error"]) .dl-filter-chip { display:inline-flex; align-items:center; gap:10px; max-inline-size:100%; min-block-size:36px; padding:6px 10px; border:1px solid var(--dl-control-border); background:var(--dl-selected); color:var(--dl-selected-text); border-radius:6px; font:inherit; font-size:12px; cursor:pointer; overflow-wrap:anywhere; text-align:start; }
-:where([data-design="error"]) .dl-toolbar { padding:4px 24px 12px; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; }
-:where([data-design="error"]) .dl-toolbar p { color:var(--dl-muted); font-size:12px; }
-:where([data-design="error"]) .dl-toolbar .dl-button { font-size:12px; padding:8px 10px; }
-:where([data-design="error"]) .dl-selection-bar { margin:0 24px 16px; padding:14px 16px; background:var(--dl-selected); color:var(--dl-selected-text); border:1px solid var(--dl-control-border); border-radius:8px; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px; }
-:where([data-design="error"]) .dl-selection-copy { min-inline-size:0; flex:1 1 190px; }
-:where([data-design="error"]) .dl-selection-copy p { font-size:12px; margin-block-start:2px; overflow-wrap:anywhere; }
+/* Default scope and selected scope share a content-sized slot. Inactive content
+   still contributes to layout, but is invisible, inert, and absent from the accessibility tree. */
+:where([data-design="error"]) .dl-context-toolbar { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:12px; margin:0 24px 16px; padding:12px 14px; border:1px solid transparent; border-radius:8px; color:var(--dl-text); background:var(--dl-canvas); }
+:where([data-design="error"]) .dl-context-toolbar[data-selection-active="true"] { background:var(--dl-selected); color:var(--dl-selected-text); border-color:var(--dl-control-border); }
+:where([data-design="error"]) :is(.dl-context-copy,.dl-context-actions) { display:grid; min-inline-size:0; }
+:where([data-design="error"]) :is(.dl-context-copy,.dl-context-actions) > div { grid-area:1/1; min-inline-size:0; align-self:center; }
+:where([data-design="error"]) .dl-context-actions > div { justify-self:end; }
+:where([data-design="error"]) .dl-context-toolbar [aria-hidden="true"] { visibility:hidden; pointer-events:none; }
+:where([data-design="error"]) .dl-context-copy :is(#result-count,strong) { font-weight:600; font-size:14px; }
+:where([data-design="error"]) .dl-context-copy :is(#result-total,#selection-total) { color:var(--dl-text); font-size:12px; margin-block-start:2px; overflow-wrap:anywhere; }
+:where([data-design="error"]) #selection-scope { color:var(--dl-text); font-size:12px; }
+:where([data-design="error"]) .dl-context-actions .dl-button { font-size:12px; padding:8px 10px; }
+@media (max-width:719px) {
+  :where([data-design="error"]) .dl-context-toolbar { grid-template-columns:minmax(0,1fr); }
+  :where([data-design="error"]) .dl-context-actions > div { justify-self:stretch; }
+  :where([data-design="error"]) .dl-context-actions .dl-cluster { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+}
+@media (max-width:540px) { :where([data-design="error"]) .dl-context-toolbar { margin-inline:16px; padding:12px; } }
 :where([data-design="error"]) .dl-scroll { max-inline-size:100%; overflow:auto; padding:4px; }
 :where([data-design="error"]) .dl-table { border-collapse:collapse; inline-size:100%; min-inline-size:650px; font-size:14px; }
 :where([data-design="error"]) .dl-table :is(th,td) { padding:12px 10px; text-align:start; vertical-align:middle; }
@@ -91,16 +103,13 @@
   :where([data-design="error"]) .dl-collection-heading { padding:18px 16px 0; }
   :where([data-design="error"]) .dl-filterbar { padding:16px 16px 12px; }
   :where([data-design="error"]) .dl-filterbar > .dl-field { flex:1 1 100%; }
-  :where([data-design="error"]) :is(.dl-toolbar,.dl-active-filters) { padding-inline:16px; }
-  :where([data-design="error"]) .dl-selection-bar { margin-inline:16px; padding:12px; }
-  :where([data-design="error"]) .dl-selection-bar .dl-cluster { inline-size:100%; }
-  :where([data-design="error"]) .dl-selection-bar .dl-button { flex:1 1 100px; }
+  :where([data-design="error"]) .dl-active-filters { padding-inline:16px; }
   :where([data-design="error"]) .dl-collection-footer { padding-inline:16px; }
   :where([data-design="error"]) .dl-inspector { padding:20px; }
   :where([data-design="error"]) .dl-filter-chip { min-block-size:44px; }
 }
 @media (forced-colors:active) {
-  :where([data-design="error"]) :is(.dl-panel,.dl-inspector,.dl-filter-chip,.dl-selection-bar) { border-color:CanvasText; }
+  :where([data-design="error"]) :is(.dl-panel,.dl-inspector,.dl-filter-chip,.dl-context-toolbar) { border-color:CanvasText; }
   :where([data-design="error"]) .dl-table [data-detail][aria-expanded="true"] { border-color:Highlight; text-decoration:underline; }
   :where([data-design="error"]) .dl-pattern-page :is(button,input,select,[tabindex]):focus-visible { outline-color:Highlight; }
 }

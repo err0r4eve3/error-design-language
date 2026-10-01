@@ -70,3 +70,20 @@ test('composition lifecycle also blocks navigation when event flag is absent',()
     assert.equal(guard(keyEvent({})),true);
   }
 });
+
+const totalSource=script.match(/function knownTotal\(items\) \{[\s\S]*?\n\}/)[0];
+const total=vm.runInNewContext('('+totalSource+')');
+const pricedRows=prices=>prices.map(price=>({dataset:{price}}));
+test('scope totals distinguish unknown, zero and empty without mixing coverage',()=>{
+  assert.equal(total(pricedRows(['2','12.5','120',''])),'已知月费合计 134.50 USD · 3/4 项有价格');
+  assert.equal(total(pricedRows(['0',''])),'已知月费合计 0.00 USD · 1/2 项有价格');
+  assert.equal(total(pricedRows([''])),'月费尚未读取');
+  assert.equal(total([]),'当前结果没有服务');
+});
+test('inactive selection controls are inaccessible before initialization',()=>{
+  for(const id of ['selection-summary','selection-bar']) {
+    const tag=html.match(new RegExp('<div[^>]*id="'+id+'"[^>]*>'))[0];
+    assert.ok(tag.includes('aria-hidden="true"'));assert.ok(/\binert(?:\s|>)/.test(tag));
+  }
+  assert.ok(!html.includes('role="toolbar"'),'No toolbar keyboard contract is implemented');
+});
