@@ -28,6 +28,7 @@
 | [任务工作流](references/task-workflows.md) | 评审、修复、打磨、新建、参考稿和环境限制 |
 | [视觉校准](references/visual-calibration.md) | 增强／降噪、表面／交互角色、密度、空态、移动任务 |
 | [同级分组与状态](references/semantic-distinction.md) | 相邻对象辨识、严格灰阶、跨视图状态与动作 |
+| [组件契约](references/component-contracts.md) | 同义复用、操作范围、状态维度及可复用 CSS |
 | [页面综合](references/design-synthesis.md) | 内容骨架、构图和跨模块口径 |
 | [产品文案](references/product-copy.md) | 不把开发说明写进产品标题；保留必要条件 |
 | [数值与材料](references/visual-system.md) | 灰阶、字号、形状、玻璃与降级起点 |
@@ -36,6 +37,7 @@
 | [项目适配](references/product-profiles.md) | 历史任务组织；不是当前实现证据或写入授权 |
 | [验收与证据](references/verification.md) | 按风险选检查，区分页面、工具与模型证据 |
 | [行为评测](evals/README.md) | 46 个待执行场景、配对方法和离线准备器 |
+| [第七轮调研](references/research-2026-10-01-round7.md) | Impeccable Extract、Carbon、W3C 与采用边界 |
 | [第六轮调研](references/research-2026-10-01-round6.md) | Impeccable 与四个官方设计系统的采用／不采用 |
 
 普通执行不一次读取全部参考、历史和测试。追溯时再看 [早期调研](references/research-2026-10-01.md)、[书籍与案例](references/reading-and-comparison.md)、[第四轮资料](references/research-2026-10-01-round4.md) 和 [历史依据](references/evidence.md)。分享个人 Skill 前检查项目名和来源文档是否适合公开。
@@ -47,6 +49,8 @@
 已有设计系统先映射角色，不叠加第二套主题。`workspace` 指辅助工作区，并非两主题都更暗的凹入层。语义色不局限于安全提示，明确的严格灰阶要求仍优先。CSS 材料是轻量近似，不宣称光学折射。
 
 [交互样张](assets/preview.html) 使用同目录 `tokens.css`、`components.css`、`preview.css`；[服务清单样张](assets/patterns.html) 使用 `tokens.css`、`components.css`、`patterns.css`。保留相对路径即可打开。清单演示数值排序、筛选、选择与详情；未知月费保持未知。两份样张无外部请求或持久化，不代表真实业务。Relay 是会话独立应用示例，不是仓库默认模板。
+
+[分组与状态样例](assets/regions.html) 另加载可选的 [regions.css](assets/regions.css)：提供静态指标组、原生单选变体，以及独立的服务状态／读取反馈。无新框架或运行依赖；默认灰阶，显式 `data-status-color="semantic"` 才启用局部语义色。它是组件文档，不是产品页面模板；不把其中演示说明复制到业务标题。
 
 ## 维护检查
 
@@ -61,6 +65,7 @@ node --test tests/*.test.cjs
 ```sh
 node tests/preview.cjs
 node tests/patterns.cjs
+node tests/regions.cjs
 ```
 
 `PLAYWRIGHT_MODULE` 可指定现有包。`CHROME_CHANNEL=chrome` 或 `CHROME_EXECUTABLE_PATH` 选择浏览器，两者不要同时设置。`DESIGN_QA_DIR` 指向仓库外证据目录；`DESIGN_PREVIEW_DIR` 仅用于维护时对照同结构资源。
@@ -70,6 +75,7 @@ node tests/patterns.cjs
 ```sh
 DESIGN_QA_MODE=inline node tests/preview.cjs
 DESIGN_QA_MODE=inline node tests/patterns.cjs
+DESIGN_QA_MODE=inline node tests/regions.cjs
 ```
 
 内存模式把本地 CSS 嵌入 HTML，使用 `setContent`；不验证 URL 或真实资源加载。默认仍为 `file`。对比度工具只覆盖受控实色与支持的合成；未知背景拒绝判断，不冒充复杂玻璃像素验证。合成 composition 事件、窄视口和模拟系统偏好也不替代真实设备。
@@ -95,5 +101,6 @@ node evals/prepare.cjs --out /tmp/edl-run-01 \
 | 4 | 开发文案隔离、宏观层级 | [第四轮](evals/validation-2026-10-01-round4.md) |
 | 5 | 同级指标与维护／未知辨识 | [第五轮](evals/validation-2026-10-01-round5.md) |
 | 6 | 统一冲突规则、有条件的设计选择、离线评测准备 | [第六轮](evals/validation-2026-10-01-round6.md) |
+| 7 | 组件契约、状态样例与浏览器负向回归 | [第七轮](evals/validation-2026-10-01-round7.md) |
 
 自动断言、截图审阅、真实路径和模型配对是不同证据；测试通过不证明平均生成质量、全站无障碍合规或相对其他工具的优势。
