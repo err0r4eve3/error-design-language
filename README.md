@@ -28,16 +28,18 @@
 | [任务工作流](references/task-workflows.md) | 评审、修复、打磨、新建、参考稿和环境限制 |
 | [视觉校准](references/visual-calibration.md) | 增强／降噪、表面／交互角色、密度、空态、移动任务 |
 | [同级分组与状态](references/semantic-distinction.md) | 相邻对象辨识、严格灰阶、跨视图状态与动作 |
-| [组件契约](references/component-contracts.md) | 同义复用、操作范围、状态维度及可复用 CSS |
+| [组件契约](references/component-contracts.md) | 同义复用、行内槽位、操作范围、状态维度及可复用 CSS |
+| [连续导航](references/continuous-navigation.md) | 分栏返回、滚动上下文、键盘归属与连续操作 |
 | [集合工作流](references/collection-workflows.md) | 可移除筛选、选择范围、非模态详情与返回位置 |
 | [页面综合](references/design-synthesis.md) | 内容骨架、构图和跨模块口径 |
 | [产品文案](references/product-copy.md) | 不把开发说明写进产品标题；保留必要条件 |
 | [数值与材料](references/visual-system.md) | 灰阶、字号、形状、玻璃与降级起点 |
 | [界面细节](references/craft-details.md) | 中文、数字、图标、密度与内容压力 |
-| [交互契约](references/interaction-contracts.md)／[界面模式](references/interface-patterns.md) | 表单、异步、键盘、输入法、表格、选择、URL 隐私 |
+| [交互契约](references/interaction-contracts.md)／[界面模式](references/interface-patterns.md) | 表单、组合浮层、分阶段异步、键盘、输入法与集合状态 |
 | [项目适配](references/product-profiles.md) | 历史任务组织；不是当前实现证据或写入授权 |
 | [验收与证据](references/verification.md) | 按风险选检查，区分页面、工具与模型证据 |
 | [行为评测](evals/README.md) | 46 个待执行场景、配对方法和离线准备器 |
+| [第十一轮调研](references/research-2026-10-01-round11.md) | Primer、Radix 与 React Spectrum 的源码规则与检验场景 |
 | [第八轮调研](references/research-2026-10-01-round8.md) | Cloudflare、Supabase、Vercel 与 Cloudscape 的对照 |
 | [第七轮调研](references/research-2026-10-01-round7.md) | Impeccable Extract、Carbon、W3C 与采用边界 |
 | [第六轮调研](references/research-2026-10-01-round6.md) | Impeccable 与四个官方设计系统的采用／不采用 |
@@ -105,5 +107,8 @@ node evals/prepare.cjs --out /tmp/edl-run-01 \
 | 6 | 统一冲突规则、有条件的设计选择、离线评测准备 | [第六轮](evals/validation-2026-10-01-round6.md) |
 | 7 | 组件契约、状态样例与浏览器负向回归 | [第七轮](evals/validation-2026-10-01-round7.md) |
 | 8 | 同类控制台、集合工作流、清单样例更新 | [第八轮](evals/validation-2026-10-01-round8.md) |
+| 9 | Telegram 分栏返回与键盘归属 | [第九轮](evals/validation-2026-10-01-round9.md) |
+| 10 | 稳定选择工具区与连续查看焦点 | [第十轮](evals/validation-2026-10-01-round10.md) |
+| 11 | 开源实现提炼：行内槽位、组合浮层、分阶段异步 | [第十一轮](evals/validation-2026-10-01-round11.md) |
 
 自动断言、截图审阅、真实路径和模型配对是不同证据；测试通过不证明平均生成质量、全站无障碍合规或相对其他工具的优势。
