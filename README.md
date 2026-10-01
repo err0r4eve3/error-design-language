@@ -1,105 +1,99 @@
 # 项目设计语言
 
-面向产品前端的个人 Skill。默认黑白灰、液态／毛玻璃辅助层、有限圆角与实色业务内容；保留各项目的身份、布局和任务差异。当前明确要求与已确认参考设计优先，不把每次修复都变成换肤。
+面向产品前端的个人 Skill。默认黑白灰、玻璃辅助层、有限圆角与实色业务内容；保留品牌、布局和任务差异。当前明确要求与确认稿优先，历史偏好不构成迁移授权。
 
 ## 使用
 
-把完整目录安装到宿主支持的 Skill 目录，目录名保持 `error-design-language`，不要只复制 `SKILL.md`。支持显式 Skill 调用的 Codex 环境可使用：
+安装完整目录，目录名保持 `error-design-language`，不要只复制 `SKILL.md`。支持显式 Skill 调用的 Codex 环境可使用：
 
 ```text
-使用 $error-design-language，优化订单页的层级与失败恢复，
-保留现有导航和业务逻辑，验证本次修改涉及的桌面与手机状态。
+使用 $error-design-language，改善订单页的分组与失败恢复。
+保留现有导航、品牌色和业务逻辑，验证本次涉及的桌面与手机状态。
 ```
 
-| 任务 | 调用时说明 |
+| 任务 | 范围示例 |
 |---|---|
-| 只读评审 | “只评审，不修改文件；给出位置、触发步骤和用户后果。” |
-| 局部修复 | “只修复深色按钮 hover 不可读，不改导航或整体配色。” |
-| 页面打磨 | “保留结构，改善阅读层级、操作流程与移动体验。” |
-| 新建／重设计 | “按主任务决定布局，做完整路径，不只做首屏。” |
+| 只读评审 | 只评审，给位置、触发步骤与用户后果，不修改文件 |
+| 局部修复 | 只修深色 hover 不可读，不换主题 |
+| 页面打磨 | 保留认可区域，先判断主次、同级分组、状态或操作线索哪里失配 |
+| 新建／重设计 | 按主任务组织完整页面，不只实现首屏 |
 
-入口和相对资源不依赖特定框架；`agents/openai.yaml` 是宿主适配元数据，不保证所有工具都支持相同安装方式或触发行为。Skill 不自动部署、付款、注册或修改其他项目。
+入口不依赖特定框架。`agents/openai.yaml` 是宿主适配，不保证各环境安装／触发方式相同。本 Skill 不自动部署、付款、注册，也不修改其他项目。
 
-## 内容
+## 按需内容
 
-| 文件 | 用途 |
+| 资源 | 用途 |
 |---|---|
-| [SKILL.md](SKILL.md) | 模式选择、核心约束和完成标准 |
-| [任务工作流](references/task-workflows.md) | 评审、修复、打磨、新建及工具受限处理 |
-| [交互契约](references/interaction-contracts.md) | 控件语义、键盘、异步状态、失败恢复和中文压力 |
-| [数值与材料](references/visual-system.md) | 灰阶、排版、圆角、玻璃与降级 |
-| [排版与界面细节](references/craft-details.md) | 中文、数字、图标、密度、重排与动效 |
-| [页面设计综合](references/design-synthesis.md) | 从内容骨架到视觉主次、指标口径、完整页面与恢复路径 |
-| [书籍与案例对照](references/reading-and-comparison.md) | 6 项书籍／在线读物的阅读范围、公开模板对照和采纳边界 |
-| [界面模式](references/interface-patterns.md) | 输入法、筛选、表格、选择范围、URL 隐私与反馈 |
-| [调研与取舍](references/research-2026-10-01.md) | 3 个同类 Skill 与官方产品模式、标准；说明采纳和不采纳 |
-| [服务清单样张](assets/patterns.html) | 本地数值排序、筛选、选择范围和详情 |
-| [项目适配](references/product-profiles.md) | 按已知项目的任务组织选择相关语境 |
-| [验收与证据](references/verification.md) | 选取检查、区分证据层级与验证边界 |
-| [依据与边界](references/evidence.md) | 私人偏好来源，仅在追溯或处理冲突时读 |
-| [交互样张](assets/preview.html) | 离线演示，不是真实业务数据 |
-| [行为评测](evals/README.md) | 38 个回归场景与配对比较方法；不是已通过结果 |
+| [入口](SKILL.md) | 范围、核心约束与完成标准 |
+| [任务工作流](references/task-workflows.md) | 评审、修复、打磨、新建、参考稿和环境限制 |
+| [视觉校准](references/visual-calibration.md) | 增强／降噪、表面／交互角色、密度、空态、移动任务 |
+| [同级分组与状态](references/semantic-distinction.md) | 相邻对象辨识、严格灰阶、跨视图状态与动作 |
+| [页面综合](references/design-synthesis.md) | 内容骨架、构图和跨模块口径 |
+| [产品文案](references/product-copy.md) | 不把开发说明写进产品标题；保留必要条件 |
+| [数值与材料](references/visual-system.md) | 灰阶、字号、形状、玻璃与降级起点 |
+| [界面细节](references/craft-details.md) | 中文、数字、图标、密度与内容压力 |
+| [交互契约](references/interaction-contracts.md)／[界面模式](references/interface-patterns.md) | 表单、异步、键盘、输入法、表格、选择、URL 隐私 |
+| [项目适配](references/product-profiles.md) | 历史任务组织；不是当前实现证据或写入授权 |
+| [验收与证据](references/verification.md) | 按风险选检查，区分页面、工具与模型证据 |
+| [行为评测](evals/README.md) | 46 个待执行场景、配对方法和离线准备器 |
+| [第六轮调研](references/research-2026-10-01-round6.md) | Impeccable 与四个官方设计系统的采用／不采用 |
 
-普通执行只读相关参考文件，不一次加载全部历史和维护测试。分享此个人 Skill 前检查来源文档是否适合公开。
+普通执行不一次读取全部参考、历史和测试。追溯时再看 [早期调研](references/research-2026-10-01.md)、[书籍与案例](references/reading-and-comparison.md)、[第四轮资料](references/research-2026-10-01-round4.md) 和 [历史依据](references/evidence.md)。分享个人 Skill 前检查项目名和来源文档是否适合公开。
 
 ## 复用样例
 
-按顺序加载 `assets/tokens.css` 和 `assets/components.css`。容器设 `data-design="error"`，主题设 `data-theme="neutral"` 或 `dark`；按钮类 `dl-button`，主操作加 `primary`，轻操作加 `quiet`；输入和选择器为 `dl-input`／`dl-select`。它们拥有自己的盒模型约束，不需要样张的全局 reset。事件处理和可访问语义仍由使用方实现。
+依次加载 [tokens.css](assets/tokens.css) 与 [components.css](assets/components.css)。容器设 `data-design="error"`，主题设 `data-theme="neutral"` 或 `dark`。按钮 `dl-button`，主操作加 `primary`，轻操作加 `quiet`；输入为 `dl-input`／`dl-select`。控件有独立盒模型，不依赖样张全局 reset；事件和可访问语义由使用方实现。
 
-已有设计系统先映射语义 token，不叠加另一套全局主题。液态玻璃为 CSS 材质近似，不是真实光学折射。样张直接用浏览器打开，保留同目录三个 CSS 文件；无远程资源、业务请求或持久化。
+已有设计系统先映射角色，不叠加第二套主题。`workspace` 指辅助工作区，并非两主题都更暗的凹入层。语义色不局限于安全提示，明确的严格灰阶要求仍优先。CSS 材料是轻量近似，不宣称光学折射。
+
+[交互样张](assets/preview.html) 使用同目录 `tokens.css`、`components.css`、`preview.css`；[服务清单样张](assets/patterns.html) 使用 `tokens.css`、`components.css`、`patterns.css`。保留相对路径即可打开。清单演示数值排序、筛选、选择与详情；未知月费保持未知。两份样张无外部请求或持久化，不代表真实业务。Relay 是会话独立应用示例，不是仓库默认模板。
 
 ## 维护检查
 
-普通使用不需要测试依赖。仓库结构与颜色工具测试使用 Node.js 内置测试运行器：
+普通使用不需要测试依赖。结构、颜色数学及本地工具检查使用 Node.js 内置运行器：
 
 ```sh
 node --test tests/*.test.cjs
 ```
 
-可选浏览器回归使用现有 Playwright 和 Chromium：
+可选浏览器检查复用已有 Playwright 与 Chromium：
 
 ```sh
 node tests/preview.cjs
 node tests/patterns.cjs
 ```
 
-`PLAYWRIGHT_MODULE` 可指向现有 Playwright 包；`CHROME_CHANNEL=chrome` 选择已安装 Chrome，或用 `CHROME_EXECUTABLE_PATH` 指定浏览器，两者不要同时设置。`DESIGN_QA_DIR` 可设为仓库外的截图和 JSON 结果目录。`DESIGN_PREVIEW_DIR` 仅供维护时对比另一套同结构样张资源。
+`PLAYWRIGHT_MODULE` 可指定现有包。`CHROME_CHANNEL=chrome` 或 `CHROME_EXECUTABLE_PATH` 选择浏览器，两者不要同时设置。`DESIGN_QA_DIR` 指向仓库外证据目录；`DESIGN_PREVIEW_DIR` 仅用于维护时对照同结构资源。
 
-环境禁止页面导航时，显式选择内存 fixture 模式，不绕过宿主策略：
+若环境禁止页面导航，显式选择内存 fixture，不绕过策略：
 
 ```sh
 DESIGN_QA_MODE=inline node tests/preview.cjs
 DESIGN_QA_MODE=inline node tests/patterns.cjs
 ```
 
-它把样张的三个本地 CSS 嵌入 HTML，通过 `setContent` 运行；**不验证 URL 导航或真实资源加载**。默认仍为 `file` 模式。
+内存模式把本地 CSS 嵌入 HTML，使用 `setContent`；不验证 URL 或真实资源加载。默认仍为 `file`。对比度工具只覆盖受控实色与支持的合成；未知背景拒绝判断，不冒充复杂玻璃像素验证。合成 composition 事件、窄视口和模拟系统偏好也不替代真实设备。
 
-浏览器检查涵盖 24 组主题／材质／宽度、39 项受控实色文字对比、6 项键盘焦点、4 项输入边界，以及单选、模态背景隔离和焦点返回、空结果、提交防重与失败恢复。另检查控件独立复用、长标签、系统偏好，并用反例确认检查器能拒绝消失的焦点环和不支持的渐变测色。
+第六轮另提供离线输入准备：
 
-自动测试不能代替截图审阅、真实设备、接口验收或整站无障碍审核。玻璃上的复杂背景不在该对比度算法范围内。行为场景必须另行运行模型；结构测试通过不代表 38 个场景通过。参见 [上一轮验证](evals/validation-2026-09-30.md) 、[第二轮验证](evals/validation-2026-10-01.md) 与 [第三轮验证](evals/validation-2026-10-01-round3.md)。
+```sh
+node evals/prepare.cjs --out /tmp/edl-run-01 \
+  --cases peer-same-style,strict-monochrome-status,comparison-disclosure
+```
 
-## 第二轮增加的细节
+目标必须是源目录外尚不存在的目录，父目录须存在。只生成输入、分离的判定记录、SHA-256 和 `not_run` 模板，不执行模型／页面，也不创建应用 fixture。输入文件分离不等于权限隔离，细节见 [评测说明](evals/README.md)。46 个场景的定义和准备器单元测试不是 46 项模型通过结果。
 
-来源见 [2026-10-01 调研](references/research-2026-10-01.md)。`SKILL.md` 只增加按需入口，不把全部资料变成每次执行的必读项。
+## 迭代与验证记录
 
-`patterns.html` 直接打开即可使用，同目录需要 `tokens.css`、`components.css`、`patterns.css`。`patterns.css` 是可选补充，不影响仅复用基础控件的项目。服务清单样张不发请求、不写 URL、不存储筛选或敏感输入；未知月费保持“未读取”，只演示单币种排序。
+历史结果只代表对应轮次的实际执行；不能合并为当前所有文件均已重新验证。
 
-`tests/patterns.cjs` 使用与原样张相同的环境变量；在受限环境可显式使用 `DESIGN_QA_MODE=inline`。它检查数值升降序、未知末位、选择范围、合成输入法事件、空结果恢复、详情焦点返回、键盘局部滚动和文字间距压力。它不验证生产路由、真实输入法或完整无障碍合规。
+| 轮次 | 重点 | 验证记录 |
+|---|---|---|
+| 1 | 范围、交互契约、控件与焦点 | [第一轮](evals/validation-2026-09-30.md) |
+| 2 | 同类 Skill、产品模式、输入法与清单 | [第二轮](evals/validation-2026-10-01.md) |
+| 3 | 书籍与完整页面、Relay 示例 | [第三轮](evals/validation-2026-10-01-round3.md) |
+| 4 | 开发文案隔离、宏观层级 | [第四轮](evals/validation-2026-10-01-round4.md) |
+| 5 | 同级指标与维护／未知辨识 | [第五轮](evals/validation-2026-10-01-round5.md) |
+| 6 | 统一冲突规则、有条件的设计选择、离线评测准备 | [第六轮](evals/validation-2026-10-01-round6.md) |
 
-38 个行为场景仍须单独运行模型。静态检查和浏览器样张通过，不是模型生成效果已经提升的证据。
-
-## 第三轮：从独立模式到完整页面
-
-新增 [页面设计综合](references/design-synthesis.md) 和 [书籍与案例对照](references/reading-and-comparison.md)，补充内容优先的构图、风格适配、跨模块口径以及失败后焦点恢复。详细参考按需读取，入口不重复书目。
-
-本轮另交付独立的 Relay 服务控制台作为 Skill 应用示例；它不是下一次页面必须采用的模板。演示包记录所用 Skill 文件哈希、可运行页面与浏览器检查。页面不读取真实账户、不发业务请求、不产生真实费用。模型对照场景仍须独立运行，演示页不是效果提升的统计证据。
-
-实际检查与未验证范围见 [第三轮验证](evals/validation-2026-10-01-round3.md)。
-
-## 标题文案与层级（第四轮）
-
-标题、副标题不得承载开发需求、功能验收清单或设计自评；副标题不是必填。保留费用、风险、数据覆盖和必要操作帮助，见 [产品文案边界](references/product-copy.md)。整页打磨加入去装饰分割线与缩略截图检查，见 [页面设计综合](references/design-synthesis.md)。来源和取舍见 [第四轮调研](references/research-2026-10-01-round4.md)。
-
-Relay 仍是独立会话示例，不成为所有项目的默认模板。模型行为场景没有因新增而自动视为通过。
-
-本轮实际运行、反例及未验证项见 [第四轮验证](evals/validation-2026-10-01-round4.md)。
+自动断言、截图审阅、真实路径和模型配对是不同证据；测试通过不证明平均生成质量、全站无障碍合规或相对其他工具的优势。
