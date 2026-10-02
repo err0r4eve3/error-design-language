@@ -53,6 +53,7 @@ description: "设计、实现、修复或只读评审产品前端 UI/UX；适用
 | 增强／降噪、表面角色、密度、空态与移动任务 | [视觉校准](references/visual-calibration.md) |
 | 相邻指标、状态混淆及非颜色线索 | [分组与状态辨识](references/semantic-distinction.md) |
 | 组件复用、操作范围与状态组合 | [组件契约与样例](references/component-contracts.md) |
+| 应用分层、数据契约与生命周期 | [应用工程](references/application-engineering.md) |
 | 整页组织与跨模块口径 | [页面综合](references/design-synthesis.md) |
 | 标题、帮助与开发说明隔离 | [产品文案](references/product-copy.md) |
 | 灰阶、排版、形状、玻璃参数 | [数值与材料](references/visual-system.md) |

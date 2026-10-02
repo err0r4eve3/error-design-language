@@ -30,7 +30,8 @@
       "rule_owner": "SKILL.md",
       "sample_suites": [
         "preview",
-        "regions"
+        "regions",
+        "panel"
       ],
       "model_cases": [
         "fix-hover-only",
@@ -47,7 +48,7 @@
       ],
       "model_status": "not_run",
       "integration_status": "not_run",
-      "gap": "样例不代表文章、展示或编辑器构图质量；视觉诊断细节由维护索引指定。"
+      "gap": "Panel提供原生模块应用与本地服务的运行检查；不代表真实后端、框架集成或模型评测。样例不代表文章、展示或编辑器构图质量；视觉诊断细节由维护索引指定。"
     },
     {
       "id": "copy",
@@ -70,7 +71,8 @@
       "id": "collection",
       "rule_owner": "references/collection-workflows.md",
       "sample_suites": [
-        "patterns"
+        "patterns",
+        "panel"
       ],
       "model_cases": [
         "build-dense-console",
@@ -82,7 +84,7 @@
       ],
       "model_status": "not_run",
       "integration_status": "not_run",
-      "gap": "真实分页接口与权限集成未验证。"
+      "gap": "Panel提供原生模块应用与本地服务的运行检查；不代表真实后端、框架集成或模型评测。真实分页接口与权限集成未验证。"
     },
     {
       "id": "navigation",
@@ -102,7 +104,8 @@
       "id": "forms",
       "rule_owner": "references/interaction-contracts.md",
       "sample_suites": [
-        "submit-feedback"
+        "submit-feedback",
+        "panel"
       ],
       "model_cases": [
         "form-error-summary",
@@ -111,12 +114,14 @@
       ],
       "model_status": "not_run",
       "integration_status": "not_run",
-      "gap": "只有单字段本地演示；多字段和服务端确认结果需独立fixture。"
+      "gap": "Panel提供原生模块应用与本地服务的运行检查；不代表真实后端、框架集成或模型评测。现有单字段反馈与Panel三字段本地创建；真实服务端字段错误和写入确认仍需独立fixture。"
     },
     {
       "id": "async",
       "rule_owner": "references/interaction-contracts.md",
-      "sample_suites": [],
+      "sample_suites": [
+        "panel"
+      ],
       "model_cases": [
         "stale-response",
         "cached-data-account-boundary",
@@ -124,7 +129,7 @@
       ],
       "model_status": "not_run",
       "integration_status": "not_run",
-      "gap": "tests/async-contract.test.cjs仅验证独立参考模型，真实Hook／缓存适配未执行。"
+      "gap": "Panel提供原生模块应用与本地服务的运行检查；不代表真实后端、框架集成或模型评测。tests/async-contract.test.cjs仅验证独立参考模型，真实Hook／缓存适配未执行。"
     },
     {
       "id": "style-boundaries",

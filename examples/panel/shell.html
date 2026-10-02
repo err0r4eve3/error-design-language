@@ -1,0 +1,37 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><title>Relay · 项目总览</title>
+<style>/*__STYLES__*/</style>
+<script type="importmap">/*__IMPORTS__*/</script></head><body>
+<div id="relay-panel" data-design="error" data-theme="neutral">
+<a class="skip-link" href="#panel-main">跳到主内容</a>
+<aside class="sidebar">
+<div class="brand"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 8h11a8 8 0 0 1 0 16H4V8Z" fill="currentColor"/><path d="M21 8h7v16h-7z" fill="currentColor"/></svg><span>relay<span class="brand-dot">.</span></span></div>
+<div class="workspace"><span class="workspace-avatar">N</span><div><strong>Northstar</strong><span>演示工作空间</span></div><span class="workspace-mark">N / S</span></div>
+<nav class="main-nav" aria-label="工作空间导航">
+<button class="nav-item active" data-view="overview" aria-current="page" data-icon="grid">项目总览</button>
+<button class="nav-item" data-view="instances" data-icon="server">计算实例 <span id="nav-count">—</span></button>
+<button class="nav-item" data-view="billing" data-icon="bill">用量与账单</button>
+<button class="nav-item" data-view="activity" data-icon="clock">操作记录</button>
+</nav>
+<div class="sidebar-bottom"><div class="local-label"><span class="local-dot"></span>本地演示环境</div><p>数据仅在当前页面中保留。<br>刷新页面会恢复初始内容。</p><button class="nav-item" data-action="settings" data-icon="help">演示设置</button><div class="identity"><span class="user-avatar">N</span><div><strong>Northstar</strong><small>个人工作空间</small></div></div></div>
+</aside>
+<div class="app-body"><header class="topbar"><div class="breadcrumb"><span>工作空间</span><span class="slash">/</span><label class="sr-only" for="scope">项目</label><select id="scope" aria-label="切换项目"><option value="northstar">Northstar</option><option value="sandbox">Sandbox</option></select><span class="demo-tag">DEMO</span></div><div class="topbar-actions"><span class="snapshot-label">快照 · 10月2日 13:00</span><button id="theme-toggle" class="icon-button" data-action="theme" aria-label="切换为深色主题" data-icon="moon"></button></div></header>
+<main id="panel-main" tabindex="-1"><div class="page-heading"><div><h1 id="page-title">项目总览</h1><div class="mobile-snapshot">快照 · 10月2日 13:00</div></div><div class="page-actions"><button class="button" id="reload" data-action="reload" data-icon="refresh">刷新</button><button class="button primary" id="new-instance" data-action="new" data-icon="plus">新建实例</button></div></div>
+<div id="load-error" class="error-banner" role="status" hidden></div>
+<section id="metrics" class="metrics" aria-label="项目资源概览"></section>
+<div id="overview-panels" class="overview-panels"><section id="traffic" class="chart-panel" aria-label="流量趋势"></section><section id="attention" class="attention-panel" aria-label="需要关注"></section></div>
+<section id="collection" class="collection-panel" aria-labelledby="instances-title"><div class="section-heading collection-heading"><div class="heading-with-count"><h2 id="instances-title">计算实例</h2><span id="instance-count" class="count-label">—</span></div><div class="collection-tools"><label class="search-field"><span data-icon="search"></span><input id="query" type="search" placeholder="搜索名称或编号" maxlength="120" aria-label="搜索实例"></label><label><span class="sr-only">实例状态</span><select id="status-filter"><option value="all">全部状态</option><option value="running">运行中</option><option value="maintenance">维护中</option><option value="unknown">待确认</option><option value="stopped">已停止</option></select></label></div></div>
+<div id="selection-bar" class="selection-bar"></div>
+<div class="table-scroll" tabindex="0" role="region" aria-label="实例比较表，可横向滚动"><table class="instance-table"><thead><tr><th class="select-cell"><input type="checkbox" id="select-all" aria-label="选择当前结果中的全部实例"></th><th scope="col">实例名称 / 规格</th><th scope="col">地域</th><th scope="col">状态</th><th scope="col">CPU</th><th scope="col" class="numeric">本月出站</th><th scope="col" id="cost-header" aria-sort="none" class="numeric"><button class="sort-button" data-action="sort">月费 <span id="sort-label">↕</span></button></th><th scope="col"><span class="sr-only">查看详情</span></th></tr></thead><tbody id="instance-rows"></tbody></table></div>
+<div id="empty" class="empty-state" hidden><h3>没有匹配的实例</h3><p>调整名称或状态条件，再试一次。</p><button class="button" data-action="reset-filters">清除筛选</button></div>
+</section>
+<section id="inspector" class="inspector" aria-labelledby="detail-heading" hidden></section>
+<section id="billing" class="billing-panel" hidden></section><section id="activity" class="activity-panel" hidden></section>
+<div class="page-foot"><span>计量单位：GiB / TiB · 费用单位：USD</span><span>Northstar / Relay</span></div>
+</main></div>
+<div id="notice" class="notice" role="status" aria-live="polite" aria-atomic="true" hidden></div>
+<dialog id="create-dialog" aria-labelledby="create-title"><form id="create-form"><div class="dialog-heading"><div><span class="muted">Northstar / 计算</span><h2 id="create-title">新建实例</h2></div><button type="button" class="icon-button" data-action="close-create" aria-label="取消新建" data-icon="close"></button></div>
+<div class="dialog-body"><label class="form-label" for="instance-name">实例名称</label><input id="instance-name" name="name" class="form-input" placeholder="例如 hk-worker-03" required minlength="2" maxlength="40" pattern="[a-zA-Z0-9][a-zA-Z0-9\-]{1,39}" aria-describedby="name-help"><p class="field-help" id="name-help">2–40位字母、数字或连字符。</p><label class="form-label" for="instance-region">地域</label><select id="instance-region" name="region" class="form-input"><option value="hk">香港 · HK</option><option value="tyo">东京 · TYO</option><option value="sg">新加坡 · SG</option></select>
+<fieldset class="plans"><legend class="form-label">计算规格</legend><label><input type="radio" name="plan" value="nano"><span><strong>1 vCPU</strong><small>2 GiB 内存</small><b>$8<em> / 月</em></b></span></label><label><input type="radio" name="plan" value="standard" checked><span><strong>2 vCPU</strong><small>4 GiB 内存</small><b>$12<em> / 月</em></b></span></label><label><input type="radio" name="plan" value="compute"><span><strong>4 vCPU</strong><small>8 GiB 内存</small><b>$24<em> / 月</em></b></span></label></fieldset>
+<p class="form-disclosure">仅添加到当前演示项目，不创建真实服务器或产生费用。</p><p id="create-error" class="form-error" role="status" hidden></p></div><div class="dialog-footer"><button type="button" class="button" data-action="close-create">取消</button><button type="submit" class="button primary" id="create-submit">添加实例</button></div></form></dialog>
+<dialog id="settings-dialog" aria-labelledby="settings-title"><div class="dialog-heading"><h2 id="settings-title" tabindex="-1" autofocus>演示设置</h2><button class="icon-button" data-action="close-settings" aria-label="关闭演示设置" data-icon="close"></button></div><div class="dialog-body"><p>所有实例、用量与价格均为本地演示数据。没有真实账户、网络请求或付费操作。</p><p>页面重新加载后恢复初始数据。切换项目会清空当前筛选和选择，但保留本次会话中的项目数据。</p><button class="button full" data-action="fail-read">下一次读取模拟失败</button><button class="button full" data-action="fail-create">下一次创建模拟失败</button><p class="field-help">设置只影响下一次对应操作；失败后可直接重试。</p></div></dialog>
+</div><script type="module">import {mount} from '#relay/app'; import {createDemoService} from '#relay/service'; const panel=mount(document.querySelector('#relay-panel'),{service:createDemoService()}); if(globalThis.__EDL_TEST__)globalThis.__relay=panel;</script></body></html>

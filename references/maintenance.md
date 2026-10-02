@@ -11,6 +11,7 @@
 | 数值、主题配对、材质起点 | [数值与材料](visual-system.md) | 示例可采用具体数值，但不反向升级成通用阈值 |
 | 页面内容骨架与跨模块口径 | [页面综合](design-synthesis.md) | 页面案例保留各自对象和统计范围 |
 | 行内槽位、组件变体、样式及主题边界 | [组件契约](component-contracts.md) | 集合页只描述组合，不并建组件规范 |
+| 应用分层、数据契约、侧效应与交付 | [应用工程](application-engineering.md) | 现有组件和交互规则定义语义，工程层说明负责位置，不另立框架要求 |
 | 请求、草稿／提交、浮层事件与焦点原则 | [交互契约](interaction-contracts.md) | 连续导航只展开导航场景；测试不能自行改写语义 |
 | 集合结果、勾选、当前查看对象 | [集合工作流](collection-workflows.md) | 界面模式引用范围，不定义第二种默认选择策略 |
 | 分栏切换、返回锚点、连续键盘 | [连续导航](continuous-navigation.md) | 保留页内导航和真实历史的区别 |
@@ -44,4 +45,4 @@ Node 累计摘要是结构化事件证据；零退出只是必要条件。缺少
 
 `.nvmrc` 固定22.16.0作为当前复现基线，不表示最新或生产推荐。`node tests/run.cjs --suite unit` 无需npm依赖，CI在PR至main、main推送和手动触发时执行，并保存run.json、unit-summary.json和日志。完整SHA固定的Actions仅取得contents:read权限，检出凭据不持久化。
 
-工作流位置是 [Skill QA](../.github/workflows/qa.yml)。它目前只运行Node与覆盖定义检查，不安装浏览器、不运行模型、不部署。七套浏览器仍按已有环境显式执行；CI定义存在不等于对应提交已通过。
+工作流位置是 [Skill QA](../.github/workflows/qa.yml)。它目前只运行Node与覆盖定义检查，不安装浏览器、不运行模型、不部署。浏览器套件仍按注册表及已有环境显式执行；CI定义存在不等于对应提交已通过。

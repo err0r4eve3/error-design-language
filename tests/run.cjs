@@ -17,7 +17,7 @@ function validateRegistry(data = registry) {
     ids.add(s.id);
     if (s.script !== `tests/${s.id}.cjs` || !/^[\w-]+\.json$/.test(s.report)) throw new Error('Unsafe suite path');
     if (!s.modes?.length || s.modes.some(m => !['inline', 'file'].includes(m))) throw new Error('Invalid suite modes');
-    for (const name of [s.script, ...s.assets]) {
+    for (const name of [s.script, ...s.assets, ...(s.resources || [])]) {
       if (path.isAbsolute(name) || name.split(/[\\/]/).includes('..')) throw new Error('Unsafe resource path');
       const file = path.join(root, name);
       if (!fs.statSync(file).isFile()) throw new Error(`Missing suite resource: ${name}`);
@@ -122,7 +122,7 @@ function run(options, env = process.env) {
     results.suites[id] = {...classify(child, report, id === 'unit'), mode, duration_ms: Date.now() - started,
       exit_code: child.status, report: report ? reportRelative : null, browser: report?.browser || null,
       ...(id === 'unit' && report?.counts ? {test_counts: report.counts} : {}),
-      sources: fingerprints(id === 'unit' ? [...units, 'tests/run.cjs', 'tests/support/unit-reporter.cjs'] : [s.script, 'tests/support/qa-runtime.cjs', 'tests/suites.json']),
+      sources: fingerprints(id === 'unit' ? [...units, 'tests/run.cjs', 'tests/support/unit-reporter.cjs'] : [s.script, 'tests/support/qa-runtime.cjs', 'tests/suites.json', ...(s.resources || [])]),
       assets_sha256: id === 'unit' ? null : Object.fromEntries(s.assets.map(n => [n, hash(fs.readFileSync(path.join(assets, path.basename(n))))]))};
     summary();
   }

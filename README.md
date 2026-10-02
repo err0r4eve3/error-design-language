@@ -75,7 +75,7 @@ node evals/coverage.cjs
 
 七个旧浏览器脚本仍可直接运行，统一使用共享输出保护；被拒绝目录连错误报告也不写入。`DESIGN_PREVIEW_DIR` 指向对照资源时同样被保护。报告只更新本次运行拥有的文件，不采用已有报告。临时目录保护不是针对恶意本地进程的安全沙箱。
 
-维护规则的主定义位置见 [维护边界](references/maintenance.md)；[覆盖索引](evals/coverage.json) 关联52个场景与7套浏览器样例，并明确实际应用／模型未运行。索引检查不是效果评测。运行依赖仍使用已有安装；此入口没有自动安装、部署或启动外部服务。
+维护规则的主定义位置见 [维护边界](references/maintenance.md)；[覆盖索引](evals/coverage.json) 关联52个场景与8套浏览器样例，并区分本地应用样例、真实框架集成与模型执行。索引检查不是效果评测。运行依赖仍使用已有安装；此入口没有自动安装、部署或启动外部服务。
 
 普通使用不需要测试依赖。结构、颜色数学、本地工具和只读列表契约检查使用 Node.js 内置运行器：
 
@@ -163,3 +163,9 @@ node tests/dialog-reading.cjs
 新脚本只支持内存HTML/CSS；`DESIGN_PREVIEW_DIR` 可指向同结构资产，`DESIGN_QA_DIR` 必须为源外尚不存在的目录。长正文是明确注入的压力数据，不是实际服务记录。
 
 本轮架构修复及实际执行范围见 [第十七轮验证](evals/validation-2026-10-02-round17.md)。
+
+## 第十九轮：应用工程与新Panel
+
+[工程规则](references/application-engineering.md) · [Panel源码与运行](examples/panel/README.md)。新示例使用原生ES模块、可注入本地服务、数据契约与统一派生值；不会接触真实账户或服务器。`node examples/panel/build.cjs /tmp/relay-panel.html` 生成便携页面。应用单元检查为 `node --test tests/panel.test.cjs`；浏览器检查通过 `node tests/run.cjs --suite panel --mode inline --out /tmp/relay-panel-qa-new` 执行。原八份assets不变，Panel不替代既有样张。
+
+本轮来源、测试与边界见 [第十九轮记录](evals/validation-2026-10-02-round19.md)。
