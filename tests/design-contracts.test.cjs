@@ -44,3 +44,17 @@ test('root readme is navigation, with a single historical index',()=>{
  assert.ok(read('README.md').includes('history/README.md'));
  assert.ok(read('history/README.md').includes('尚未迁移'));
 });
+
+test('selection role pairs have a scoped separation floor and readable text in both themes',()=>{
+ const {themeColors,assertSelectionRoles}=require('./support/state-roles.cjs');
+ for(const theme of ['neutral','dark']) assertSelectionRoles(themeColors(tokens,theme));
+});
+test('selection contract detects collapsed states and unreadable secondary text',()=>{
+ const {themeColors,assertSelectionRoles}=require('./support/state-roles.cjs');
+ for(const theme of ['neutral','dark']) {
+  const colors=themeColors(tokens,theme);
+  assert.throws(()=>assertSelectionRoles({...colors,selected:colors.hover}),/selection separation/);
+  assert.throws(()=>assertSelectionRoles({...colors,muted:colors.selected}),/selected text/);
+  assert.throws(()=>assertSelectionRoles({...colors,'selected-indicator':colors.selected}),/selection boundary/);
+ }
+});
