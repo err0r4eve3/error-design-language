@@ -25,7 +25,7 @@
 <div class="empty" hidden><h3>没有匹配记录</h3><p class="muted">可以清除筛选后继续。</p><button class="dl-button" id="clear" type="button">清除筛选</button></div>
 <div class="list-footer"><p class="selection-note" aria-live="polite">已选择：页面层级</p><button class="dl-button primary" id="detail" type="button">查看详情</button></div>
 </section>
-<section class="form-section" aria-labelledby="form-title"><h2 id="form-title">错误恢复</h2><p>仅模拟一次失败与重试，不发送请求或保存输入。</p><form id="demo-form"><div class="form-grid"><div class="field"><label for="email">接收邮箱</label><input class="dl-input" id="email" type="email" required value="preview@example.com" autocomplete="off" aria-describedby="feedback"></div><button class="dl-button primary" id="submit" type="submit">模拟提交</button></div><p class="feedback" id="feedback" role="status" aria-live="polite"></p></form></section>
+<section class="form-section" aria-labelledby="form-title"><h2 id="form-title">错误恢复</h2><p id="email-help">仅模拟一次失败与重试，不发送请求或保存输入。</p><form id="demo-form"><div class="form-grid"><div class="field"><label for="email">接收邮箱</label><input class="dl-input" id="email" type="email" required value="preview@example.com" autocomplete="off" aria-describedby="email-help draft-note"></div><button class="dl-button primary" id="submit" type="submit">模拟提交</button></div><p class="draft-note" id="draft-note" role="status" aria-atomic="true"></p><p class="feedback" id="feedback" role="status" aria-live="polite" aria-atomic="true"></p></form></section>
 </div><aside class="aside" aria-label="设计规则">
 <section><h2>材料</h2><p>壳层可轻透，内容保持稳定。</p><div class="legend"><div><span class="swatch" style="background:var(--dl-canvas)"></span>画布</div><div><span class="swatch" style="background:var(--dl-workspace)"></span>工作区</div><div><span class="swatch" style="background:var(--dl-surface)"></span>内容面</div><div><span class="swatch" style="background:var(--dl-selected)"></span>选中层</div></div></section>
 <section><h2>按钮</h2><div class="control-samples"><button class="dl-button primary" data-demo="主操作" type="button">主操作</button><button class="dl-button" data-demo="次操作" type="button">次操作</button><button class="dl-button quiet" data-demo="轻操作" type="button">轻操作</button><button class="dl-button" disabled type="button">不可用</button></div><p id="control-state" role="status">同一尺寸，不同优先级。</p></section>
@@ -34,7 +34,14 @@
 </aside></div>
 <footer class="foot">统一视觉，按任务调整布局与密度。全部记录均为演示数据。</footer>
 </main>
-<dialog id="dialog" aria-labelledby="detail-title"><h2 id="detail-title">页面层级</h2><p id="detail-body"></p><p id="detail-meta">演示内容 · 非实际项目状态</p><div class="dialog-footer"><button class="dl-button" id="close" type="button">关闭</button></div></dialog>
+<dialog id="dialog" aria-labelledby="detail-title">
+  <div class="dialog-body">
+    <h2 id="detail-title" tabindex="-1" autofocus>页面层级</h2>
+    <p id="detail-body"></p>
+    <p id="detail-meta">演示内容 · 非实际项目状态</p>
+  </div>
+  <div class="dialog-footer"><button class="dl-button" id="close" type="button">关闭</button></div>
+</dialog>
 <noscript>交互样张需要 JavaScript；配色和布局仍可阅读。</noscript>
 <script>
 const $=s=>document.querySelector(s);
@@ -55,8 +62,61 @@ tasks.forEach(x=>x.querySelector('input').addEventListener('change',sync));
 $('#detail').addEventListener('click',()=>{const selected=tasks.find(x=>!x.hidden&&x.querySelector('input').checked);if(!selected)return;$('#detail-title').textContent=selected.dataset.name;$('#detail-body').textContent=descriptions[selected.dataset.name];$('#dialog').showModal();});
 $('#close').addEventListener('click',()=>$('#dialog').close());
 document.querySelectorAll('[data-demo]').forEach(button=>button.addEventListener('click',()=>{$('#control-state').textContent='已触发：'+button.dataset.demo+'（演示）';}));
-let attempt=0;let pending=false;
-$('#demo-form').addEventListener('submit',e=>{e.preventDefault();if(pending)return;pending=true;$('#submit').disabled=true;$('#submit').setAttribute('aria-busy','true');$('#submit').textContent='处理中…';$('#feedback').className='feedback';$('#feedback').textContent='正在模拟提交…';setTimeout(()=>{attempt++;pending=false;$('#submit').disabled=false;$('#submit').removeAttribute('aria-busy');if(attempt%2===1){$('#feedback').className='feedback error';$('#feedback').textContent='未完成：模拟连接失败，输入已保留。请重试。';$('#submit').textContent='重试';}else{$('#feedback').className='feedback success';$('#feedback').textContent='已完成：模拟处理成功，未发送任何数据。';$('#submit').textContent='重新演示';}},450);});
+// A result belongs to the submitted snapshot, not to the draft at completion time.
+const form = $('#demo-form');
+const email = $('#email');
+const submit = $('#submit');
+const feedback = $('#feedback');
+const draftNote = $('#draft-note');
+let attempt = 0;
+let pending = false;
+let submittedEmail = null;
+let submissionPhase = 'idle';
+function syncSubmissionDraft() {
+  const changed = submittedEmail !== null && email.value !== submittedEmail;
+  const text = changed ? '当前输入已更改，尚未提交。' : '';
+  // Do not repeatedly announce an unchanged message on every keystroke.
+  if (draftNote.textContent !== text) draftNote.textContent = text;
+  submit.textContent = pending ? '处理中…' : changed ? '提交当前输入'
+    : submissionPhase === 'error' ? '重试' : submissionPhase === 'success' ? '重新演示' : '模拟提交';
+}
+function showSubmissionResult(message, snapshot, phase) {
+  feedback.className = phase === 'pending' ? 'feedback' : 'feedback ' + phase;
+  const target = document.createElement('span');
+  target.className = 'submission-target';
+  target.append('本次提交的邮箱：');
+  const value = document.createElement('bdi');
+  value.id = 'submitted-email'; value.dir = 'ltr'; value.textContent = snapshot;
+  target.append(value);
+  feedback.replaceChildren(message, target);
+}
+email.addEventListener('input', syncSubmissionDraft);
+email.addEventListener('change', syncSubmissionDraft);
+form.addEventListener('submit', event => {
+  event.preventDefault();
+  if (pending || !form.reportValidity()) return;
+  const snapshot = email.value;
+  submittedEmail = snapshot;
+  pending = true;
+  submissionPhase = 'pending';
+  submit.disabled = true;
+  submit.setAttribute('aria-busy', 'true');
+  syncSubmissionDraft();
+  showSubmissionResult('正在模拟提交…', snapshot, 'pending');
+  setTimeout(() => {
+    attempt++;
+    pending = false;
+    submit.disabled = false;
+    submit.removeAttribute('aria-busy');
+    submissionPhase = attempt % 2 === 1 ? 'error' : 'success';
+    showSubmissionResult(submissionPhase === 'error'
+      ? '未完成：模拟连接失败，输入已保留。未发送任何数据。'
+      : '已完成：模拟处理成功，未发送任何数据。', snapshot, submissionPhase);
+    // New edits survive both outcomes; neither result moves focus or resets the form.
+    syncSubmissionDraft();
+  }, 450);
+});
+
 </script>
 </body>
 </html>

@@ -53,6 +53,12 @@ small { font-size:14px; }
 .field input { width:100%; }
 .feedback { margin-top:12px; min-height:26px; font-size:14px; }
 .feedback:not(:empty) { padding:10px 14px; border-left:2px solid var(--dl-strong); background:var(--dl-feedback); color:var(--dl-text); }
+/* Keep the current draft note beside the input and the submitted identity in the result. */
+#demo-form .draft-note { margin:8px 0 0; min-height:22px; color:var(--dl-text); font-size:14px; line-height:1.6; }
+#demo-form .feedback { overflow-wrap:anywhere; }
+#demo-form .submission-target { display:block; margin-top:6px; color:var(--dl-muted); }
+#demo-form .submission-target bdi { display:block; color:var(--dl-text); }
+
 .aside { align-self:start; padding:24px; border:1px solid var(--dl-line); border-radius:16px; background:var(--dl-surface); }
 .aside section+section { margin-top:24px; padding-top:24px; border-top:1px solid var(--dl-line); }
 .aside p { font-size:14px; color:var(--dl-muted); margin-top:8px; }
@@ -65,10 +71,25 @@ small { font-size:14px; }
 .rules { margin:14px 0 0; padding:0; list-style:none; display:grid; gap:10px; font-size:14px; }
 .rules li { padding-left:12px; border-left:2px solid var(--dl-line); }
 .foot { margin-top:32px; padding-top:18px; border-top:1px solid var(--dl-line); font-size:13px; color:var(--dl-muted); }
-dialog { width:min(480px,calc(100% - 32px)); padding:28px; border:1px solid var(--dl-line); border-radius:var(--dl-radius-overlay); color:var(--dl-text); background:var(--dl-surface); box-shadow:0 20px 60px #0003; }
+/* Reading and exit controls have different scroll responsibilities. */
+dialog {
+  width:min(480px,calc(100% - 32px)); padding:0;
+  max-block-size:calc(100vh - 32px); max-block-size:calc(100dvh - 32px);
+  overflow:hidden; border:1px solid var(--dl-line); border-radius:var(--dl-radius-overlay);
+  color:var(--dl-text); background:var(--dl-surface); box-shadow:0 20px 60px #0003;
+}
+/* Do not override the native closed state with an unconditional display:flex. */
+dialog[open] { display:flex; flex-direction:column; }
 dialog::backdrop { background:#0006; }
+dialog .dialog-body {
+  min-block-size:0; min-inline-size:0; padding:28px;
+  overflow:auto; overscroll-behavior:contain; overflow-wrap:anywhere;
+}
 dialog p { margin-top:14px; }
-dialog .dialog-footer { display:flex; justify-content:flex-end; margin-top:24px; }
+dialog .dialog-footer {
+  flex:none; display:flex; flex-wrap:wrap; justify-content:flex-end; gap:12px;
+  padding:16px 28px; border-block-start:1px solid var(--dl-line); background:var(--dl-surface);
+}
 #detail-meta { color:var(--dl-muted); font-size:14px; }
 noscript { display:block; padding:16px; }
 @supports (backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px)) {

@@ -127,3 +127,22 @@ node evals/prepare.cjs --out /tmp/edl-run-01 \
 | 14 | 选择卡方向边界、技术短语与窄容器回归 | [第十四轮](evals/validation-2026-10-02-round14.md) |
 
 自动断言、截图审阅、真实路径和模型配对是不同证据；测试通过不证明平均生成质量、全站无障碍合规或相对其他工具的优势。
+
+### 第十五轮：提交结果与未提交草稿
+
+交互样张的邮箱反馈绑定本次提交的值；等待时可继续编辑，结果不覆盖新草稿。新草稿使用“提交当前输入”，只有同值失败才显示“重试”。详见 [来源与取舍](references/research-2026-10-02-round15.md) 和 [验证范围](evals/validation-2026-10-02-round15.md)。
+
+新增可选定向检查：`node tests/submit-feedback.cjs`（始终为内存页面，复用上述 Playwright／浏览器环境变量，`DESIGN_QA_DIR` 必须是源外新目录）。它检查真实样张，不是表单框架适配或模型评测。原样张 CSS 与 HTML 需一并更新，其他页面不变。
+
+### 第十六轮：长内容详情的阅读与退出
+
+[规则与源码依据](references/research-2026-10-02-round16.md) · [本轮验证记录](evals/validation-2026-10-02-round16.md)。本轮在上一轮本地表单修订上继续；第十五轮曾被写入工具拦截，历史记录保留，远端是否包含两轮以第十六轮提交结果为准。
+
+`preview.html` 的只读详情从标题开始，正文局部滚动，关闭操作保持可达；短内容不强制全屏。原生关闭状态、焦点返回与上一轮的提交／草稿区分保留。不是所有弹窗都必须采用此布局或初始焦点。可选检查使用已有 Playwright：
+
+```sh
+node --test tests/dialog-reading.test.cjs
+node tests/dialog-reading.cjs
+```
+
+新脚本只支持内存HTML/CSS；`DESIGN_PREVIEW_DIR` 可指向同结构资产，`DESIGN_QA_DIR` 必须为源外尚不存在的目录。长正文是明确注入的压力数据，不是实际服务记录。
