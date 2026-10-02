@@ -12,8 +12,21 @@ export function mount(root,{service}={}) {
   let activeView='overview',composing=false,noticeTimer=null,dead=false,lastNotice='',priorScope='northstar',firstSnapshot=true;
   for(const el of root.querySelectorAll('[data-icon]')){if(!el.querySelector(':scope > svg'))el.insertAdjacentHTML('afterbegin',icon(el.dataset.icon));}
   const createDialog=find('#create-dialog'),settingsDialog=find('#settings-dialog');
+  const tableScroll=find('.table-scroll'),tableHelp=find('#table-scroll-help');
+  function updateTableOverflow(){
+    if(dead)return;
+    const overflow=!tableScroll.hidden&&tableScroll.clientWidth>0&&tableScroll.scrollWidth>tableScroll.clientWidth+1;
+    tableHelp.hidden=!overflow;
+    tableScroll.tabIndex=overflow?0:-1;
+    if(overflow)tableScroll.setAttribute('aria-describedby','table-scroll-help');
+    else tableScroll.removeAttribute('aria-describedby');
+  }
+  // Observe the actual container AND table; sidebar/content changes need not resize the window.
+  const tableObserver=typeof ResizeObserver==='function'?new ResizeObserver(updateTableOverflow):null;
+  tableObserver?.observe(tableScroll);tableObserver?.observe(find('.instance-table'));
+  if(!tableObserver)on(window,'resize',updateTableOverflow);
   function notify(text){if(!text)return;find('#notice').textContent=text;find('#notice').hidden=false;clearTimeout(noticeTimer);noticeTimer=setTimeout(()=>{find('#notice').hidden=true;},4500);}
-  function visibleSections(){find('#metrics').hidden=!['overview','billing'].includes(activeView);find('#overview-panels').hidden=activeView!=='overview';find('#collection').hidden=!['overview','instances'].includes(activeView);find('#billing').hidden=activeView!=='billing';find('#activity').hidden=activeView!=='activity';find('#inspector').hidden=!store.get().detailId||!['overview','instances'].includes(activeView);}
+  function visibleSections(){find('#metrics').hidden=!['overview','billing'].includes(activeView);find('#overview-panels').hidden=activeView!=='overview';find('#collection').hidden=!['overview','instances'].includes(activeView);find('#billing').hidden=activeView!=='billing';find('#activity').hidden=activeView!=='activity';find('#inspector').hidden=!store.get().detailId||!['overview','instances'].includes(activeView);updateTableOverflow();}
   function setView(name){if(!['overview','instances','billing','activity'].includes(name))return;activeView=name;find('#page-title').textContent={overview:'项目总览',instances:'计算实例',billing:'用量与账单',activity:'操作记录'}[name];for(const n of root.querySelectorAll('.nav-item[data-view]')){n.classList.toggle('active',n.dataset.view===name);if(n.dataset.view===name)n.setAttribute('aria-current','page');else n.removeAttribute('aria-current');}visibleSections();}
   function render(){
     if(dead)return;const s=store.get(),focused=root.contains(document.activeElement)?document.activeElement.dataset.focus:null;
@@ -64,6 +77,6 @@ export function mount(root,{service}={}) {
   on(find('#create-form'),'submit',async e=>{e.preventDefault();const form=e.currentTarget;if(store.get().create.pending||!form.reportValidity())return;const draft=Object.fromEntries(new FormData(form));const ok=await store.create(draft);if(ok&&!dead){createDialog.close();form.reset();find('#new-instance').focus();}});
   on(root,'keydown',e=>{if(e.defaultPrevented||e.isComposing||composing||e.key!=='Escape'||root.querySelector('dialog[open]')||e.target.closest('input,textarea,select,[contenteditable="true"]'))return;const id=store.get().detailId;if(id){store.inspect(null);restoreFocus(root,`inspect-${id}`);e.preventDefault();}});
   find('#scope').value='northstar';find('#query').value='';find('#status-filter').value='all';setView('overview');render();void store.refresh();
-  const instance={store,destroy(){if(dead)return;dead=true;clearTimeout(noticeTimer);lifetime.abort();unsubscribe();store.dispose();for(const url of urls)URL.revokeObjectURL(url);urls.clear();if(createDialog.open)createDialog.close();if(settingsDialog.open)settingsDialog.close();mounted.delete(root);}};
+  const instance={store,destroy(){if(dead)return;dead=true;tableObserver?.disconnect();clearTimeout(noticeTimer);lifetime.abort();unsubscribe();store.dispose();for(const url of urls)URL.revokeObjectURL(url);urls.clear();if(createDialog.open)createDialog.close();if(settingsDialog.open)settingsDialog.close();mounted.delete(root);}};
   mounted.set(root,instance);return instance;
 }

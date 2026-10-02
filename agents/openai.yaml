@@ -1,4 +1,4 @@
 interface:
   display_name: "项目设计语言"
-  short_description: "黑白灰与玻璃设计；按范围修复层级、交互和移动体验"
+  short_description: "任务驱动的产品界面；改进层级、状态、交互与响应式"
   default_prompt: "使用 $error-design-language，按本次请求选择只读评审、局部修复、打磨或新建；保留既有产品语义与明确设计要求，在授权范围改进前端，并分别报告实际验证和未验证项。"

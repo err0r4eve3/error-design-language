@@ -31,9 +31,107 @@ async function main(){
  await check('keyboard modal containment and short viewport recovery',async()=>{await p.setViewportSize({width:390,height:420});await p.click('#new-instance');await p.fill('#instance-name','keyboard-worker');await p.keyboard.press('Escape');assert.equal(await p.evaluate(()=>document.activeElement.id),'new-instance');assert.ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));});
  await check('mount and dispose do not duplicate icon or event handlers',async()=>{await p.evaluate(async()=>{const{mount}=await import('#relay/app');const{createDemoService}=await import('#relay/service');window.__relay=mount(document.querySelector('#relay-panel'),{service:createDemoService({delay:0})});});await p.waitForSelector('[data-row="hk-01"]');assert.equal(await p.locator('#new-instance > svg').count(),1);await p.click('#new-instance');await p.fill('#instance-name','one-click');await p.click('#create-submit');await p.waitForFunction(()=>!document.querySelector('#create-dialog').open);assert.equal(await p.locator('#instance-rows tr').count(),7);});
  await p.close();p=await createPage();
+ await check('mobile summary keeps price and state visible while preserving comparison columns',async()=>{
+   report.mobile=[];
+   for(const dark of [false,true])for(const width of [320,390]){
+     await p.setViewportSize({width,height:844});
+     await p.locator('#relay-panel').evaluate((e,d)=>e.dataset.theme=d?'dark':'neutral',dark);
+     await p.locator('.table-scroll').evaluate(e=>e.scrollLeft=0);
+     await p.waitForFunction(()=>!document.querySelector('#table-scroll-help').hidden);
+     const observations=await p.locator('#instance-rows tr').evaluateAll(rows=>rows.map(row=>{
+       const summary=row.querySelector('.mobile-record-summary'),box=summary.getBoundingClientRect(),region=row.closest('.table-scroll').getBoundingClientRect();
+       return {id:row.dataset.row,summary:summary.innerText,status:row.querySelector('td:nth-child(4)').innerText,price:row.querySelector('td:nth-child(7)').innerText,
+         hiddenFromAT:summary.getAttribute('aria-hidden'),focusables:summary.querySelectorAll('button,input,a,[tabindex]').length,
+         left:box.left,right:box.right,regionLeft:region.left,regionRight:region.right};
+     }));
+     assert.equal(observations.length,6);
+     for(const row of observations){assert.ok(row.summary.includes(row.status),row.id);assert.ok(row.summary.includes(row.price),row.id);assert.equal(row.hiddenFromAT,'true');assert.equal(row.focusables,0);assert.ok(row.left>=row.regionLeft&&row.right<=row.regionRight,row.id+' summary outside initial table viewport');}
+     const fonts=await p.locator('.cost-foot>span,.metric-foot,.record-meta,.table-scroll-help,.attention-content>span').evaluateAll(es=>es.filter(e=>e.getClientRects().length).map(e=>({selector:e.className,size:parseFloat(getComputedStyle(e).fontSize),primary:!!e.closest('.metric-primary')})));
+     for(const f of fonts)assert.ok(f.size>=(f.primary?11:12),JSON.stringify(f));
+     for(const sel of ['#new-instance','#reload','#theme-toggle','.record-name','.sort-button','.segmented button','#status-filter','#scope']){
+       const r=await p.locator(sel).first().boundingBox();assert.ok(r&&r.height>=44&&r.width>=44,sel+' comfortable mobile target');
+     }
+     assert.ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'page overflow');
+     for(const sel of ['.record-price','.table-scroll-help','#instance-rows .value-unknown']){
+       const c=await p.locator(sel).first().evaluate(e=>({fg:getComputedStyle(e).color,bgs:[...function*(p){while(p){yield p;p=p.parentElement}}(e)].map(p=>getComputedStyle(p).backgroundColor).reverse()}));
+       const bg=c.bgs.reduce((a,v)=>composite(parseSRGB(v),a),[255,255,255,1]);const ratio=contrastRatio(parseSRGB(c.fg),bg);
+       assert.ok(ratio>=4.5,sel+' mobile text '+ratio);report.contrast.push({phase:'mobile',dark,width,sel,ratio});
+     }
+     report.mobile.push({dark,width,rows:observations,fonts});
+   }
+   await p.click('[data-row="sg-02"] .record-name');await p.click('#inspector [data-read]');
+   await p.waitForFunction(()=>document.querySelector('[data-row="sg-02"] .mobile-record-summary').textContent.includes('运行中'));
+   assert.match(await p.locator('[data-row="sg-02"] .record-price').innerText(),/未读取/);
+   await p.click('[data-action="close-detail"]');
+ });
+ await check('scroll hint tracks real overflow, empty results, container resize and view visibility',async()=>{
+   await p.setViewportSize({width:390,height:844});await p.fill('#query','absent-instance');
+   assert.ok(await p.locator('#table-scroll-help').isHidden());assert.equal(await p.locator('.table-scroll').getAttribute('tabindex'),'-1');
+   await p.fill('#query','');await p.waitForFunction(()=>!document.querySelector('#table-scroll-help').hidden);
+   assert.equal(await p.locator('.table-scroll').getAttribute('aria-describedby'),'table-scroll-help');
+   await p.locator('.table-scroll').focus();await p.keyboard.press('ArrowRight');
+   await p.waitForFunction(()=>document.querySelector('.table-scroll').scrollLeft>0);
+   await p.locator('.table-scroll').evaluate(e=>e.scrollLeft=0);
+   await p.click('.main-nav [data-view="billing"]');assert.ok(await p.locator('#table-scroll-help').isHidden());
+   await p.click('.main-nav [data-view="instances"]');await p.waitForFunction(()=>!document.querySelector('#table-scroll-help').hidden);
+   await p.setViewportSize({width:1440,height:1080});await p.waitForFunction(()=>document.querySelector('#table-scroll-help').hidden);
+   assert.equal(await p.locator('.table-scroll').getAttribute('aria-describedby'),null);
+   await p.locator('#collection').evaluate(e=>e.style.width='550px');await p.waitForFunction(()=>!document.querySelector('#table-scroll-help').hidden);
+   await p.locator('#collection').evaluate(e=>e.style.removeProperty('width'));await p.waitForFunction(()=>document.querySelector('#table-scroll-help').hidden);
+ });
+ await check('rendered data counterexamples preserve unknown, zero, partial, empty and supplied notes',async()=>{
+   report.presentation=[];await p.locator('#relay-panel').evaluate(e=>e.dataset.theme='neutral');
+   for(const scenario of ['unknown','zero','partial','empty','stopped','maintenance']){
+     await p.evaluate(async scenario=>{
+       const {mount}=await import('#relay/app'),{seedSnapshot}=await import('#relay/service');const snapshot=seedSnapshot();
+       if(scenario==='unknown')snapshot.items.forEach(r=>r.cents=null);
+       if(scenario==='zero')snapshot.items.forEach(r=>r.cents=0);
+       if(scenario==='partial')snapshot.items.forEach((r,i)=>r.cents=i===0?1600:null);
+       if(scenario==='empty')snapshot.items=[];
+       if(scenario==='stopped'){snapshot.items[0].status='stopped';snapshot.items[0].note=' \t ';}
+       if(scenario==='maintenance'){snapshot.items[0].status='maintenance';snapshot.items[0].note='网络设备维护，恢复时间未提供。';}
+       globalThis.__relay=mount(document.querySelector('#relay-panel'),{service:{list:async()=>structuredClone(snapshot)}});
+     },scenario);
+     await p.waitForFunction(()=>!!globalThis.__relay.store.get().snapshot);
+     if(['unknown','zero','partial','empty'].includes(scenario)){
+       await p.click('.main-nav [data-view="billing"]');
+       const expected={unknown:'未读取',zero:'$0.00',partial:'$16.00',empty:'暂无实例'}[scenario];
+       assert.equal(await p.locator('.bill-total').innerText(),expected);
+       const metric=await p.locator('.metric-cost').innerText();assert.ok(metric.includes(expected.replace('$','')),metric);
+       report.presentation.push({scenario,total:expected,metric});
+       if(scenario==='unknown')await shot('panel-unknown-cost');
+     }else{
+       if(scenario==='maintenance')assert.match(await p.locator('#attention').innerText(),/网络设备维护，恢复时间未提供。/);
+       await p.click('[data-row="hk-01"] .record-name');
+       const actual=await p.locator('.detail-note').innerText();
+       assert.equal(actual,scenario==='stopped'?'未提供状态说明。':'网络设备维护，恢复时间未提供。');
+       report.presentation.push({scenario,note:actual});
+     }
+   }
+ });
+ await check('overflow observers disconnect on remount and disposal, resize fallback still works',async()=>{
+   await p.evaluate(async()=>{
+     const Native=globalThis.ResizeObserver,live=new Set();
+     const {mount}=await import('#relay/app'),{createDemoService}=await import('#relay/service');
+     globalThis.ResizeObserver=class extends Native{constructor(fn){super(fn);live.add(this);}disconnect(){live.delete(this);super.disconnect();}};
+     try{
+       const root=document.querySelector('#relay-panel');
+       mount(root,{service:createDemoService({delay:0})});
+       const current=mount(root,{service:createDemoService({delay:0})});
+       if(live.size!==1)throw new Error('Old observer retained');current.destroy();
+       if(live.size!==0)throw new Error('Disposed observer retained');
+     }finally{globalThis.ResizeObserver=Native;}
+     globalThis.__savedObserver=Native;globalThis.ResizeObserver=undefined;
+     globalThis.__relay=mount(document.querySelector('#relay-panel'),{service:createDemoService({delay:0})});
+   });
+   await p.waitForSelector('[data-row="hk-01"]');await p.setViewportSize({width:390,height:844});await p.waitForFunction(()=>!document.querySelector('#table-scroll-help').hidden);
+   await p.setViewportSize({width:1440,height:1080});await p.waitForFunction(()=>document.querySelector('#table-scroll-help').hidden);
+   await p.evaluate(()=>{globalThis.__relay.destroy();globalThis.ResizeObserver=globalThis.__savedObserver;delete globalThis.__savedObserver;});
+ });
+ await p.close();p=await createPage();
  await check('controlled text contrast on both themes',async()=>{for(const dark of [false,true]){if(dark)await p.click('#theme-toggle');for(const sel of ['h1','.record-name','.record-meta','.metric-label','.metric-foot','.metric-value','.state-maintenance','.state-unknown','.attention-content>span']){const c=await p.locator(sel).first().evaluate(e=>({fg:getComputedStyle(e).color,bgs:[...function*(p){while(p){yield p;p=p.parentElement}}(e)].map(p=>getComputedStyle(p).backgroundColor).reverse()}));const bg=c.bgs.reduce((a,v)=>composite(parseSRGB(v),a),[255,255,255,1]);const ratio=contrastRatio(parseSRGB(c.fg),bg);assert.ok(ratio>=4.5,sel+' '+ratio);report.contrast.push({dark,sel,ratio});}}});
  await check('reduced motion and forced colors preserve semantic controls',async()=>{await p.emulateMedia({reducedMotion:'reduce',forcedColors:'active'});await p.click('#new-instance');assert.ok(await p.locator('#create-dialog').isVisible());await p.keyboard.press('Escape');await p.emulateMedia({reducedMotion:'no-preference',forcedColors:'none'});});
- await p.click('#theme-toggle');await p.setViewportSize({width:1440,height:1080});await shot('panel-desktop');await shot('panel-first-screen',false);await p.click('#new-instance');await shot('panel-create',false);await p.keyboard.press('Escape');await p.click('#theme-toggle');await shot('panel-dark');await p.click('#theme-toggle');await p.setViewportSize({width:390,height:844});await shot('panel-mobile');
+ await p.click('#theme-toggle');await p.setViewportSize({width:1440,height:1080});await shot('panel-desktop');await shot('panel-first-screen',false);await p.click('#new-instance');await shot('panel-create',false);await p.keyboard.press('Escape');await p.click('#theme-toggle');await shot('panel-dark');await p.click('#theme-toggle');await p.setViewportSize({width:390,height:844});await shot('panel-mobile');await p.locator('#collection').evaluate(e=>e.scrollIntoView({block:'start'}));await shot('panel-mobile-collection',false);await p.setViewportSize({width:320,height:844});await p.locator('#collection').evaluate(e=>e.scrollIntoView({block:'start'}));await shot('panel-320-collection',false);
  assert.deepEqual(errors,[]);assert.deepEqual(network,[]);report.errors=errors;report.externalRequests=network;report.status='pass';
  }catch(e){report.status='fail';report.error=e.stack;if(out&&p)await p.screenshot({path:path.join(out,'panel-failure.png'),fullPage:true}).catch(()=>{});throw e;}
  finally{if(out)writeReport(out,'panel.json',report);console.log(JSON.stringify({status:report.status,checks:report.checks.length,layouts:report.layouts.length,contrast:report.contrast.length,error:report.error},null,2));await b.close();}
