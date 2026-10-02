@@ -1,8 +1,8 @@
 'use strict';
+const {claimEvidence, writeReport, launchForEvidence, failureStatus, exitCode, inlineStyles} = require('./support/qa-runtime.cjs');
 // Optional rendered fixture regression; not a visual-quality scorer or a model eval.
 const fs = require('node:fs');
 const path = require('node:path');
-const os = require('node:os');
 const crypto = require('node:crypto');
 const assert = require('node:assert/strict');
 const {pathToFileURL} = require('node:url');
@@ -15,7 +15,6 @@ const result = {status:'running', mode, layouts:0, checks:[], contrast:[], scree
   'Fixture checks are not model evaluations or production business tests.',
   'Emulated viewport, media preferences and keyboard input do not prove physical-device or screen-reader behavior.'
 ]};
-const inside = (parent,child) => child===parent || child.startsWith(parent+path.sep);
 async function check(name, fn) { await fn(); result.checks.push(name); }
 function opaqueBackground(colors) {
   let surface=[0,0,0,0];
@@ -28,22 +27,12 @@ function opaqueBackground(colors) {
 async function main() {
   assert.ok(['file','inline'].includes(mode),'DESIGN_QA_MODE must be file or inline');
   assert.ok(!(process.env.CHROME_CHANNEL && process.env.CHROME_EXECUTABLE_PATH),'Choose channel or executable, not both');
-  if(process.env.DESIGN_QA_DIR) {
-    const requested=path.resolve(process.env.DESIGN_QA_DIR);
-    const target=path.join(fs.realpathSync(path.dirname(requested)),path.basename(requested));
-    assert.ok(!inside(fs.realpathSync(repo),target),'Evidence must be outside the repository');
-    fs.mkdirSync(target); // Exclusive: never overwrite another run. Parent must exist.
-    evidence=target;
-  } else evidence=fs.mkdtempSync(path.join(os.tmpdir(),'edl-regions-'));
+  evidence = claimEvidence(process.env.DESIGN_QA_DIR, {roots: [repo, assetDir], temporaryPrefix: 'edl-regions-'});
   const source=fs.readFileSync(path.join(assetDir,'regions.html'),'utf8');
   const styles=['tokens.css','components.css','regions.css'];
   result.sources=Object.fromEntries(['regions.html',...styles].map(name=>[name,crypto.createHash('sha256').update(fs.readFileSync(path.join(assetDir,name))).digest('hex')]));
   if(mode==='inline') result.limitations.push('Inline setContent: URL navigation and external resource loading not tested.');
-  const playwright=require(process.env.PLAYWRIGHT_MODULE || 'playwright');
-  const launch={headless:true};
-  if(process.env.CHROME_EXECUTABLE_PATH) launch.executablePath=process.env.CHROME_EXECUTABLE_PATH;
-  if(process.env.CHROME_CHANNEL) launch.channel=process.env.CHROME_CHANNEL;
-  const browser=await playwright.chromium.launch(launch);
+  const browser = await launchForEvidence(evidence, 'regions-results.json');
   result.browser=browser.version(); result.node=process.version;
   const context=await browser.newContext({viewport:{width:1440,height:1000}});
   const page=await context.newPage(); const errors=[], external=[];
@@ -53,10 +42,7 @@ async function main() {
   const load=async()=> {
     if(mode==='file') await page.goto(pathToFileURL(path.join(assetDir,'regions.html')).href);
     else {
-      const inline=source.replace(/<link rel="stylesheet" href="([^"]+)">/g,(_,name)=>{
-        assert.ok(styles.includes(name),`Unlisted stylesheet ${name}`);
-        return `<style>${fs.readFileSync(path.join(assetDir,name),'utf8')}</style>`;
-      });
+      const inline = inlineStyles(assetDir, 'regions.html', styles);
       await page.setContent(inline);
     }
   };
@@ -200,7 +186,7 @@ async function main() {
     result.status='passed';
   } finally { await browser.close(); }
 }
-main().catch(err=>{result.status='failed';result.error=err.stack;process.exitCode=1;}).finally(()=>{
-  if(evidence) fs.writeFileSync(path.join(evidence,'regions-results.json'),JSON.stringify(result,null,2)+'\n');
+main().catch(err=>{result.status=failureStatus(err);result.error=err.stack;process.exitCode=exitCode(err);}).finally(()=>{
+  if(evidence) writeReport(evidence, 'regions-results.json', result);
   console.log(JSON.stringify({status:result.status,layouts:result.layouts,checks:result.checks.length,contrast:result.contrast.length,evidence,error:result.error},null,2));
 });

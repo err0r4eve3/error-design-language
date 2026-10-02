@@ -734,6 +734,102 @@
         "把过期数据当实时完整结果"
       ],
       "evidence": "实际代码 diff、工具轨迹和相同内容／尺寸／主题的状态证据；无法执行的部分标明未验证，不按文字承诺判通过。"
+    },
+    {
+      "id": "status-css-ownership",
+      "prompt": "修复状态组件同时加载两份样式后出现双图标和字号变化。",
+      "context": "提供assets/patterns.html与assets/regions.html及对应CSS副本。只修复样式归属，不改状态枚举和业务事件。",
+      "should_trigger": true,
+      "mode": "fix",
+      "must": [
+        "用实际片段复现两种CSS顺序",
+        "区分不兼容变体的样式所有权并同步HTML"
+      ],
+      "must_not": [
+        "以全局important或SVG隐藏掩盖冲突",
+        "改掉状态含义或仅验证单页"
+      ],
+      "evidence": "实际输入与fixture版本、工具轨迹、最小diff和对应状态证据；环境缺失标blocked。定义不是执行结果。"
+    },
+    {
+      "id": "nested-theme-boundary",
+      "prompt": "修复内层明确灰阶仍被外层维护色染色的问题。",
+      "context": "提供regions样例及外层浅色semantic、内层深色mono组合。每个data-design边界默认灰阶，保留既有配置语义。",
+      "should_trigger": true,
+      "mode": "fix",
+      "must": [
+        "局部明确配置覆盖祖先影响",
+        "切换与移除opt-in后结果与独立同配置根一致"
+      ],
+      "must_not": [
+        "全局grayscale或影响内容图片",
+        "只改一个硬编码颜色不验证边界"
+      ],
+      "evidence": "实际输入与fixture版本、工具轨迹、最小diff和对应状态证据；环境缺失标blocked。定义不是执行结果。"
+    },
+    {
+      "id": "submitted-draft-identity",
+      "prompt": "提交后继续编辑时，别把旧响应说成当前内容已保存。",
+      "context": "使用preview单邮箱演示；允许等待时继续编辑，原生验证与仅模拟数据保留。",
+      "should_trigger": true,
+      "mode": "fix",
+      "must": [
+        "完成反馈绑定提交快照且保留新草稿",
+        "同值重试与提交新草稿使用不同且准确的反馈"
+      ],
+      "must_not": [
+        "异步完成后清空新草稿",
+        "把前端防重说成服务器幂等"
+      ],
+      "evidence": "实际输入与fixture版本、工具轨迹、最小diff和对应状态证据；环境缺失标blocked。定义不是执行结果。"
+    },
+    {
+      "id": "long-dialog-reading",
+      "prompt": "修复长详情打开就跳到末尾，且读到中间找不到退出的问题。",
+      "context": "使用preview原生dialog，并明确注入长正文；保留短文自然高度和原生关闭语义。",
+      "should_trigger": true,
+      "mode": "fix",
+      "must": [
+        "按阅读任务选择初始焦点并保持开头可见",
+        "正文可滚动到末尾且退出可达，关闭返回合理触发点"
+      ],
+      "must_not": [
+        "一律给所有弹窗相同焦点模板",
+        "只加overflow:hidden隐藏正文或强制显示关闭态"
+      ],
+      "evidence": "实际输入与fixture版本、工具轨迹、最小diff和对应状态证据；环境缺失标blocked。定义不是执行结果。"
+    },
+    {
+      "id": "async-sibling-domain",
+      "prompt": "切换左侧列表不应取消右侧独立查询，旧结果也不能串进新账户。",
+      "context": "使用有两个独立视图的应用fixture；缺少该fixture须标blocked。允许库内缓存和在途复用，不可改服务器。",
+      "should_trigger": true,
+      "mode": "fix",
+      "must": [
+        "分清数据身份、请求身份与可提交的视图域",
+        "可控乱序成功错误与收尾，独立视图不互相取消"
+      ],
+      "must_not": [
+        "全局唯一请求编号取消所有面板",
+        "给适配器补保护后声称真实应用通过"
+      ],
+      "evidence": "实际输入与fixture版本、工具轨迹、最小diff和对应状态证据；环境缺失标blocked。定义不是执行结果。"
+    },
+    {
+      "id": "nested-layer-dismissal",
+      "prompt": "修复对话框内菜单按一次Escape把两层一起关掉。",
+      "context": "提供框架portal应用fixture；缺失运行环境须标blocked。保留输入法与原控件事件优先权。",
+      "should_trigger": true,
+      "mode": "fix",
+      "must": [
+        "一次关闭仅当前负责层处理，父层保持",
+        "关闭子层后焦点及父层隔离正确，portal逻辑范围不误判"
+      ],
+      "must_not": [
+        "用全局stopPropagation或body放行冒充修复",
+        "以原生单层dialog通过代替嵌套应用验证"
+      ],
+      "evidence": "实际输入与fixture版本、工具轨迹、最小diff和对应状态证据；环境缺失标blocked。定义不是执行结果。"
     }
   ]
 }

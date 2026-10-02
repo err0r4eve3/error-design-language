@@ -1,5 +1,6 @@
 /* Optional controlled-fixture regression. Does not certify real sites or WCAG compliance. */
 'use strict';
+const {claimEvidence, writeReport, launchForEvidence, failureStatus, exitCode, inlineStyles} = require('./support/qa-runtime.cjs');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -7,7 +8,7 @@ const {pathToFileURL} = require('node:url');
 const {parseSRGB, composite, contrastRatio} = require('./color.cjs');
 const root = path.resolve(__dirname, '..');
 const mode = process.env.DESIGN_QA_MODE || 'file';
-const evidence = process.env.DESIGN_QA_DIR;
+let evidence = null;
 const assets = path.resolve(process.env.DESIGN_PREVIEW_DIR || path.join(root, 'assets'));
 const target = pathToFileURL(path.join(assets, 'preview.html')).href;
 const results = {mode, layouts: [], text: [], focus: [], boundaries: [], checks: [], limitations: [
@@ -18,19 +19,10 @@ if (mode === 'inline') results.limitations.push('In-memory HTML/CSS fixture: URL
 
 function save() {
   if (!evidence) return;
-  fs.mkdirSync(evidence, {recursive: true});
-  fs.writeFileSync(path.join(evidence, 'validation.json'), JSON.stringify(results, null, 2));
+  writeReport(evidence, 'validation.json', results);
 }
 function inlinedFixture() {
-  const seen = new Set();
-  const html = fs.readFileSync(path.join(assets, 'preview.html'), 'utf8').replace(/<link\b[^>]*>/g, tag => {
-    const href = tag.match(/href="([^"]+)"/)?.[1];
-    assert.ok(['tokens.css', 'components.css', 'preview.css'].includes(href), `Unsupported fixture link: ${tag}`);
-    seen.add(href);
-    return `<style>${fs.readFileSync(path.join(assets, href), 'utf8')}</style>`;
-  });
-  assert.equal(seen.size, 3, 'All three sample stylesheets must be included');
-  return html;
+  return inlineStyles(assets, 'preview.html', ['tokens.css', 'components.css', 'preview.css']);
 }
 
 // Read actual computed styles, but deliberately refuse unsupported compositing cases.
@@ -117,13 +109,9 @@ async function reusableControls(browser) {
 
 (async () => {
   assert.ok(['file', 'inline'].includes(mode), 'DESIGN_QA_MODE must be file or inline');
+  evidence = claimEvidence(process.env.DESIGN_QA_DIR, {roots: [root, assets]});
   assert.ok(!(process.env.CHROME_CHANNEL && process.env.CHROME_EXECUTABLE_PATH), 'Choose a channel OR an executable, not both');
-  let chromium;
-  try { ({chromium} = require(process.env.PLAYWRIGHT_MODULE || 'playwright')); }
-  catch (error) { throw new Error('Playwright is required only for browser QA. Use an existing installation via PLAYWRIGHT_MODULE.', {cause: error}); }
-  const browser = await chromium.launch({headless: true,
-    ...(process.env.CHROME_CHANNEL ? {channel: process.env.CHROME_CHANNEL} : {}),
-    ...(process.env.CHROME_EXECUTABLE_PATH ? {executablePath: process.env.CHROME_EXECUTABLE_PATH} : {})});
+  const browser = await launchForEvidence(evidence, 'validation.json');
   results.browser = browser.version();
   let page;
   try {
@@ -250,7 +238,6 @@ async function reusableControls(browser) {
     results.checks.push('focus-and-compositing-negative-controls');
 
     if (evidence) {
-      fs.mkdirSync(evidence, {recursive: true});
       for (const theme of ['neutral', 'dark']) {
         await page.selectOption('#theme', theme); await page.selectOption('#material', 'liquid');
         await page.mouse.move(1, 1); await page.evaluate(() => document.activeElement.blur());
@@ -282,11 +269,11 @@ async function reusableControls(browser) {
       checks: results.checks.length};
     save(); console.log(JSON.stringify({status: results.status, mode, browser: results.browser, ...results.summary, limitations: results.limitations}, null, 2));
   } catch (error) {
-    results.status = 'fail'; results.error = error.stack || String(error); save();
+    results.status = failureStatus(error); results.error = error.stack || String(error); save();
     if (page && evidence) await page.screenshot({path: path.join(evidence, 'failure.png'), fullPage: true}).catch(() => {});
     throw error;
   } finally { await browser.close(); }
 })().catch(error => {
-  results.status = 'fail'; results.error = error.stack || String(error); save();
-  console.error(error); process.exitCode = 1;
+  results.status = failureStatus(error); results.error = error.stack || String(error); save();
+  console.error(error); process.exitCode = exitCode(error);
 });

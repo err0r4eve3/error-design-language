@@ -1,12 +1,13 @@
 /* Local collection fixture QA. Not a model evaluation or a production test. */
 'use strict';
+const {claimEvidence, writeReport, launchForEvidence, failureStatus, exitCode, inlineStyles} = require('./support/qa-runtime.cjs');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const {pathToFileURL} = require('node:url');
 const {parseSRGB, composite, contrastRatio} = require('./color.cjs');
 const root = path.resolve(__dirname, '..');
-const assets = path.join(root,'assets');
+const assets = path.resolve(process.env.DESIGN_PREVIEW_DIR || path.join(root,'assets'));
 const mode = process.env.DESIGN_QA_MODE || 'file';
 let out;
 const result = {mode, checks:[], layouts:[], contrast:[], limitations:[
@@ -15,13 +16,9 @@ const result = {mode, checks:[], layouts:[], contrast:[], limitations:[
   'Geometry and copy guards protect this fixture, not general visual quality.'
 ]};
 function inline() {
-  return fs.readFileSync(path.join(assets,'patterns.html'),'utf8').replace(/<link\b[^>]*>/g, tag => {
-    const href = tag.match(/href="([^"]+)"/)?.[1];
-    assert.ok(['tokens.css','components.css','patterns.css'].includes(href));
-    return `<style>${fs.readFileSync(path.join(assets,href),'utf8')}</style>`;
-  });
+  return inlineStyles(assets, 'patterns.html', ['tokens.css', 'components.css', 'patterns.css']);
 }
-const save = () => { if(out) fs.writeFileSync(path.join(out,'patterns-validation.json'),JSON.stringify(result,null,2)); };
+const save = () => { if(out) writeReport(out, 'patterns-validation.json', result); };
 async function settle(page) {
   // Viewport changes deliver matchMedia/ResizeObserver callbacks asynchronously.
   await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
@@ -74,19 +71,8 @@ async function peerLayout(page) {
 (async()=>{
   assert.ok(['file','inline'].includes(mode));
   assert.ok(!(process.env.CHROME_CHANNEL && process.env.CHROME_EXECUTABLE_PATH));
-  if(process.env.DESIGN_QA_DIR) {
-    const requested=path.resolve(process.env.DESIGN_QA_DIR);
-    const target=path.join(fs.realpathSync(path.dirname(requested)),path.basename(requested));
-    const source=fs.realpathSync(root);
-    assert.ok(target!==source && !target.startsWith(source+path.sep),'Evidence must be outside source');
-    assert.ok(!fs.existsSync(target),'Use a fresh evidence directory');
-    fs.mkdirSync(target,{mode:0o700});
-    out=target; // Failed validation must never write an error report into a rejected path.
-  }
-  const {chromium}=require(process.env.PLAYWRIGHT_MODULE || 'playwright');
-  const browser=await chromium.launch({headless:true,
-    ...(process.env.CHROME_CHANNEL?{channel:process.env.CHROME_CHANNEL}:{}),
-    ...(process.env.CHROME_EXECUTABLE_PATH?{executablePath:process.env.CHROME_EXECUTABLE_PATH}:{})});
+  out = claimEvidence(process.env.DESIGN_QA_DIR, {roots: [root, assets]});
+  const browser = await launchForEvidence(out, 'patterns-validation.json');
   result.browser=browser.version();
   const page=await browser.newPage({viewport:{width:1440,height:1000},acceptDownloads:true});
   page.setDefaultTimeout(5000);
@@ -471,8 +457,8 @@ async function peerLayout(page) {
     result.consoleErrors=errors;result.externalRequests=external;result.status='pass';save();
     console.log(JSON.stringify({status:result.status,browser:result.browser,mode,checks:result.checks.length,layouts:result.layouts.length,contrast:result.contrast.length},null,2));
   } catch(error) {
-    result.status='fail';result.error=error.stack;save();
+    result.status=failureStatus(error);result.error=error.stack;save();
     if(out) await page.screenshot({path:path.join(out,'patterns-failure.png'),fullPage:true}).catch(()=>{});
     throw error;
   } finally { await browser.close(); }
-})().catch(error=>{result.status='fail';result.error=error.stack;save();console.error(error);process.exitCode=1;});
+})().catch(error=>{result.status=failureStatus(error);result.error=error.stack;save();console.error(error);process.exitCode=exitCode(error);});

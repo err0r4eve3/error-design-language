@@ -38,7 +38,7 @@
 | [交互契约](references/interaction-contracts.md)／[界面模式](references/interface-patterns.md) | 表单、组合浮层、分阶段异步、键盘、输入法与集合状态 |
 | [项目适配](references/product-profiles.md) | 历史任务组织；不是当前实现证据或写入授权 |
 | [验收与证据](references/verification.md) | 按风险选检查，区分页面、工具与模型证据 |
-| [行为评测](evals/README.md) | 46 个待执行场景、配对方法和离线准备器 |
+| [行为评测](evals/README.md) | 52 个待执行场景、配对方法和离线准备器 |
 | [第十四轮调研](references/research-2026-10-02-round14.md) | Radix 方向上下文、React Aria 与技术短语隔离 |
 | [第十二轮调研](references/research-2026-10-02-round12.md) | TanStack Query、React Router 与确定性竞态探针 |
 | [第十一轮调研](references/research-2026-10-01-round11.md) | Primer、Radix 与 React Spectrum 的源码规则与检验场景 |
@@ -61,6 +61,21 @@
 清单的紧凑状态样式使用 `dl-collection-state`；带图标的独立状态保留 `dl-state`。从旧清单片段升级需同步 HTML 和 CSS。嵌套 `data-design="error"` 建立新的主题边界：状态色省略或 `mono` 为灰阶，`semantic` 为该边界显式启用语义色，不从外层越界套用。
 
 ## 维护检查
+
+优先用统一入口；不传参数只运行 Node 单元检查，不自动启动浏览器或安装依赖：
+
+```sh
+node tests/run.cjs --list
+node tests/run.cjs --suite unit
+node tests/run.cjs --suite preview,patterns --mode inline --out /tmp/edl-qa-new
+node evals/coverage.cjs
+```
+
+`--suite all --mode inline` 显式选择全部当前套件；`--out` 的父目录必须存在，目标须在源码及输入资源之外且尚不存在。不指定输出时创建新的系统临时目录。每套浏览器检查有独立子目录，根目录 `run.json` 记录实际源文件哈希、Node／浏览器信息、模式和 pass／fail／blocked／not_run；套件数不与各套件的断言、布局或颜色采样数相加。缺少 Playwright 或浏览器无法启动为 blocked（退出码2），断言或配置错误退出1，全部所选套件通过退出0。零退出码却无有效通过报告不会计为通过。
+
+七个旧浏览器脚本仍可直接运行，统一使用共享输出保护；被拒绝目录连错误报告也不写入。`DESIGN_PREVIEW_DIR` 指向对照资源时同样被保护。报告只更新本次运行拥有的文件，不采用已有报告。临时目录保护不是针对恶意本地进程的安全沙箱。
+
+维护规则的主定义位置见 [维护边界](references/maintenance.md)；[覆盖索引](evals/coverage.json) 关联52个场景与7套浏览器样例，并明确实际应用／模型未运行。索引检查不是效果评测。运行依赖仍使用已有安装；此入口没有自动安装、部署或启动外部服务。
 
 普通使用不需要测试依赖。结构、颜色数学、本地工具和只读列表契约检查使用 Node.js 内置运行器：
 
@@ -103,7 +118,7 @@ node evals/prepare.cjs --out /tmp/edl-run-01 \
   --cases peer-same-style,strict-monochrome-status,comparison-disclosure
 ```
 
-目标必须是源目录外尚不存在的目录，父目录须存在。只生成输入、分离的判定记录、SHA-256 和 `not_run` 模板，不执行模型／页面，也不创建应用 fixture。输入文件分离不等于权限隔离，细节见 [评测说明](evals/README.md)。46 个场景的定义和准备器单元测试不是 46 项模型通过结果。
+目标必须是源目录外尚不存在的目录，父目录须存在。只生成输入、分离的判定记录、SHA-256 和 `not_run` 模板，不执行模型／页面，也不创建应用 fixture。输入文件分离不等于权限隔离，细节见 [评测说明](evals/README.md)。52 个场景的定义和准备器单元测试不是 52 项模型通过结果。
 
 ## 迭代与验证记录
 
@@ -146,3 +161,5 @@ node tests/dialog-reading.cjs
 ```
 
 新脚本只支持内存HTML/CSS；`DESIGN_PREVIEW_DIR` 可指向同结构资产，`DESIGN_QA_DIR` 必须为源外尚不存在的目录。长正文是明确注入的压力数据，不是实际服务记录。
+
+本轮架构修复及实际执行范围见 [第十七轮验证](evals/validation-2026-10-02-round17.md)。

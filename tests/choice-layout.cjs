@@ -1,4 +1,5 @@
 'use strict';
+const {claimEvidence, writeReport, launchForEvidence, failureStatus, exitCode, inlineStyles} = require('./support/qa-runtime.cjs');
 // Real choice markup in nested direction/width fixtures; no application locale migration.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -70,13 +71,7 @@ function assertUnitOrder(m) {
   }
 }
 function prepareOutput(requested, assets) {
-  if(!requested) return null;
-  const resolved=path.resolve(requested);
-  const dest=path.join(fs.realpathSync(path.dirname(resolved)),path.basename(resolved));
-  for(const source of [fs.realpathSync(root),fs.realpathSync(assets)])
-    assert.ok(dest!==source&&!dest.startsWith(source+path.sep),'Evidence must be outside source');
-  assert.ok(!fs.existsSync(dest),'Use a fresh evidence directory');
-  fs.mkdirSync(dest,{mode:0o700}); return dest;
+  return claimEvidence(requested, {roots: [root, assets]});
 }
 async function run() {
   let browser,out;
@@ -86,10 +81,7 @@ async function run() {
     assert.ok(!(process.env.CHROME_CHANNEL && process.env.CHROME_EXECUTABLE_PATH),'Choose channel or executable, not both');
     out=prepareOutput(process.env.DESIGN_QA_DIR,assets);
     const source=readSources(assets);
-    const {chromium}=require(process.env.PLAYWRIGHT_MODULE || 'playwright');
-    browser=await chromium.launch({headless:true,
-      ...(process.env.CHROME_CHANNEL?{channel:process.env.CHROME_CHANNEL}:{}),
-      ...(process.env.CHROME_EXECUTABLE_PATH?{executablePath:process.env.CHROME_EXECUTABLE_PATH}:{})});
+      browser = await launchForEvidence(out, 'choice-layout.json');
     report.node=process.version;report.browser=browser.version();
     const page=await browser.newPage({viewport:{width:1440,height:1000}});
     page.setDefaultTimeout(5000);
@@ -176,10 +168,10 @@ async function run() {
       await page.screenshot({path:path.join(out,'choice-mobile.png'),fullPage:true});
     }
     report.status='passed';
-  } catch(e) {report.status='failed';report.error=e.stack;process.exitCode=1;}
+  } catch(e) {report.status=failureStatus(e);report.error=e.stack;process.exitCode=exitCode(e);}
   finally {
     if(browser)await browser.close();
-    if(out)fs.writeFileSync(path.join(out,'choice-layout.json'),JSON.stringify(report,null,2)+'\n');
+    if(out)writeReport(out, 'choice-layout.json', report);
     console.log(JSON.stringify(report,null,2));
   }
 }

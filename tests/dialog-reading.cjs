@@ -1,29 +1,16 @@
 /* Optional regression of the delivered native dialog. Not a framework or screen-reader test. */
 'use strict';
+const {claimEvidence, writeReport, launchForEvidence, failureStatus, exitCode, inlineStyles} = require('./support/qa-runtime.cjs');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 
 function inlineFixture(assets) {
-  const expected = new Set(['tokens.css', 'components.css', 'preview.css']);
-  const html = fs.readFileSync(path.join(assets, 'preview.html'), 'utf8').replace(/<link\b[^>]*>/g, tag => {
-    const name = tag.match(/href="([^"]+)"/)?.[1];
-    assert.ok(expected.delete(name), 'unexpected or repeated stylesheet');
-    return `<style>${fs.readFileSync(path.join(assets, name), 'utf8')}</style>`;
-  });
-  assert.equal(expected.size, 0, 'missing stylesheet');
-  return html;
+  return inlineStyles(assets, 'preview.html', ['tokens.css', 'components.css', 'preview.css']);
 }
 function claimOutput(value) {
-  if (!value) return null;
-  const resolved = path.resolve(value);
-  const dest = path.join(fs.realpathSync(path.dirname(resolved)), path.basename(resolved));
-  const relative = path.relative(fs.realpathSync(root), dest);
-  assert.ok(relative === '..' || relative.startsWith('..' + path.sep) || path.isAbsolute(relative), 'output must be outside source');
-  assert.ok(!fs.existsSync(dest), 'output must not already exist');
-  fs.mkdirSync(dest);
-  return dest;
+  return claimEvidence(value, {roots: [root, path.resolve(process.env.DESIGN_PREVIEW_DIR || path.join(root, 'assets'))]});
 }
 // Wait for layout/input delivery, not an artificial network delay.
 const frames = (page, n = 12) => page.evaluate(count => new Promise(resolve => {
@@ -58,15 +45,12 @@ async function main() {
   const out = claimOutput(process.env.DESIGN_QA_DIR);
   const html = inlineFixture(path.resolve(process.env.DESIGN_PREVIEW_DIR || path.join(root, 'assets')));
   assert.ok(!(process.env.CHROME_CHANNEL && process.env.CHROME_EXECUTABLE_PATH), 'choose channel OR executable');
-  const {chromium} = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
-  const browser = await chromium.launch({headless:true,
-    ...(process.env.CHROME_EXECUTABLE_PATH ? {executablePath:process.env.CHROME_EXECUTABLE_PATH} : {}),
-    ...(process.env.CHROME_CHANNEL ? {channel:process.env.CHROME_CHANNEL} : {})});
+  const browser = await launchForEvidence(out, 'dialog-reading.json');
   const result = {mode:'inline',browser:browser.version(),checks:[],layouts:[],errors:[],requests:[],
     limitations:['Actual preview markup and script with explicitly injected long reading content.',
       'No real URL loading, server, native IME, software keyboard, zoom, Safari/Firefox, or screen-reader speech.',
       'Native dialog containment checked against page controls; browser chrome is outside this test.']};
-  const save = () => { if (out) fs.writeFileSync(path.join(out, 'dialog-reading.json'), JSON.stringify(result,null,2)); };
+  const save = () => { if (out) writeReport(out, 'dialog-reading.json', result); };
   const shot = (p,name) => out ? p.screenshot({path:path.join(out,name+'.png')}) : undefined;
   async function pageFor(width=1000,height=700,source=html) {
     const p = await browser.newPage({viewport:{width,height},reducedMotion:'reduce'});
@@ -174,5 +158,5 @@ async function main() {
   } catch(e) {result.passed=false;result.failure=String(e);save();throw e;}
   finally {await browser.close();}
 }
-if(require.main===module)main().catch(e=>{console.error(e);process.exitCode=1;});
+if(require.main===module)main().catch(e=>{console.error(e);process.exitCode=exitCode(e);});
 module.exports={inlineFixture,claimOutput};

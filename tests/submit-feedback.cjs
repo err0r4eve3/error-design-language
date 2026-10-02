@@ -1,42 +1,26 @@
 /* Optional real-sample regression. Inline DOM and controlled time, not a backend test. */
 'use strict';
+const {claimEvidence, writeReport, launchForEvidence, failureStatus, exitCode, inlineStyles} = require('./support/qa-runtime.cjs');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const {parseSRGB, composite, contrastRatio} = require('./color.cjs');
 const root = path.resolve(__dirname, '..');
 function inlineFixture(assets) {
-  const css = new Set(['tokens.css', 'components.css', 'preview.css']);
-  const html = fs.readFileSync(path.join(assets, 'preview.html'), 'utf8').replace(/<link\b[^>]*>/g, tag => {
-    const file = tag.match(/href="([^"]+)"/)?.[1];
-    assert.ok(css.delete(file), 'unexpected or repeated stylesheet');
-    return `<style>${fs.readFileSync(path.join(assets, file), 'utf8')}</style>`;
-  });
-  assert.equal(css.size, 0, 'missing stylesheet');
-  return html;
+  return inlineStyles(assets, 'preview.html', ['tokens.css', 'components.css', 'preview.css']);
 }
 function claimOutput(value) {
-  if (!value) return null;
-  const resolved = path.resolve(value);
-  const dest = path.join(fs.realpathSync(path.dirname(resolved)), path.basename(resolved));
-  const relative = path.relative(fs.realpathSync(root), dest);
-  assert.ok(relative === '..' || relative.startsWith('..' + path.sep) || path.isAbsolute(relative), 'output must be outside source');
-  assert.ok(!fs.existsSync(dest), 'output must not already exist');
-  fs.mkdirSync(dest); // No recursive creation; never overwrite an earlier run.
-  return dest;
+  return claimEvidence(value, {roots: [root, path.resolve(process.env.DESIGN_PREVIEW_DIR || path.join(root, 'assets'))]});
 }
 async function main() {
   const out = claimOutput(process.env.DESIGN_QA_DIR); // Before loading a browser or writing reports.
   const html = inlineFixture(path.resolve(process.env.DESIGN_PREVIEW_DIR || path.join(root, 'assets')));
   assert.ok(!(process.env.CHROME_CHANNEL && process.env.CHROME_EXECUTABLE_PATH), 'choose channel OR executable');
-  const {chromium} = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
-  const browser = await chromium.launch({headless:true,
-    ...(process.env.CHROME_EXECUTABLE_PATH ? {executablePath:process.env.CHROME_EXECUTABLE_PATH} : {}),
-    ...(process.env.CHROME_CHANNEL ? {channel:process.env.CHROME_CHANNEL} : {})});
+  const browser = await launchForEvidence(out, 'submit-feedback.json');
   const result = {mode:'inline',browser:browser.version(),checks:[],layouts:[],contrasts:[],errors:[],requests:[],
     limitations:['Real sample, simulated completion clock. No server or network request.',
       'No native IME, Safari/Firefox, physical device, screen-reader speech, or model-behavior evaluation.']};
-  const save = () => { if (out) fs.writeFileSync(path.join(out,'submit-feedback.json'), JSON.stringify(result,null,2)); };
+  const save = () => { if (out) writeReport(out, 'submit-feedback.json', result); };
   async function pageFor(source=html, width=1000) {
     const page = await browser.newPage({viewport:{width,height:900},reducedMotion:'reduce'});
     page.on('pageerror', e=>result.errors.push(String(e)));
@@ -155,4 +139,4 @@ async function main() {
   } catch(e) {result.status='fail';result.error=e.stack;save();throw e;} finally {await browser.close();}
 }
 module.exports={inlineFixture,claimOutput};
-if(require.main===module)main().catch(e=>{console.error(e);process.exitCode=1;});
+if(require.main===module)main().catch(e=>{console.error(e);process.exitCode=exitCode(e);});

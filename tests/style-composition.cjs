@@ -1,4 +1,5 @@
 'use strict';
+const {claimEvidence, writeReport, launchForEvidence, failureStatus, exitCode, inlineStyles} = require('./support/qa-runtime.cjs');
 // Inline composition regression using markup extracted from the real sample pages.
 // Does not evaluate models, external pages, React portals, or a production application.
 const assert = require('node:assert/strict');
@@ -17,18 +18,10 @@ const read = name => fs.readFileSync(path.join(assets, name), 'utf8');
 const themes = ['neutral', 'dark'];
 const modes = ['semantic', 'mono', ''];
 function prepareOutput() {
-  if (!process.env.DESIGN_QA_DIR) return;
-  const requested = path.resolve(process.env.DESIGN_QA_DIR);
-  const target = path.join(fs.realpathSync(path.dirname(requested)), path.basename(requested));
-  for (const source of [fs.realpathSync(root), fs.realpathSync(assets)]) {
-    assert.ok(target !== source && !target.startsWith(source + path.sep), 'Evidence must be outside source');
-  }
-  assert.ok(!fs.existsSync(target), 'Use a fresh evidence directory');
-  fs.mkdirSync(target, {mode: 0o700});
-  out = target; // A rejected path must never receive even an error report.
+  out = claimEvidence(process.env.DESIGN_QA_DIR, {roots: [root, assets]});
 }
 function save() {
-  if (out) fs.writeFileSync(path.join(out, 'style-composition.json'), JSON.stringify(result, null, 2));
+  if (out) writeReport(out, 'style-composition.json', result);
 }
 const shell = `body{margin:0;padding:28px;background:var(--dl-canvas);color:var(--dl-text);font:16px/1.6 var(--dl-font)}
 main{max-width:860px;margin:auto}h1{font-size:26px;line-height:1.3;margin:0 0 8px;color:var(--dl-strong)}
@@ -39,10 +32,7 @@ const modeAttr = mode => mode ? ` data-status-color="${mode}"` : '';
 async function main() {
   assert.ok(!(process.env.CHROME_CHANNEL && process.env.CHROME_EXECUTABLE_PATH), 'Choose channel or executable, not both');
   prepareOutput();
-  const {chromium} = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
-  browser = await chromium.launch({headless: true,
-    ...(process.env.CHROME_CHANNEL ? {channel: process.env.CHROME_CHANNEL} : {}),
-    ...(process.env.CHROME_EXECUTABLE_PATH ? {executablePath: process.env.CHROME_EXECUTABLE_PATH} : {})});
+  browser = await launchForEvidence(out, 'style-composition.json');
   result.browser = browser.version(); result.node = process.version;
   const errors = [], network = [];
   async function freshPage() {
@@ -217,4 +207,4 @@ async function main() {
   result.status = 'passed'; save();
   console.log(JSON.stringify({status: result.status, checks: result.checks.length, orders: result.orders.length, scopes: result.scopes.length, contrast: result.contrast.length}));
 }
-main().catch(error => { result.status = 'failed'; result.error = String(error); save(); console.error(error); process.exitCode = 1; }).finally(async () => { await browser?.close(); });
+main().catch(error => { result.status = failureStatus(error); result.error = String(error); save(); console.error(error); process.exitCode = exitCode(error); }).finally(async () => { await browser?.close(); });
