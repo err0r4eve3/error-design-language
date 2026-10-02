@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "suites": [
+    {"id":"preview","script":"tests/preview.cjs","report":"validation.json","modes":["file","inline"],"assets":["assets/preview.html","assets/preview.css","assets/components.css","assets/tokens.css"],"level":"sample"},
+    {"id":"patterns","script":"tests/patterns.cjs","report":"patterns-validation.json","modes":["file","inline"],"assets":["assets/patterns.html","assets/patterns.css","assets/components.css","assets/tokens.css"],"level":"sample"},
+    {"id":"regions","script":"tests/regions.cjs","report":"regions-results.json","modes":["file","inline"],"assets":["assets/regions.html","assets/regions.css","assets/components.css","assets/tokens.css"],"level":"sample"},
+    {"id":"style-composition","script":"tests/style-composition.cjs","report":"style-composition.json","modes":["inline"],"assets":["assets/patterns.html","assets/patterns.css","assets/regions.html","assets/regions.css","assets/components.css","assets/tokens.css"],"level":"sample"},
+    {"id":"choice-layout","script":"tests/choice-layout.cjs","report":"choice-layout.json","modes":["inline"],"assets":["assets/regions.html","assets/regions.css","assets/components.css","assets/tokens.css"],"level":"sample"},
+    {"id":"submit-feedback","script":"tests/submit-feedback.cjs","report":"submit-feedback.json","modes":["inline"],"assets":["assets/preview.html","assets/preview.css","assets/components.css","assets/tokens.css"],"level":"sample"},
+    {"id":"dialog-reading","script":"tests/dialog-reading.cjs","report":"dialog-reading.json","modes":["inline"],"assets":["assets/preview.html","assets/preview.css","assets/components.css","assets/tokens.css"],"level":"sample"}
+  ]
+}

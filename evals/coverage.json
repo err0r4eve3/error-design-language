@@ -1,0 +1,188 @@
+{
+  "schema_version": 1,
+  "baseline_commit": "44d80ba325c370aea3b0d3a3db5c12a57b84e9e9",
+  "meaning": "Links are coverage definitions, never passing results. Per-run evidence lives outside the source.",
+  "capabilities": [
+    {
+      "id": "scope-brand",
+      "rule_owner": "SKILL.md",
+      "sample_suites": [],
+      "model_cases": [
+        "review-readonly",
+        "reference-over-default",
+        "no-browser",
+        "no-execution",
+        "backend-negative",
+        "paper-negative",
+        "untrusted-reference",
+        "hierarchy-no-browser",
+        "hierarchy-user-brand",
+        "books-evidence-boundary",
+        "reference-evidence-boundary",
+        "showcase-is-not-benchmark"
+      ],
+      "model_status": "not_run",
+      "integration_status": "not_run",
+      "gap": "宿主路由与独立模型运行尚未验证。"
+    },
+    {
+      "id": "visual-hierarchy",
+      "rule_owner": "SKILL.md",
+      "sample_suites": [
+        "preview",
+        "regions"
+      ],
+      "model_cases": [
+        "fix-hover-only",
+        "glass-fallback",
+        "preserve-content-color",
+        "icon-and-density",
+        "motion-restraint",
+        "peer-same-style",
+        "amplify-target-only",
+        "quiet-with-anchor",
+        "surface-state-collision",
+        "hierarchy-divider-dependency",
+        "preserve-approved-bento"
+      ],
+      "model_status": "not_run",
+      "integration_status": "not_run",
+      "gap": "样例不代表文章、展示或编辑器构图质量；视觉诊断细节由维护索引指定。"
+    },
+    {
+      "id": "copy",
+      "rule_owner": "references/product-copy.md",
+      "sample_suites": [
+        "patterns"
+      ],
+      "model_cases": [
+        "copy-dev-brief-leak",
+        "copy-metadata-not-fluff",
+        "copy-docs-exception",
+        "copy-heading-orientation",
+        "copy-dynamic-states"
+      ],
+      "model_status": "not_run",
+      "integration_status": "not_run",
+      "gap": "检查器不是自然语言语义判定器。"
+    },
+    {
+      "id": "collection",
+      "rule_owner": "references/collection-workflows.md",
+      "sample_suites": [
+        "patterns"
+      ],
+      "model_cases": [
+        "build-dense-console",
+        "numeric-unknown-sort",
+        "selection-scope",
+        "metric-contract-partial",
+        "comparison-disclosure",
+        "empty-cause-recovery"
+      ],
+      "model_status": "not_run",
+      "integration_status": "not_run",
+      "gap": "真实分页接口与权限集成未验证。"
+    },
+    {
+      "id": "navigation",
+      "rule_owner": "references/continuous-navigation.md",
+      "sample_suites": [
+        "patterns"
+      ],
+      "model_cases": [
+        "private-url-state",
+        "focus-after-list-rerender"
+      ],
+      "model_status": "not_run",
+      "integration_status": "not_run",
+      "gap": "页内返回不等于真实URL、重载和Back/Forward。"
+    },
+    {
+      "id": "forms",
+      "rule_owner": "references/interaction-contracts.md",
+      "sample_suites": [
+        "submit-feedback"
+      ],
+      "model_cases": [
+        "form-error-summary",
+        "payment-unknown",
+        "submitted-draft-identity"
+      ],
+      "model_status": "not_run",
+      "integration_status": "not_run",
+      "gap": "只有单字段本地演示；多字段和服务端确认结果需独立fixture。"
+    },
+    {
+      "id": "async",
+      "rule_owner": "references/interaction-contracts.md",
+      "sample_suites": [],
+      "model_cases": [
+        "stale-response",
+        "cached-data-account-boundary",
+        "async-sibling-domain"
+      ],
+      "model_status": "not_run",
+      "integration_status": "not_run",
+      "gap": "tests/async-contract.test.cjs仅验证独立参考模型，真实Hook／缓存适配未执行。"
+    },
+    {
+      "id": "style-boundaries",
+      "rule_owner": "references/component-contracts.md",
+      "sample_suites": [
+        "style-composition",
+        "regions"
+      ],
+      "model_cases": [
+        "strict-monochrome-status",
+        "status-css-ownership",
+        "nested-theme-boundary"
+      ],
+      "model_status": "not_run",
+      "integration_status": "not_run",
+      "gap": "仅状态样式组合，不保证全套CSS任意顺序兼容。"
+    },
+    {
+      "id": "content-pressure",
+      "rule_owner": "references/craft-details.md",
+      "sample_suites": [
+        "choice-layout",
+        "patterns"
+      ],
+      "model_cases": [
+        "cjk-small-screen",
+        "text-spacing-reflow",
+        "ime-search",
+        "copy-rejection"
+      ],
+      "model_status": "not_run",
+      "integration_status": "not_run",
+      "gap": "合成事件与窄容器不证明原生输入法、实体触摸或真实缩放。"
+    },
+    {
+      "id": "overlays",
+      "rule_owner": "references/interaction-contracts.md",
+      "sample_suites": [
+        "dialog-reading"
+      ],
+      "model_cases": [
+        "long-dialog-reading",
+        "nested-layer-dismissal"
+      ],
+      "model_status": "not_run",
+      "integration_status": "not_run",
+      "gap": "原生阅读弹窗已有关联样例；嵌套portal应用仍缺运行fixture。"
+    },
+    {
+      "id": "editorial-showcase",
+      "rule_owner": "SKILL.md",
+      "sample_suites": [],
+      "model_cases": [
+        "build-editorial-not-console"
+      ],
+      "model_status": "not_run",
+      "integration_status": "not_run",
+      "gap": "有内容组织规则，没有可执行文章／展示页面模型基准。"
+    }
+  ]
+}

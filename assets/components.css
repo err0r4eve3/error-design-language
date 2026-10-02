@@ -1,4 +1,8 @@
 /* Reusable controls; load after tokens.css. No global opacity or brightness filter. */
+:where([data-design="error"]) :is(.dl-button,.dl-input,.dl-select) {
+  box-sizing: border-box;
+  max-inline-size: 100%;
+}
 :where([data-design="error"]) .dl-button {
   --button-bg: var(--dl-secondary);
   --button-fg: var(--dl-on-secondary);
@@ -10,6 +14,8 @@
   justify-content: center;
   gap: 8px;
   min-height: 44px;
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
   padding: 10px 16px;
   border: 1px solid var(--button-line);
   border-radius: var(--dl-radius-control);
@@ -64,4 +70,15 @@
 :where([data-design="error"]) .dl-input[aria-invalid="true"] { border-width: 2px; border-color: var(--dl-strong); }
 @media (max-width:540px) {
   :where([data-design="error"]) :is(.dl-input,.dl-select) { font-size: 16px; }
+}
+
+@media (forced-colors: active) {
+  :where([data-design="error"]) .dl-button { border-color: ButtonText; }
+  :where([data-design="error"]) .dl-button:disabled:not([aria-busy="true"]) {
+    color: GrayText;
+    border-color: GrayText;
+  }
+  :where([data-design="error"]) :is(.dl-button,.dl-input,.dl-select):focus-visible {
+    outline-color: Highlight;
+  }
 }

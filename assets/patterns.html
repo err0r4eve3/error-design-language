@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>服务清单</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="components.css">
+<link rel="stylesheet" href="patterns.css">
+</head>
+<body data-design="error" data-theme="neutral" class="dl-pattern-body">
+<main class="dl-pattern-page">
+  <header class="dl-pattern-header">
+    <div><p class="dl-page-context">演示工作区 / 资源</p><h1>服务清单</h1></div>
+    <div class="dl-cluster"><span class="dl-environment">演示数据 · 不连接真实服务</span><div class="dl-field"><label for="theme">主题</label><select id="theme" class="dl-select"><option value="neutral">浅色</option><option value="dark">深色</option></select></div></div>
+  </header>
+  <div class="dl-pattern-layout" id="collection-layout" data-inspecting="false">
+    <section class="dl-panel" id="service-collection" aria-labelledby="services-title">
+      <header class="dl-collection-heading"><h2 id="services-title">全部服务</h2><span class="dl-collection-meta">月费单位 USD</span></header>
+      <div class="dl-filterbar" role="search" aria-label="筛选服务">
+        <div class="dl-field dl-search-field"><label for="query">服务名称或编号</label><input id="query" class="dl-input" type="search" autocomplete="off" placeholder="搜索服务…"></div>
+        <div class="dl-field"><label for="status">服务状态</label><select id="status" class="dl-select"><option value="all">全部状态</option><option value="running">运行中</option><option value="stopped">已停止</option><option value="unknown">状态待确认</option></select></div>
+      </div>
+      <div class="dl-active-filters" id="active-filters" role="group" aria-label="活动筛选" hidden>
+        <button class="dl-filter-chip" id="clear-query" type="button" hidden><span id="query-chip"></span><span aria-hidden="true">×</span></button>
+        <button class="dl-filter-chip" id="clear-status" type="button" hidden><span id="status-chip"></span><span aria-hidden="true">×</span></button>
+      </div>
+      <div class="dl-context-toolbar" id="context-toolbar" data-selection-active="false">
+        <div class="dl-context-copy">
+          <div id="result-summary"><p id="result-count" role="status">显示 4 / 4 项服务</p><p id="result-total"></p></div>
+          <div id="selection-summary" aria-hidden="true" inert><strong id="selection-count">已选择 0 项</strong><span id="selection-scope"></span><p id="selection-total"></p></div>
+        </div>
+        <div class="dl-context-actions">
+          <div id="result-actions"><button id="reset" type="button" class="dl-button quiet" hidden>清除全部筛选</button></div>
+          <div id="selection-bar" class="dl-cluster" role="group" aria-label="已选服务操作" aria-hidden="true" inert><button id="clear-selection" class="dl-button quiet" type="button">取消选择</button><button id="export-selected" class="dl-button primary" type="button">导出已选 CSV</button></div>
+        </div>
+      </div>
+      <p id="selection-announcement" class="dl-visually-hidden" role="status" aria-atomic="true"></p>
+      <div class="dl-scroll" id="table-scroll" role="region" tabindex="0" aria-label="服务清单" aria-describedby="scroll-help">
+        <table class="dl-table">
+          <colgroup><col class="dl-col-check"><col><col class="dl-col-price"><col class="dl-col-state"><col class="dl-col-action"></colgroup>
+          <caption class="dl-visually-hidden">服务名称、月费、状态及详情</caption>
+          <thead><tr>
+            <th scope="col"><label class="dl-check"><input id="select-visible" type="checkbox" aria-label="选择本次筛选的全部记录"></label></th>
+            <th scope="col">服务与编号</th>
+            <th scope="col" id="price-heading" class="dl-number" aria-sort="ascending"><button class="dl-sort" id="sort-price" type="button">月费（USD）<span id="sort-direction" aria-hidden="true"> ↑</span></button></th>
+            <th scope="col">状态</th><th scope="col" class="dl-row-action">操作</th>
+          </tr></thead>
+          <tbody id="records">
+            <tr data-id="demo-01" data-name="文档预览" data-price="2" data-status="running">
+              <td><label class="dl-check"><input type="checkbox" aria-label="选择文档预览"></label></td>
+              <th scope="row" class="dl-break">文档预览<small class="dl-mono" translate="no">demo-01</small></th>
+              <td class="dl-number">2.00</td>
+              <td><span class="dl-collection-state" data-state="running">运行中</span></td>
+              <td class="dl-row-action"><button type="button" data-detail aria-expanded="false" aria-controls="inspector" aria-label="查看文档预览详情">查看详情</button></td>
+            </tr>
+            <tr data-id="demo-02" data-name="课程资料与协作工作区" data-price="12.5" data-status="stopped">
+              <td><label class="dl-check"><input type="checkbox" aria-label="选择课程资料与协作工作区"></label></td>
+              <th scope="row" class="dl-break">课程资料与协作工作区<small class="dl-mono" translate="no">demo-02</small></th>
+              <td class="dl-number">12.50</td>
+              <td><span class="dl-collection-state" data-state="stopped">已停止</span></td>
+              <td class="dl-row-action"><button type="button" data-detail aria-expanded="false" aria-controls="inspector" aria-label="查看课程资料与协作工作区详情">查看详情</button></td>
+            </tr>
+            <tr data-id="demo-03" data-name="计算任务" data-price="120" data-status="running">
+              <td><label class="dl-check"><input type="checkbox" aria-label="选择计算任务"></label></td>
+              <th scope="row" class="dl-break">计算任务<small class="dl-mono" translate="no">demo-03</small></th>
+              <td class="dl-number">120.00</td>
+              <td><span class="dl-collection-state" data-state="running">运行中</span></td>
+              <td class="dl-row-action"><button type="button" data-detail aria-expanded="false" aria-controls="inspector" aria-label="查看计算任务详情">查看详情</button></td>
+            </tr>
+            <tr data-id="demo-04" data-name="待核验记录" data-price="" data-status="unknown">
+              <td><label class="dl-check"><input type="checkbox" aria-label="选择待核验记录"></label></td>
+              <th scope="row" class="dl-break">待核验记录<small class="dl-mono" translate="no">demo-04</small></th>
+              <td class="dl-number">未读取</td>
+              <td><span class="dl-collection-state" data-state="unknown">状态待确认</span></td>
+              <td class="dl-row-action"><button type="button" data-detail aria-expanded="false" aria-controls="inspector" aria-label="查看待核验记录详情">查看详情</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div id="empty" class="dl-empty dl-stack" hidden><h2>没有匹配的服务</h2><p>修改搜索词或清除筛选，查看其他服务。</p><button id="empty-reset" class="dl-button" type="button">清除筛选</button></div>
+      <footer class="dl-collection-footer"><span>修改筛选将清除当前选择</span><span id="scroll-help">可横向滚动比较各列</span></footer>
+    </section>
+    <aside class="dl-inspector" id="inspector" aria-labelledby="record-title" hidden>
+      <header><div class="dl-inspector-header"><p class="dl-inspector-label">服务详情</p><button id="close-detail" class="dl-button quiet" type="button" aria-label="关闭服务详情"><svg class="dl-back-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M19 12H5m6-6-6 6 6 6"/></svg><span id="close-detail-label">关闭</span></button></div><h2 id="record-title" tabindex="-1"></h2><p id="record-id" class="dl-inspector-id dl-mono" translate="no"></p></header>
+      <div class="dl-detail-context" id="detail-context" hidden><p id="detail-scope"></p><button id="compare-list" class="dl-button quiet" type="button">同时查看清单</button></div>
+      <dl class="dl-keyvalues">
+        <div><dt>服务状态</dt><dd><span id="record-state" class="dl-collection-state"></span></dd></div>
+        <div><dt>月费</dt><dd id="record-price" class="dl-mono"></dd></div>
+      </dl>
+      <p id="record-note" class="dl-inspector-note" hidden></p>
+      <div class="dl-stack"><p id="record-position"></p><div class="dl-inspector-nav"><button id="previous-record" class="dl-button" type="button" aria-keyshortcuts="Alt+ArrowUp" title="上一项（Alt+↑）">上一项</button><button id="next-record" class="dl-button" type="button" aria-keyshortcuts="Alt+ArrowDown" title="下一项（Alt+↓）">下一项</button></div></div>
+    </aside>
+  </div>
+  <p id="record-announcement" class="dl-visually-hidden" role="status" aria-atomic="true"></p>
+  <p id="action-feedback" class="dl-action-feedback" role="status" aria-atomic="true"></p>
+</main>
+<noscript>交互需要 JavaScript；静态清单仍可阅读。</noscript>
+<script>
+(() => {
+'use strict';
+const cleanupKey = Symbol.for('error-design-language.collection-demo.cleanup');
+window[cleanupKey]?.();
+const find = selector => document.querySelector(selector);
+const rows = [...document.querySelectorAll('#records tr')];
+const labels = {running:'运行中', stopped:'已停止', unknown:'状态待确认'};
+let composing = false;
+let committedQuery = '';
+let lastFilter = null;
+let direction = 'ascending';
+let inspectedRow = null;
+const compactViewport = matchMedia('(max-width: 719px)');
+let keepCollectionVisible = false;
+let returnContext = null;
+let detailComposing = false;
+// Only navigation state is retained in memory. No query or selection is persisted.
+function syncPane() {
+  const collection = find('#service-collection');
+  const focusDetail = Boolean(compactViewport.matches && inspectedRow && !keepCollectionVisible);
+  if (focusDetail && !collection.hidden) {
+    returnContext = {x:scrollX, y:scrollY, tableLeft:find('#table-scroll').scrollLeft};
+  }
+  collection.hidden = focusDetail;
+  find('#collection-layout').dataset.pane = focusDetail ? 'detail' : 'collection';
+  find('#detail-context').hidden = !focusDetail;
+  find('#detail-scope').textContent = `当前结果 ${visibleRows().length} 项 · 已选择 ${selectedRows().length} 项`;
+  find('#close-detail-label').textContent = focusDetail ? '返回清单' : '关闭';
+  find('#close-detail').setAttribute('aria-label', focusDetail ? '返回服务清单' : '关闭服务详情');
+}
+function restoreContext(target) {
+  if (returnContext) {
+    const position = returnContext;
+    returnContext = null;
+    find('#table-scroll').scrollLeft = position.tableLeft;
+    window.scrollTo({left:position.x, top:position.y, behavior:'instant'});
+  }
+  if (!target) return;
+  target.focus({preventScroll:true});
+  // Preserve the old viewport when possible; never leave the returned focus off-screen.
+  const rect = target.getBoundingClientRect();
+  if (rect.top < 0 || rect.bottom > innerHeight || rect.left < 0 || rect.right > innerWidth)
+    target.scrollIntoView({block:'nearest', inline:'nearest', behavior:'instant'});
+}
+function inputOwnsKey(event) {
+  return event.defaultPrevented || event.isComposing || composing || detailComposing || event.keyCode === 229
+    || event.ctrlKey || event.metaKey || event.shiftKey
+    || Boolean(event.target.closest?.('input,textarea,select,[contenteditable]:not([contenteditable="false"]),[role="combobox"],[role="menu"],[role="listbox"],dialog'));
+}
+const visibleRows = () => [...find('#records').children].filter(row => !row.hidden);
+const selectedRows = () => visibleRows().filter(row => row.querySelector('input').checked);
+const note = text => { find('#action-feedback').textContent = text; };
+function knownTotal(items) {
+  const priced = items.filter(row => row.dataset.price !== '');
+  // Fixture prices have at most two decimal places; unknown amounts are excluded explicitly.
+  const cents = priced.reduce((sum, row) => sum + Math.round(Number(row.dataset.price) * 100), 0);
+  return !items.length ? '当前结果没有服务' : priced.length
+    ? `已知月费合计 ${(cents / 100).toFixed(2)} USD · ${priced.length}/${items.length} 项有价格`
+    : '月费尚未读取';
+}
+function showContextGroup(id, active) {
+  const group = find('#' + id);
+  group.setAttribute('aria-hidden', String(!active));
+  group.inert = !active;
+}
+function syncSelection(announce = false) {
+  const visible = visibleRows();
+  const selected = selectedRows();
+  const all = find('#select-visible');
+  all.checked = visible.length > 0 && selected.length === visible.length;
+  all.indeterminate = selected.length > 0 && selected.length < visible.length;
+  all.disabled = visible.length === 0;
+  for (const row of rows) row.dataset.selected = String(row.querySelector('input').checked);
+  const active = selected.length > 0;
+  find('#context-toolbar').dataset.selectionActive = String(active);
+  showContextGroup('result-summary', !active);
+  showContextGroup('result-actions', !active);
+  showContextGroup('selection-summary', active);
+  showContextGroup('selection-bar', active);
+  find('#result-total').textContent = knownTotal(visible);
+  find('#selection-count').textContent = `已选择 ${selected.length} 项`;
+  find('#selection-scope').textContent = ` · 当前结果 ${visible.length} 项`;
+  find('#selection-total').textContent = selected.length ? knownTotal(selected) : '月费尚未读取';
+  if (announce) find('#selection-announcement').textContent = selected.length
+    ? `已选择 ${selected.length} 项服务。${knownTotal(selected)}` : '已取消选择。';
+  else if (!active) find('#selection-announcement').textContent = '';
+  if (inspectedRow) syncPane();
+}
+function closeInspector(returnFocus = false) {
+  const previous = inspectedRow;
+  inspectedRow = null;
+  keepCollectionVisible = false;
+  detailComposing = false;
+  find('#record-announcement').textContent = '';
+  syncPane();
+  find('#inspector').hidden = true;
+  find('#collection-layout').dataset.inspecting = 'false';
+  for (const row of rows) {
+    row.dataset.inspected = 'false';
+    row.querySelector('[data-detail]').setAttribute('aria-expanded','false');
+    row.querySelector('[data-detail]').textContent = '查看详情';
+  }
+  for (const id of ['record-title','record-id','record-price','record-state','record-note','record-position']) find('#'+id).textContent = '';
+  restoreContext(returnFocus ? (previous && !previous.hidden ? previous.querySelector('[data-detail]') : find('#query')) : null);
+}
+function inspect(row, focus = true) {
+  if (!row || row.hidden) return;
+  inspectedRow = row;
+  const visible = visibleRows();
+  const index = visible.indexOf(row);
+  for (const item of rows) {
+    const current = item === row;
+    item.dataset.inspected = String(current);
+    item.querySelector('[data-detail]').setAttribute('aria-expanded', String(current));
+    item.querySelector('[data-detail]').textContent = current ? '查看中' : '查看详情';
+  }
+  find('#record-title').textContent = row.dataset.name;
+  find('#record-id').textContent = row.dataset.id;
+  find('#record-state').textContent = labels[row.dataset.status];
+  find('#record-state').dataset.state = row.dataset.status;
+  find('#record-price').textContent = row.dataset.price === '' ? '未读取' : Number(row.dataset.price).toFixed(2) + ' USD / 月';
+  const unknown = row.dataset.status === 'unknown' || row.dataset.price === '';
+  find('#record-note').hidden = !unknown;
+  find('#record-note').textContent = unknown ? '状态或价格尚未读取，不代表服务故障或费用为零。' : '';
+  find('#record-position').textContent = `当前筛选第 ${index + 1} / ${visible.length} 项`;
+  find('#previous-record').disabled = index === 0;
+  find('#next-record').disabled = index === visible.length - 1;
+  find('#inspector').hidden = false;
+  find('#collection-layout').dataset.inspecting = 'true';
+  syncPane();
+  if (focus) find('#record-title').focus();
+}
+function filterRows() {
+  const query = committedQuery.trim().toLocaleLowerCase('zh-CN');
+  const status = find('#status').value;
+  const signature = JSON.stringify([query,status]);
+  if (signature === lastFilter) return;
+  lastFilter = signature;
+  const hadSelection = selectedRows().length > 0;
+  for (const row of rows) {
+    row.hidden = !`${row.dataset.name} ${row.dataset.id}`.toLocaleLowerCase('zh-CN').includes(query)
+      || (status !== 'all' && row.dataset.status !== status);
+    row.querySelector('input').checked = false;
+  }
+  const count = visibleRows().length;
+  find('#result-count').textContent = `显示 ${count} / ${rows.length} 项服务`;
+  find('#table-scroll').hidden = count === 0;
+  find('#scroll-help').hidden = count === 0;
+  find('#empty').hidden = count > 0;
+  find('#reset').hidden = !query && status === 'all';
+  find('#active-filters').hidden = !query && status === 'all';
+  find('#clear-query').hidden = !query;
+  find('#clear-status').hidden = status === 'all';
+  find('#query-chip').textContent = '搜索：' + committedQuery.trim();
+  find('#clear-query').setAttribute('aria-label','移除搜索筛选：'+committedQuery.trim());
+  find('#status-chip').textContent = '状态：' + (labels[status] || '全部');
+  find('#clear-status').setAttribute('aria-label','移除状态筛选：'+(labels[status] || '全部'));
+  if (inspectedRow?.hidden) closeInspector();
+  else if (inspectedRow) inspect(inspectedRow, false);
+  syncSelection();
+  note(hadSelection ? '筛选已变更，已清除原选择。' : '');
+}
+function applyQuery() { committedQuery = find('#query').value; filterRows(); }
+function resetFilters() {
+  composing = false; committedQuery = '';
+  find('#query').value = ''; find('#status').value = 'all';
+  filterRows(); find('#query').focus();
+}
+function csvCell(value) {
+  let text = String(value);
+  // Treat user strings as text when opened by spreadsheet software.
+  if (/^[\s]*[=+@-]/.test(text) || /^[\t\r\n]/.test(text)) text = "'" + text;
+  return '"' + text.replaceAll('"','""') + '"';
+}
+find('#query').addEventListener('compositionstart', () => { composing = true; });
+find('#query').addEventListener('compositionend', () => { composing = false; applyQuery(); });
+find('#query').addEventListener('input', event => { if (!composing && !event.isComposing) applyQuery(); });
+find('#status').addEventListener('change', filterRows);
+find('#reset').addEventListener('click', resetFilters);
+find('#empty-reset').addEventListener('click', resetFilters);
+find('#clear-query').addEventListener('click', () => { composing = false; committedQuery = ''; find('#query').value = ''; filterRows(); find('#query').focus(); });
+find('#clear-status').addEventListener('click', () => { find('#status').value = 'all'; filterRows(); find('#status').focus(); });
+find('#select-visible').addEventListener('change', event => {
+  for (const row of visibleRows()) row.querySelector('input').checked = event.target.checked;
+  syncSelection(true); note('');
+});
+for (const row of rows) row.querySelector('input').addEventListener('change', () => { syncSelection(true); note(''); });
+find('#clear-selection').addEventListener('click', () => {
+  for (const row of rows) row.querySelector('input').checked = false;
+  syncSelection(); find('#select-visible').focus(); note('已取消选择。');
+});
+find('#sort-price').addEventListener('click', () => {
+  direction = direction === 'ascending' ? 'descending' : 'ascending';
+  const sorted = [...rows].sort((a,b) => {
+    const x = a.dataset.price === '' ? null : Number(a.dataset.price);
+    const y = b.dataset.price === '' ? null : Number(b.dataset.price);
+    if (x === null || y === null) return x === y ? 0 : x === null ? 1 : -1;
+    return (direction === 'ascending' ? x - y : y - x) || rows.indexOf(a) - rows.indexOf(b);
+  });
+  for (const row of sorted) find('#records').append(row);
+  find('#price-heading').setAttribute('aria-sort', direction);
+  find('#sort-direction').textContent = direction === 'ascending' ? ' ↑' : ' ↓';
+  if (inspectedRow) inspect(inspectedRow, false);
+});
+for (const row of rows) row.querySelector('[data-detail]').addEventListener('click', () => inspect(row));
+find('#close-detail').addEventListener('click', () => closeInspector(true));
+find('#inspector').addEventListener('compositionstart', () => { detailComposing = true; });
+find('#inspector').addEventListener('compositionend', () => { detailComposing = false; });
+find('#inspector').addEventListener('keydown', event => {
+  if (inputOwnsKey(event) || event.repeat) return;
+  if (event.key === 'Escape' && !event.altKey) {
+    event.preventDefault(); event.stopPropagation(); closeInspector(true);
+  } else if (event.altKey && ['ArrowUp','ArrowDown'].includes(event.key)) {
+    const button = find(event.key === 'ArrowUp' ? '#previous-record' : '#next-record');
+    if (!button.disabled) { event.preventDefault(); event.stopPropagation(); button.click(); }
+  }
+});
+find('#compare-list').addEventListener('click', () => {
+  keepCollectionVisible = true; syncPane();
+  restoreContext(inspectedRow?.querySelector('[data-detail]'));
+});
+function onCompactChange() {
+  const hadHiddenFocus = find('#service-collection').contains(document.activeElement);
+  const wasHidden = find('#service-collection').hidden;
+  syncPane();
+  if (wasHidden && !find('#service-collection').hidden) {
+    // A different width has different geometry; do not replay old document coordinates.
+    if (returnContext) find('#table-scroll').scrollLeft = returnContext.tableLeft;
+    returnContext = null;
+  }
+  if (hadHiddenFocus && find('#service-collection').hidden) find('#record-title').focus();
+}
+compactViewport.addEventListener('change', onCompactChange);
+for (const [selector, step] of [['#previous-record',-1],['#next-record',1]]) find(selector).addEventListener('click', () => {
+  const visible = visibleRows();
+  const next = visible[visible.indexOf(inspectedRow) + step];
+  if (!inspectedRow || !next) return;
+  const origin = document.activeElement;
+  inspect(next, false);
+  // Keep a still-usable navigation trigger focused. At an endpoint, do not jump to
+  // the opposite action: repeated Enter must not silently reverse direction.
+  if (origin?.disabled || !find('#inspector').contains(origin)) {
+    find('#record-title').focus();
+    find('#record-announcement').textContent = '';
+  } else {
+    find('#record-announcement').textContent = `${next.dataset.name}，${find('#record-position').textContent}`;
+  }
+});
+find('#export-selected').addEventListener('click', () => {
+  const selected = selectedRows();
+  if (!selected.length) return;
+  let url, link;
+  try {
+    const data = [['服务编号','服务名称','月费（USD）','状态'],...selected.map(row => [row.dataset.id,row.dataset.name,row.dataset.price,labels[row.dataset.status]])];
+    const csv = '\ufeff' + data.map(row => row.map(csvCell).join(',')).join('\r\n') + '\r\n';
+    url = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8'}));
+    link = document.createElement('a'); link.href = url; link.download = 'selected-services.csv'; document.body.append(link); link.click();
+    note(`已生成 ${selected.length} 项服务的 CSV 文件。`);
+  } catch { note('导出未完成，所选服务保持不变。请重试。'); }
+  finally { link?.remove(); if (url) setTimeout(() => URL.revokeObjectURL(url),1000); }
+});
+find('#theme').addEventListener('change', event => { document.body.dataset.theme = event.target.value; });
+filterRows();
+function syncScrollHint() {
+  const table = find('#table-scroll');
+  const overflow = !table.hidden && table.scrollWidth > table.clientWidth + 1;
+  find('#scroll-help').hidden = !overflow;
+  table.tabIndex = overflow ? 0 : -1;
+}
+const scrollObserver = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(syncScrollHint) : null;
+scrollObserver?.observe(find('#table-scroll'));
+window[cleanupKey] = () => {
+  compactViewport.removeEventListener('change', onCompactChange);
+  scrollObserver?.disconnect();
+};
+syncScrollHint();
+})();
+</script>
+</body>
+</html>

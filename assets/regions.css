@@ -1,0 +1,103 @@
+/* Optional semantic regions. Load after tokens.css; controls also need components.css.
+   No global reset or required application shell. Values are starting points, not a spec. */
+:where([data-design="error"]) :is(.dl-metric-grid,.dl-metric,.dl-choice,.dl-choice-body,.dl-state,.dl-state-mark,.dl-request) {
+  box-sizing: border-box; min-inline-size: 0;
+}
+:where([data-design="error"]) .dl-metric-grid {
+  display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,16rem),1fr));
+  gap: 16px; margin: 0;
+}
+:where([data-design="error"]) .dl-metric {
+  padding: 22px 24px; background: var(--dl-surface); color: var(--dl-text);
+  border: 1px solid var(--dl-line); border-radius: var(--dl-radius-control);
+}
+:where([data-design="error"]) .dl-metric dt { color: var(--dl-text); font-size: 14px; font-weight: 600; }
+:where([data-design="error"]) .dl-metric dd { margin: 12px 0 0; }
+:where([data-design="error"]) .dl-metric-reading { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; }
+:where([data-design="error"]) .dl-metric-value {
+  color: var(--dl-strong); font-size: clamp(28px,3vw,38px); font-weight: 650;
+  line-height: 1.15; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; min-inline-size: 0;
+}
+:where([data-design="error"]) :is(.dl-metric-unit,.dl-metric-note) { color: var(--dl-muted); font-size: 14px; }
+:where([data-design="error"]) .dl-metric .dl-metric-note { margin-block-start: 12px; line-height: 1.6; }
+/* Same-intent objects share a style. Selection comes from the native radio, not a class. */
+:where([data-design="error"]) .dl-choices {
+  display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,13rem),1fr)); gap: 12px;
+}
+:where([data-design="error"]) .dl-choice { display: block; position: relative; cursor: pointer; }
+:where([data-design="error"]) .dl-choice input {
+  position: absolute; inset-inline-start: 18px; inset-block-start: 23px;
+  inline-size: 18px; block-size: 18px; margin: 0; accent-color: var(--dl-selected-indicator);
+}
+:where([data-design="error"]) .dl-choice-body {
+  display: grid; align-content: start; gap: 8px; min-block-size: 112px;
+  padding-block: 18px; padding-inline: 48px 18px; border: 2px solid var(--dl-line);
+  border-radius: var(--dl-radius-control); background: var(--dl-surface); color: var(--dl-text);
+  overflow-wrap: anywhere;
+}
+:where([data-design="error"]) .dl-choice-title { color: inherit; font-size: 17px; font-weight: 600; }
+:where([data-design="error"]) .dl-choice-note { font-size: 14px; }
+:where([data-design="error"]) .dl-choice input:checked + .dl-choice-body {
+  border-color: var(--dl-selected-indicator); background: var(--dl-selected); color: var(--dl-selected-text);
+}
+:where([data-design="error"]) .dl-choice input:disabled + .dl-choice-body {
+  background: var(--dl-disabled); color: var(--dl-on-disabled); border-color: var(--dl-disabled-border); cursor: not-allowed;
+}
+:where([data-design="error"]) .dl-choice input:focus-visible + .dl-choice-body {
+  outline: 2px solid var(--dl-focus); outline-offset: 3px;
+}
+/* A lifecycle label is not a live region, a button, or a request-progress indicator. */
+:where([data-design="error"]) .dl-state {
+  --state-fg: var(--dl-text); --state-bg: var(--dl-feedback);
+  display: inline-flex; align-items: center; gap: 8px; max-inline-size: 100%;
+  color: var(--state-fg); font-size: 14px; font-weight: 600; line-height: 1.5;
+}
+:where([data-design="error"]) .dl-state-mark {
+  flex: 0 0 28px; display: grid; place-items: center; inline-size: 28px; block-size: 28px;
+  border: 1px solid currentColor; border-radius: 6px; background: var(--state-bg);
+}
+:where([data-design="error"]) .dl-state svg {
+  inline-size: 17px; block-size: 17px; fill: none; stroke: currentColor;
+  stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round;
+}
+:where([data-design="error"]) .dl-state[data-state="unknown"] .dl-state-mark {
+  border-style: dashed; border-radius: 50%; background: transparent;
+}
+:where([data-design="error"]) .dl-state > span:last-child { min-inline-size: 0; overflow-wrap: anywhere; }
+/* Resolve the opt-in at each design boundary, not on every matching ancestor.
+   A nested data-design scope defaults to monochrome unless it explicitly opts in. */
+:where([data-design="error"]) {
+  --dl-region-maintenance-fg: var(--dl-text);
+  --dl-region-maintenance-bg: var(--dl-feedback);
+}
+:where([data-design="error"][data-status-color="semantic"]) {
+  --dl-region-maintenance-fg: #805100;
+  --dl-region-maintenance-bg: #fff2d8;
+}
+:where([data-design="error"][data-status-color="semantic"][data-theme="dark"]) {
+  --dl-region-maintenance-fg: #f4c975;
+  --dl-region-maintenance-bg: #34280f;
+}
+:where([data-design="error"]) .dl-state[data-state="maintenance"] {
+  --state-fg: var(--dl-region-maintenance-fg);
+  --state-bg: var(--dl-region-maintenance-bg);
+}
+:where([data-design="error"]) .dl-request {
+  padding: 16px; background: var(--dl-feedback); color: var(--dl-text); border-radius: var(--dl-radius-control);
+}
+:where([data-design="error"]) .dl-request[data-phase="error"] { border-inline-start: 3px solid var(--dl-strong); }
+:where([data-design="error"]) .dl-request-action { min-inline-size: 144px; }
+@media (hover:hover) {
+  :where([data-design="error"]) .dl-choice:hover input:not(:checked):not(:disabled) + .dl-choice-body { border-color: var(--dl-control-border); }
+}
+@media (max-width:540px) {
+  :where([data-design="error"]) .dl-metric { padding: 20px; }
+}
+@media (forced-colors:active) {
+  :where([data-design="error"]) :is(.dl-metric,.dl-choice-body,.dl-request) { border: 1px solid CanvasText; background: Canvas; color: CanvasText; }
+  :where([data-design="error"]) .dl-choice input:checked + .dl-choice-body { border: 2px solid Highlight; }
+  :where([data-design="error"]) .dl-choice input:disabled + .dl-choice-body { color: GrayText; border-color: GrayText; }
+  :where([data-design="error"]) .dl-choice input:focus-visible + .dl-choice-body { outline-color: Highlight; }
+  :where([data-design="error"]) .dl-state { color: CanvasText; }
+  :where([data-design="error"]) .dl-state-mark { background: Canvas; }
+}
