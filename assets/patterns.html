@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="components.css">
 <link rel="stylesheet" href="patterns.css">
 </head>
-<body data-design="error" data-theme="neutral" class="dl-pattern-body">
+<body data-example-kind="product-demo" data-design="error" data-theme="neutral" class="dl-pattern-body">
 <main class="dl-pattern-page">
   <header class="dl-pattern-header">
     <div><p class="dl-page-context">演示工作区 / 资源</p><h1>服务清单</h1></div>
@@ -23,6 +23,7 @@
         <div class="dl-field"><label for="status">服务状态</label><select id="status" class="dl-select"><option value="all">全部状态</option><option value="running">运行中</option><option value="stopped">已停止</option><option value="unknown">状态待确认</option></select></div>
       </div>
       <div class="dl-active-filters" id="active-filters" role="group" aria-label="活动筛选" hidden>
+        <button id="reset" type="button" class="dl-button quiet" hidden>清除全部筛选</button>
         <button class="dl-filter-chip" id="clear-query" type="button" hidden><span id="query-chip"></span><span aria-hidden="true">×</span></button>
         <button class="dl-filter-chip" id="clear-status" type="button" hidden><span id="status-chip"></span><span aria-hidden="true">×</span></button>
       </div>
@@ -32,11 +33,12 @@
           <div id="selection-summary" aria-hidden="true" inert><strong id="selection-count">已选择 0 项</strong><span id="selection-scope"></span><p id="selection-total"></p></div>
         </div>
         <div class="dl-context-actions">
-          <div id="result-actions"><button id="reset" type="button" class="dl-button quiet" hidden>清除全部筛选</button></div>
+          <div id="result-actions"><button id="select-results" type="button" class="dl-button">选择当前结果</button></div>
           <div id="selection-bar" class="dl-cluster" role="group" aria-label="已选服务操作" aria-hidden="true" inert><button id="clear-selection" class="dl-button quiet" type="button">取消选择</button><button id="export-selected" class="dl-button primary" type="button">导出已选 CSV</button></div>
         </div>
       </div>
       <p id="selection-announcement" class="dl-visually-hidden" role="status" aria-atomic="true"></p>
+      <p id="scroll-help" class="dl-scroll-help">左右滚动查看完整列；也可聚焦表格后按方向键。</p>
       <div class="dl-scroll" id="table-scroll" role="region" tabindex="0" aria-label="服务清单" aria-describedby="scroll-help">
         <table class="dl-table">
           <colgroup><col class="dl-col-check"><col><col class="dl-col-price"><col class="dl-col-state"><col class="dl-col-action"></colgroup>
@@ -80,7 +82,7 @@
         </table>
       </div>
       <div id="empty" class="dl-empty dl-stack" hidden><h2>没有匹配的服务</h2><p>修改搜索词或清除筛选，查看其他服务。</p><button id="empty-reset" class="dl-button" type="button">清除筛选</button></div>
-      <footer class="dl-collection-footer"><span>修改筛选将清除当前选择</span><span id="scroll-help">可横向滚动比较各列</span></footer>
+      <footer class="dl-collection-footer"><span>修改筛选将清除当前选择</span></footer>
     </section>
     <aside class="dl-inspector" id="inspector" aria-labelledby="record-title" hidden>
       <header><div class="dl-inspector-header"><p class="dl-inspector-label">服务详情</p><button id="close-detail" class="dl-button quiet" type="button" aria-label="关闭服务详情"><svg class="dl-back-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M19 12H5m6-6-6 6 6 6"/></svg><span id="close-detail-label">关闭</span></button></div><h2 id="record-title" tabindex="-1"></h2><p id="record-id" class="dl-inspector-id dl-mono" translate="no"></p></header>
@@ -105,6 +107,20 @@ window[cleanupKey]?.();
 const find = selector => document.querySelector(selector);
 const rows = [...document.querySelectorAll('#records tr')];
 const labels = {running:'运行中', stopped:'已停止', unknown:'状态待确认'};
+// This is a visual recap only; original table cells retain the accessible data.
+// Derive from those cells so unknown, zero, and the displayed currency stay consistent.
+for (const row of rows) {
+  row.querySelector('.dl-mobile-facts')?.remove();
+  const facts = document.createElement('span');
+  facts.className = 'dl-mobile-facts'; facts.setAttribute('aria-hidden', 'true');
+  const cost = document.createElement('span');
+  cost.className = 'dl-mobile-price';
+  const amount = row.querySelector('td.dl-number').textContent.trim();
+  cost.textContent = row.dataset.price === '' ? `月费：${amount}` : `USD ${amount} / 月`;
+  const status = row.querySelector('.dl-collection-state').cloneNode(true);
+  facts.append(cost, status);
+  row.querySelector('th[scope="row"]').append(facts);
+}
 let composing = false;
 let committedQuery = '';
 let lastFilter = null;
@@ -170,6 +186,7 @@ function syncSelection(announce = false) {
   all.checked = visible.length > 0 && selected.length === visible.length;
   all.indeterminate = selected.length > 0 && selected.length < visible.length;
   all.disabled = visible.length === 0;
+  find('#select-results').disabled = visible.length === 0;
   for (const row of rows) row.dataset.selected = String(row.querySelector('input').checked);
   const active = selected.length > 0;
   find('#context-toolbar').dataset.selectionActive = String(active);
@@ -280,6 +297,10 @@ find('#reset').addEventListener('click', resetFilters);
 find('#empty-reset').addEventListener('click', resetFilters);
 find('#clear-query').addEventListener('click', () => { composing = false; committedQuery = ''; find('#query').value = ''; filterRows(); find('#query').focus(); });
 find('#clear-status').addEventListener('click', () => { find('#status').value = 'all'; filterRows(); find('#status').focus(); });
+find('#select-results').addEventListener('click', () => {
+  for (const row of visibleRows()) row.querySelector('input').checked = true;
+  syncSelection(true); find('#clear-selection').focus(); note('');
+});
 find('#select-visible').addEventListener('change', event => {
   for (const row of visibleRows()) row.querySelector('input').checked = event.target.checked;
   syncSelection(true); note('');

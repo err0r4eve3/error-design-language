@@ -1,0 +1,50 @@
+name: Skill QA
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit:
+    name: Complete Node checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: error-design-language
+    steps:
+      - name: Check out tested revision
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          path: error-design-language
+          persist-credentials: false
+      - name: Use the reproducible Node baseline
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version-file: error-design-language/.nvmrc
+          package-manager-cache: false
+      - name: Run every discovered Node test
+        env:
+          QA_OUTPUT: ${{ runner.temp }}/edl-qa-${{ github.run_id }}-${{ github.run_attempt }}
+        run: node tests/run.cjs --suite unit --out "$QA_OUTPUT"
+      - name: Validate coverage definitions
+        if: ${{ !cancelled() }}
+        run: node evals/coverage.cjs
+      - name: Preserve execution evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: node-qa-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/edl-qa-${{ github.run_id }}-${{ github.run_attempt }}/
+          if-no-files-found: ignore
+          retention-days: 7

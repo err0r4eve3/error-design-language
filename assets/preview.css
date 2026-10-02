@@ -1,19 +1,19 @@
 * { box-sizing: border-box; }
-body { margin:0; background:var(--dl-canvas); color:var(--dl-text); font:400 15px/1.65 var(--dl-font); -webkit-font-smoothing:antialiased; }
+body { margin:0; background:var(--dl-canvas); color:var(--dl-text); font:400 var(--dl-type-body)/var(--dl-leading-body) var(--dl-font); -webkit-font-smoothing:antialiased; }
 button,input,select { font:inherit; }
 a { color:inherit; }
 [hidden] { display:none!important; }
 :focus-visible { outline:2px solid var(--dl-focus); outline-offset:3px; }
 h1,h2,h3,strong { color:var(--dl-strong); }
-h1 { margin:0; font-size:30px; line-height:1.25; font-weight:650; letter-spacing:-.025em; }
-h2 { margin:0; font-size:19px; font-weight:620; line-height:1.4; }
-h3 { margin:0 0 8px; font-size:16px; }
+h1 { margin:0; font-size:var(--dl-type-page); line-height:var(--dl-leading-heading); font-weight:var(--dl-weight-heading); letter-spacing:-.025em; }
+h2 { margin:0; font-size:var(--dl-type-section); font-weight:620; line-height:1.4; }
+h3 { margin:0 0 8px; font-size:var(--dl-type-title); }
 p { margin:0; }
 small,.muted { color:var(--dl-muted); }
 small { font-size:14px; }
-.skip { position:absolute; top:-80px; left:12px; padding:10px; background:var(--dl-surface); z-index:10; }
+.skip { position:absolute; top:-80px; left:12px; padding:10px; background:var(--dl-surface); z-index:var(--dl-layer-skip); }
 .skip:focus { top:10px; }
-.topbar { border-bottom:1px solid var(--dl-line); background:var(--dl-surface); }
+.topbar { position:sticky; inset-block-start:0; z-index:var(--dl-layer-sticky); border-bottom:1px solid var(--dl-line); background:var(--dl-surface); }
 .top-inner { max-width:1220px; margin:auto; display:flex; align-items:center; gap:24px; padding:14px 28px; }
 .wordmark { font-weight:650; color:var(--dl-strong); white-space:nowrap; }
 .top-inner small { margin-right:auto; font-size:13px; }
@@ -35,7 +35,7 @@ small { font-size:14px; }
 .task:hover { background:var(--dl-hover); }
 .task input { width:18px; height:18px; margin:0; accent-color:var(--dl-selected-indicator); }
 .task:has(input:checked) { background:var(--dl-selected); color:var(--dl-selected-text); box-shadow:inset 2px 0 var(--dl-selected-indicator); }
-.task strong { font-size:16px; display:block; font-weight:600; }
+.task strong { font-size:var(--dl-type-title); display:block; font-weight:600; }
 .task small { display:block; margin-top:4px; }
 .task .state { font-size:13px; color:var(--dl-muted); white-space:nowrap; }
 .task:last-child { border-bottom:0; }
@@ -76,7 +76,7 @@ dialog {
   width:min(480px,calc(100% - 32px)); padding:0;
   max-block-size:calc(100vh - 32px); max-block-size:calc(100dvh - 32px);
   overflow:hidden; border:1px solid var(--dl-line); border-radius:var(--dl-radius-overlay);
-  color:var(--dl-text); background:var(--dl-surface); box-shadow:0 20px 60px #0003;
+  color:var(--dl-text); background:var(--dl-surface); box-shadow:var(--dl-elevation-dialog);
 }
 /* Do not override the native closed state with an unconditional display:flex. */
 dialog[open] { display:flex; flex-direction:column; }
@@ -93,10 +93,10 @@ dialog .dialog-footer {
 #detail-meta { color:var(--dl-muted); font-size:14px; }
 noscript { display:block; padding:16px; }
 @supports (backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px)) {
-  :is([data-material="frosted"],[data-material="liquid"]) :is(.topbar,.aside) { background:var(--dl-glass); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); }
+  :is([data-material="frosted"],[data-material="liquid"]) .topbar { background:var(--dl-glass); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); }
 }
-[data-material="liquid"] .aside { border-color:var(--dl-glass-line); box-shadow:inset 0 1px 0 var(--dl-glass-highlight),inset 1px 0 0 var(--dl-glass-highlight),var(--dl-shadow); }
-[data-material="liquid"] .topbar { box-shadow:inset 0 -1px 0 var(--dl-glass-highlight); }
+/* The reference sidebar remains opaque; only the scrolling chrome uses glass. */
+[data-material="liquid"] .topbar { border-color:var(--dl-glass-line); box-shadow:inset 0 -1px 0 var(--dl-glass-highlight); }
 [data-material="solid"] :is(.topbar,.aside) { -webkit-backdrop-filter:none; backdrop-filter:none; background:var(--dl-surface); box-shadow:none; }
 @media(max-width:900px) {
   .layout { grid-template-columns:minmax(0,1fr); }

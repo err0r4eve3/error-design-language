@@ -103,6 +103,36 @@ async function peerLayout(page) {
       const copy=await page.locator('main').innerText();
       assert.ok(!/按原始数值排序|窄屏可横向滚动比较|筛选决定出现哪些|状态用文字表达|功能验收|响应式控制台/.test(copy));
     });
+    await check('mobile-facts-and-scroll-help-visible-before-scrolling',async()=>{
+      for(const width of [320,390]) {
+        await page.setViewportSize({width,height:1000});
+        await page.locator('#table-scroll').evaluate(el=>el.scrollLeft=0);
+        const dimensions=await page.locator('#records tr').evaluateAll(rows=>rows.map(row=>{
+          const facts=row.querySelector('.dl-mobile-facts'),range=document.createRange();
+          range.selectNodeContents(facts);const b=range.getBoundingClientRect();
+          const scroll=document.querySelector('#table-scroll').getBoundingClientRect();
+          return {left:b.left,right:b.right,viewport:innerWidth,scrollLeft:scroll.left,scrollRight:scroll.right,
+            text:facts.textContent,price:row.querySelector('td.dl-number').textContent,
+            status:row.querySelector('td .dl-collection-state').textContent};
+        }));
+        for(const d of dimensions){
+          assert.ok(d.left>=d.scrollLeft&&d.right<=d.scrollRight,JSON.stringify(d));
+          assert.ok(d.text.includes(d.price)&&d.text.includes(d.status));
+        }
+        const hint=await page.locator('#scroll-help').boundingBox(),table=await page.locator('#table-scroll').boundingBox();
+        assert.ok(hint.y+hint.height<=table.y);
+        assert.ok(await page.getByRole('button',{name:'选择当前结果',exact:true}).isVisible());
+        await page.click('#select-results');
+        assert.equal(await page.locator('#records input:checked').count(),4);
+        await page.click('#clear-selection');
+        // All original data columns still exist and can be scrolled to.
+        await page.locator('#table-scroll').evaluate(el=>el.scrollLeft=el.scrollWidth);
+        assert.ok(await page.locator('#records tr').first().locator('td .dl-collection-state').isVisible());
+        await noOverflow(page);
+      }
+      await page.locator('#table-scroll').evaluate(el=>el.scrollLeft=0);
+      await page.setViewportSize({width:1440,height:1000});
+    });
     for(const theme of ['neutral','dark']) {
       await page.selectOption('#theme',theme);
       for(const width of [320,390,768,1024,1440]) {
@@ -366,6 +396,7 @@ async function peerLayout(page) {
       const extra=Array.from({length:32},(_,i)=>template.replaceAll('demo-03',`stress-${i}`).replaceAll('计算任务',`测试服务 ${i}`)).join('\n');
       await page.setContent(html.replace('</tbody>',extra+'</tbody>'));
       await page.setViewportSize({width:390,height:640});
+      await settle(page); // Finish media/layout delivery before recording the return coordinate.
       const button=page.locator('[data-id="stress-31"] [data-detail]');
       await button.focus();
       const before=await page.evaluate(()=>({y:scrollY,left:document.querySelector('#table-scroll').scrollLeft}));
@@ -405,9 +436,9 @@ async function peerLayout(page) {
       }
       await load();await page.setViewportSize({width:390,height:1200});await settle(page);
       const first=row('demo-01').locator('input');
-      const broken=await page.addStyleTag({content:'.dl-context-toolbar [aria-hidden="true"]{display:none!important}'});
+      const broken=await page.addStyleTag({content:'.dl-context-toolbar[data-selection-active="true"]{padding-block:40px!important}'});
       await settle(page);const brokenTop=(await first.boundingBox()).y;await first.check();await settle(page);
-      assert.ok(Math.abs((await first.boundingBox()).y-brokenTop)>20,'Negative probe must detect removal of reserved inactive layout');
+      assert.ok(Math.abs((await first.boundingBox()).y-brokenTop)>20,'Negative probe must detect state-dependent toolbar expansion');
       await broken.evaluate(el=>el.remove());await load();
     });
     await check('continuous-keyboard-navigation-retains-trigger-without-reversing-at-boundaries',async()=>{

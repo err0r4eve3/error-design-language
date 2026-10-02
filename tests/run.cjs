@@ -17,7 +17,7 @@ function validateRegistry(data = registry) {
     ids.add(s.id);
     if (s.script !== `tests/${s.id}.cjs` || !/^[\w-]+\.json$/.test(s.report)) throw new Error('Unsafe suite path');
     if (!s.modes?.length || s.modes.some(m => !['inline', 'file'].includes(m))) throw new Error('Invalid suite modes');
-    for (const name of [s.script, ...s.assets]) {
+    for (const name of [s.script, ...s.assets, ...(s.resources || [])]) {
       if (path.isAbsolute(name) || name.split(/[\\/]/).includes('..')) throw new Error('Unsafe resource path');
       const file = path.join(root, name);
       if (!fs.statSync(file).isFile()) throw new Error(`Missing suite resource: ${name}`);
@@ -56,14 +56,27 @@ function parseArgs(argv) {
   return options;
 }
 function reportPassed(report) {
-  return report && !['fail', 'failed', 'blocked'].includes(report.status) &&
-    (['pass', 'passed'].includes(report.status) || (report.status === undefined && report.passed === true));
+  if (!report || typeof report !== 'object' || Array.isArray(report)) return false;
+  // Do not let one success field override an explicit error or contradictory flag.
+  if (report.passed !== undefined && report.passed !== true) return false;
+  if (report.error != null || report.failure != null) return false;
+  return ['pass', 'passed'].includes(report.status) ||
+    (report.status === undefined && report.passed === true);
+}
+function unitReportPassed(report) {
+  if (report?.schema_version !== 1 || report.kind !== 'node-test-summary' ||
+      report.complete !== true || report.success !== true) return false;
+  const counts = report.counts;
+  const names = ['tests', 'passed', 'failed', 'cancelled', 'skipped', 'todo', 'suites', 'topLevel'];
+  if (!counts || names.some(name => !Number.isSafeInteger(counts[name]) || counts[name] < 0)) return false;
+  return counts.tests > 0 && counts.passed > 0 && counts.failed === 0 && counts.cancelled === 0;
 }
 function classify(child, report, unit = false) {
   if (child.error || child.signal) return {status: 'blocked', reason: child.error?.message || `signal:${child.signal}`};
   if (child.status === 2) return {status: 'blocked', reason: report?.error || 'Browser environment unavailable'};
   if (child.status !== 0) return {status: 'fail', reason: report?.error || `exit:${child.status}`};
-  if (!unit && !reportPassed(report)) return {status: 'fail', reason: 'Child exited zero without an explicit passing report'};
+  if (!(unit ? unitReportPassed(report) : reportPassed(report)))
+    return {status: 'fail', reason: 'Child exited zero without a complete, consistent passing report'};
   return {status: 'pass'};
 }
 function fingerprints(names) {
@@ -91,7 +104,11 @@ function run(options, env = process.env) {
     if (id === 'unit' && !units.length) throw new Error('No unit tests discovered');
     const mode = id === 'unit' ? 'node' : options.mode || s.modes[0];
     const childOut = path.join(out, id);
-    const args = id === 'unit' ? ['--test', ...units] : [s.script];
+    const reportRelative = id === 'unit' ? 'unit-summary.json' : `${id}/${s.report}`;
+    const reportPath = path.join(out, reportRelative);
+    const args = id === 'unit' ? ['--test', '--test-reporter=tap',
+      `--test-reporter=${path.join(root, 'tests/support/unit-reporter.cjs')}`,
+      '--test-reporter-destination=stdout', `--test-reporter-destination=${reportPath}`, ...units] : [s.script];
     const started = Date.now();
     results.suites[id] = {status: 'running', mode, started_at: new Date(started).toISOString()}; summary();
     const child = spawnSync(process.execPath, args, {cwd: root, encoding: 'utf8', timeout: options.timeout, maxBuffer: 32 * 1024 * 1024,
@@ -99,12 +116,13 @@ function run(options, env = process.env) {
     writeArtifact(out, `${id}.stdout.log`, child.stdout || '');
     writeArtifact(out, `${id}.stderr.log`, child.stderr || '');
     let report;
-    if (s && fs.existsSync(path.join(childOut, s.report))) {
-      try { report = JSON.parse(fs.readFileSync(path.join(childOut, s.report), 'utf8')); } catch { /* invalid report fails below */ }
+    if (fs.existsSync(reportPath)) {
+      try { report = JSON.parse(fs.readFileSync(reportPath, 'utf8')); } catch { /* invalid report fails below */ }
     }
     results.suites[id] = {...classify(child, report, id === 'unit'), mode, duration_ms: Date.now() - started,
-      exit_code: child.status, report: s && report ? `${id}/${s.report}` : null, browser: report?.browser || null,
-      sources: fingerprints(id === 'unit' ? units : [s.script, 'tests/support/qa-runtime.cjs', 'tests/suites.json']),
+      exit_code: child.status, report: report ? reportRelative : null, browser: report?.browser || null,
+      ...(id === 'unit' && report?.counts ? {test_counts: report.counts} : {}),
+      sources: fingerprints(id === 'unit' ? [...units, 'tests/run.cjs', 'tests/support/unit-reporter.cjs'] : [s.script, 'tests/support/qa-runtime.cjs', 'tests/suites.json', ...(s.resources || [])]),
       assets_sha256: id === 'unit' ? null : Object.fromEntries(s.assets.map(n => [n, hash(fs.readFileSync(path.join(assets, path.basename(n))))]))};
     summary();
   }
@@ -117,4 +135,4 @@ if (require.main === module) {
     process.exitCode = result.counts?.fail ? 1 : result.counts?.blocked ? 2 : 0;
   } catch (e) { console.error(e); process.exitCode = 1; }
 }
-module.exports = {parseArgs, validateRegistry, reportPassed, classify, run};
+module.exports = {parseArgs, validateRegistry, reportPassed, unitReportPassed, classify, run};

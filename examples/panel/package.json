@@ -1,0 +1,4 @@
+{
+  "name": "relay-panel-demo", "private": true, "type": "module",
+  "imports": {"#relay/*": "./*.mjs"}
+}

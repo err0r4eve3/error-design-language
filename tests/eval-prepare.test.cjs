@@ -32,7 +32,8 @@ test('prepares only prompt/context inputs, with separate unexecuted review recor
  assert.equal(manifest.source_commit,null);assert.equal(manifest.source.tree_sha256,sourceManifest(f.source).tree_sha256);
 });
 test('real suite validates and selected negative routing input does not expose expected trigger',t=>{
- const suite=validateSuite(readJSON(path.join(repo,'evals/cases.json')));assert.equal(suite.cases.length,46);
+ const suite=validateSuite(readJSON(path.join(repo,'evals/cases.json')));
+ assert.ok(suite.cases.some(c=>c.id==='backend-negative' && !c.should_trigger));
  const f=setup(t);prepare({sourceRoot:repo,outDir:f.out,ids:['backend-negative']});
  const input=readJSON(path.join(f.out,'inputs/backend-negative.json'));
  assert.deepEqual(Object.keys(input).sort(),['context','prompt']);
@@ -84,4 +85,18 @@ test('CLI rejects malformed flags and supports an explicit help command',()=>{
  assert.equal(spawnSync(process.execPath,[cli,'--help'],{encoding:'utf8'}).status,0);
  for(const args of [[],['--unknown','a'],['--out'],['--cases',''],['--out','a','--out','b']])
    assert.equal(spawnSync(process.execPath,[cli,...args],{encoding:'utf8'}).status,1);
+});
+
+test('complete current suite prepares every ID, including newly registered cases',t=>{
+ const suite=validateSuite(readJSON(path.join(repo,'evals/cases.json')));
+ const f=setup(t);const result=prepare({sourceRoot:repo,outDir:f.out});
+ const ids=suite.cases.map(c=>c.id);
+ assert.equal(result.cases,ids.length);
+ assert.deepEqual(readJSON(path.join(f.out,'manifest.json')).case_ids,ids);
+ for(const id of ids){
+  assert.deepEqual(Object.keys(readJSON(path.join(f.out,`inputs/${id}.json`))).sort(),['context','prompt']);
+  assert.equal(readJSON(path.join(f.out,`review/${id}.json`)).status,'not_run');
+ }
+ assert.equal(fs.readdirSync(path.join(f.out,'inputs')).length,ids.length);
+ assert.equal(fs.readdirSync(path.join(f.out,'review')).length,ids.length);
 });

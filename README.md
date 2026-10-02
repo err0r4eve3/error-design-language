@@ -1,165 +1,56 @@
-# 项目设计语言
+# Error Design Language
 
-面向产品前端的个人 Skill。默认黑白灰、玻璃辅助层、有限圆角与实色业务内容；保留品牌、布局和任务差异。当前明确要求与确认稿优先，历史偏好不构成迁移授权。
+面向产品前端的个人Skill：灰阶结构、实色内容、精确数字、有限圆角。当前品牌和确认稿优先；评审、局部修复、打磨、新建分别约束范围。
 
 ## 使用
 
-安装完整目录，目录名保持 `error-design-language`，不要只复制 `SKILL.md`。支持显式 Skill 调用的 Codex 环境可使用：
+安装完整`error-design-language`目录，保留名称与相对路径。普通任务从[SKILL.md](SKILL.md)开始，按需读取规则；无需安装测试依赖。中文与英文UI请求都写入description，实际激活行为由宿主决定。
 
 ```text
-使用 $error-design-language，改善订单页的分组与失败恢复。
-保留现有导航、品牌色和业务逻辑，验证本次涉及的桌面与手机状态。
+使用 $error-design-language，改善订单页的层级和失败恢复。
+保留导航、品牌色及业务逻辑，只检查本次涉及的桌面与手机状态。
 ```
 
-| 任务 | 范围示例 |
+## 找到正确入口
+
+| 任务 | 资源 |
 |---|---|
-| 只读评审 | 只评审，给位置、触发步骤与用户后果，不修改文件 |
-| 局部修复 | 只修深色 hover 不可读，不换主题 |
-| 页面打磨 | 保留认可区域，先判断主次、同级分组、状态或操作线索哪里失配 |
-| 新建／重设计 | 按主任务组织完整页面，不只实现首屏 |
+| 页面方向与工作范围 | [Skill入口](SKILL.md)、[任务工作流](references/task-workflows.md) |
+| 主次与同级分组 | [视觉校准](references/visual-calibration.md)、[状态辨识](references/semantic-distinction.md) |
+| 内容与文案 | [页面综合](references/design-synthesis.md)、[产品文案](references/product-copy.md) |
+| 字阶、数字、主题 | [tokens.css](assets/tokens.css)、[token契约](references/token-contracts.md)、[数值与材料](references/visual-system.md) |
+| 组件与应用工程 | [组件契约](references/component-contracts.md)、[应用工程](references/application-engineering.md) |
+| 状态与导航 | [交互契约](references/interaction-contracts.md)、[集合工作流](references/collection-workflows.md)、[连续导航](references/continuous-navigation.md) |
+| 维护与测试 | [维护边界](references/maintenance.md)、[验证原则](references/verification.md)、[行为评测](evals/README.md) |
+| 历史来源和逐轮结果 | [迭代索引](history/README.md) |
 
-入口不依赖特定框架。`agents/openai.yaml` 是宿主适配，不保证各环境安装／触发方式相同。本 Skill 不自动部署、付款、注册，也不修改其他项目。
+## 三种不同用途的样例
 
-## 按需内容
+[preview.html](assets/preview.html)与[regions.html](assets/regions.html)是**组件参考文档**，可以讲解控件或模拟状态；它们的讲解不能直接复制到业务副标题。[patterns.html](assets/patterns.html)是**集合任务演示**，保留原生表格、筛选、独立选择及详情；移动端显示就近的费用／状态摘要，完整列仍可滚动比较。[Relay Panel](examples/panel/README.md)是**应用工程演示**，从同一组原生模块构建页面，包含项目、账单和创建流程。
 
-| 资源 | 用途 |
-|---|---|
-| [入口](SKILL.md) | 范围、核心约束与完成标准 |
-| [任务工作流](references/task-workflows.md) | 评审、修复、打磨、新建、参考稿和环境限制 |
-| [视觉校准](references/visual-calibration.md) | 增强／降噪、表面／交互角色、密度、空态、移动任务 |
-| [同级分组与状态](references/semantic-distinction.md) | 相邻对象辨识、严格灰阶、跨视图状态与动作 |
-| [组件契约](references/component-contracts.md) | 同义复用、行内槽位、操作范围、状态维度及可复用 CSS |
-| [连续导航](references/continuous-navigation.md) | 分栏返回、滚动上下文、键盘归属与连续操作 |
-| [集合工作流](references/collection-workflows.md) | 可移除筛选、选择范围、非模态详情与返回位置 |
-| [页面综合](references/design-synthesis.md) | 内容骨架、构图和跨模块口径 |
-| [产品文案](references/product-copy.md) | 不把开发说明写进产品标题；保留必要条件 |
-| [数值与材料](references/visual-system.md) | 灰阶、字号、形状、玻璃与降级起点 |
-| [界面细节](references/craft-details.md) | 中文、数字、图标、方向边界、容器尺寸与内容压力 |
-| [交互契约](references/interaction-contracts.md)／[界面模式](references/interface-patterns.md) | 表单、组合浮层、分阶段异步、键盘、输入法与集合状态 |
-| [项目适配](references/product-profiles.md) | 历史任务组织；不是当前实现证据或写入授权 |
-| [验收与证据](references/verification.md) | 按风险选检查，区分页面、工具与模型证据 |
-| [行为评测](evals/README.md) | 52 个待执行场景、配对方法和离线准备器 |
-| [第十四轮调研](references/research-2026-10-02-round14.md) | Radix 方向上下文、React Aria 与技术短语隔离 |
-| [第十二轮调研](references/research-2026-10-02-round12.md) | TanStack Query、React Router 与确定性竞态探针 |
-| [第十一轮调研](references/research-2026-10-01-round11.md) | Primer、Radix 与 React Spectrum 的源码规则与检验场景 |
-| [第八轮调研](references/research-2026-10-01-round8.md) | Cloudflare、Supabase、Vercel 与 Cloudscape 的对照 |
-| [第七轮调研](references/research-2026-10-01-round7.md) | Impeccable Extract、Carbon、W3C 与采用边界 |
-| [第六轮调研](references/research-2026-10-01-round6.md) | Impeccable 与四个官方设计系统的采用／不采用 |
+全部使用本地演示数据，不创建真实服务器或收费。复制HTML时保留对应CSS，先加载tokens再加载控件及页面样式。已有设计系统先映射角色，不重复叠加主题。`dl-collection-state`是紧凑清单状态，`dl-state`是独立图标状态；旧代码升级需同步HTML与CSS。
 
-普通执行不一次读取全部参考、历史和测试。追溯时再看 [早期调研](references/research-2026-10-01.md)、[书籍与案例](references/reading-and-comparison.md)、[第四轮资料](references/research-2026-10-01-round4.md) 和 [历史依据](references/evidence.md)。分享个人 Skill 前检查项目名和来源文档是否适合公开。
+```sh
+node examples/panel/build.cjs /tmp/relay-panel.html
+```
 
-## 复用样例
-
-依次加载 [tokens.css](assets/tokens.css) 与 [components.css](assets/components.css)。容器设 `data-design="error"`，主题设 `data-theme="neutral"` 或 `dark`。按钮 `dl-button`，主操作加 `primary`，轻操作加 `quiet`；输入为 `dl-input`／`dl-select`。控件有独立盒模型，不依赖样张全局 reset；事件和可访问语义由使用方实现。
-
-已有设计系统先映射角色，不叠加第二套主题。`workspace` 指辅助工作区，并非两主题都更暗的凹入层。语义色不局限于安全提示，明确的严格灰阶要求仍优先。CSS 材料是轻量近似，不宣称光学折射。
-
-[交互样张](assets/preview.html) 使用同目录 `tokens.css`、`components.css`、`preview.css`；[服务清单样张](assets/patterns.html) 使用 `tokens.css`、`components.css`、`patterns.css`。保留相对路径即可打开。清单演示数值排序、逐项移除筛选、已选 CSV 导出与非模态详情；批量选择和当前查看对象分开，未知月费与覆盖范围保持可见。两份样张均不请求外部服务、不持久化交互状态；只有主动导出才生成文件，不代表真实账单或业务。Relay 是会话独立应用示例，不是仓库默认模板。
-
-[分组与状态样例](assets/regions.html) 另加载可选的 [regions.css](assets/regions.css)：提供静态指标组、原生单选变体，以及独立的服务状态／读取反馈。无新框架或运行依赖；默认灰阶，显式 `data-status-color="semantic"` 才启用局部语义色。它是组件文档，不是产品页面模板；不把其中演示说明复制到业务标题。
-
-清单的紧凑状态样式使用 `dl-collection-state`；带图标的独立状态保留 `dl-state`。从旧清单片段升级需同步 HTML 和 CSS。嵌套 `data-design="error"` 建立新的主题边界：状态色省略或 `mono` 为灰阶，`semantic` 为该边界显式启用语义色，不从外层越界套用。
+目标必须是源外尚不存在的文件。生成HTML的import map/data模块用于便携演示，不是生产CSP建议。
 
 ## 维护检查
 
-优先用统一入口；不传参数只运行 Node 单元检查，不自动启动浏览器或安装依赖：
+使用`.nvmrc`的Node基线；Node测试无需npm依赖。浏览器复用已有Playwright与Chromium，不自动安装。
 
 ```sh
 node tests/run.cjs --list
 node tests/run.cjs --suite unit
-node tests/run.cjs --suite preview,patterns --mode inline --out /tmp/edl-qa-new
+node tests/run.cjs --suite patterns,preview --mode inline --out /tmp/edl-qa-new
 node evals/coverage.cjs
 ```
 
-`--suite all --mode inline` 显式选择全部当前套件；`--out` 的父目录必须存在，目标须在源码及输入资源之外且尚不存在。不指定输出时创建新的系统临时目录。每套浏览器检查有独立子目录，根目录 `run.json` 记录实际源文件哈希、Node／浏览器信息、模式和 pass／fail／blocked／not_run；套件数不与各套件的断言、布局或颜色采样数相加。缺少 Playwright 或浏览器无法启动为 blocked（退出码2），断言或配置错误退出1，全部所选套件通过退出0。零退出码却无有效通过报告不会计为通过。
+`--suite all --mode inline`显式选择注册的全部套件；`--out`的父目录须存在，目标位于源码／输入资源之外且尚不存在。未指定时创建新的临时目录。旧脚本可继续直接调用，仍使用共享目录保护。`PLAYWRIGHT_MODULE`可指定已有包；`CHROME_EXECUTABLE_PATH`与`CHROME_CHANNEL`二选一。
 
-七个旧浏览器脚本仍可直接运行，统一使用共享输出保护；被拒绝目录连错误报告也不写入。`DESIGN_PREVIEW_DIR` 指向对照资源时同样被保护。报告只更新本次运行拥有的文件，不采用已有报告。临时目录保护不是针对恶意本地进程的安全沙箱。
+`run.json`区分pass、fail、blocked、not_run，并保留源文件哈希和环境；Node结构化累计摘要另存。零退出无完整结果不能通过。套件数、断言、布局采样与模型场景不相加。inline不验证真实URL或资源加载；合成输入法与模拟偏好不替代实体设备。
 
-维护规则的主定义位置见 [维护边界](references/maintenance.md)；[覆盖索引](evals/coverage.json) 关联52个场景与7套浏览器样例，并明确实际应用／模型未运行。索引检查不是效果评测。运行依赖仍使用已有安装；此入口没有自动安装、部署或启动外部服务。
+[Skill QA工作流](.github/workflows/qa.yml)只运行完整Node与覆盖定义检查，不运行浏览器或模型。52个模型场景仍是定义，样例回归不能提升它们的状态。历史CI成功不替代当前提交检查。
 
-普通使用不需要测试依赖。结构、颜色数学、本地工具和只读列表契约检查使用 Node.js 内置运行器：
-
-```sh
-node --test tests/*.test.cjs
-```
-
-只读列表契约可单独运行 `node --test tests/async-contract.test.cjs`。它使用受控 Promise 和测试参考模型，不联网、不调用模型，也不是数据层运行依赖。接入真实应用前须实现适配并核对策略，见 [契约范围](evals/README.md)。
-
-可选浏览器检查复用已有 Playwright 与 Chromium：
-
-```sh
-node tests/preview.cjs
-node tests/patterns.cjs
-node tests/regions.cjs
-node tests/style-composition.cjs
-node tests/choice-layout.cjs
-```
-
-`PLAYWRIGHT_MODULE` 可指定现有包。`CHROME_CHANNEL=chrome` 或 `CHROME_EXECUTABLE_PATH` 选择浏览器，两者不要同时设置。`DESIGN_QA_DIR` 指向仓库外新证据目录，父目录须存在；`DESIGN_PREVIEW_DIR` 仅用于维护时对照同结构资源。
-
-若环境禁止页面导航，显式选择内存 fixture，不绕过策略：
-
-```sh
-DESIGN_QA_MODE=inline node tests/preview.cjs
-DESIGN_QA_MODE=inline node tests/patterns.cjs
-DESIGN_QA_MODE=inline node tests/regions.cjs
-```
-
-`style-composition.cjs` 固定使用内存组合样例，从现有页面抽取节点，并对照不同 CSS 顺序及局部主题；它不测试 URL 导航。
-
-`choice-layout.cjs` 同样只使用内存样例，读取真实选择卡节点，检查局部方向、窄容器、数字单位的可见顺序和原生键盘。可选 `DESIGN_BASELINE_DIR` 指向已核对的旧 `assets` 目录，增加同条件 LTR 几何／内容对照；未指定时不报告此项通过。不表示整个应用已经支持 RTL。
-
-内存模式把本地 CSS 嵌入 HTML，使用 `setContent`；不验证 URL 或真实资源加载。默认仍为 `file`。对比度工具只覆盖受控实色与支持的合成；未知背景拒绝判断，不冒充复杂玻璃像素验证。合成 composition 事件、窄视口和模拟系统偏好也不替代真实设备。
-
-第六轮另提供离线输入准备：
-
-```sh
-node evals/prepare.cjs --out /tmp/edl-run-01 \
-  --cases peer-same-style,strict-monochrome-status,comparison-disclosure
-```
-
-目标必须是源目录外尚不存在的目录，父目录须存在。只生成输入、分离的判定记录、SHA-256 和 `not_run` 模板，不执行模型／页面，也不创建应用 fixture。输入文件分离不等于权限隔离，细节见 [评测说明](evals/README.md)。52 个场景的定义和准备器单元测试不是 52 项模型通过结果。
-
-## 迭代与验证记录
-
-历史结果只代表对应轮次的实际执行；不能合并为当前所有文件均已重新验证。
-
-| 轮次 | 重点 | 验证记录 |
-|---|---|---|
-| 1 | 范围、交互契约、控件与焦点 | [第一轮](evals/validation-2026-09-30.md) |
-| 2 | 同类 Skill、产品模式、输入法与清单 | [第二轮](evals/validation-2026-10-01.md) |
-| 3 | 书籍与完整页面、Relay 示例 | [第三轮](evals/validation-2026-10-01-round3.md) |
-| 4 | 开发文案隔离、宏观层级 | [第四轮](evals/validation-2026-10-01-round4.md) |
-| 5 | 同级指标与维护／未知辨识 | [第五轮](evals/validation-2026-10-01-round5.md) |
-| 6 | 统一冲突规则、有条件的设计选择、离线评测准备 | [第六轮](evals/validation-2026-10-01-round6.md) |
-| 7 | 组件契约、状态样例与浏览器负向回归 | [第七轮](evals/validation-2026-10-01-round7.md) |
-| 8 | 同类控制台、集合工作流、清单样例更新 | [第八轮](evals/validation-2026-10-01-round8.md) |
-| 9 | Telegram 分栏返回与键盘归属 | [第九轮](evals/validation-2026-10-01-round9.md) |
-| 10 | 稳定选择工具区与连续查看焦点 | [第十轮](evals/validation-2026-10-01-round10.md) |
-| 11 | 开源实现提炼：行内槽位、组合浮层、分阶段异步 | [第十一轮](evals/validation-2026-10-01-round11.md) |
-| 12 | 异步身份／占位语义与可控竞态探针 | [第十二轮](evals/validation-2026-10-02-round12.md) |
-| 13 | 状态样式所有权、局部主题边界与组合回归 | [第十三轮](evals/validation-2026-10-02-round13.md) |
-| 14 | 选择卡方向边界、技术短语与窄容器回归 | [第十四轮](evals/validation-2026-10-02-round14.md) |
-
-自动断言、截图审阅、真实路径和模型配对是不同证据；测试通过不证明平均生成质量、全站无障碍合规或相对其他工具的优势。
-
-### 第十五轮：提交结果与未提交草稿
-
-交互样张的邮箱反馈绑定本次提交的值；等待时可继续编辑，结果不覆盖新草稿。新草稿使用“提交当前输入”，只有同值失败才显示“重试”。详见 [来源与取舍](references/research-2026-10-02-round15.md) 和 [验证范围](evals/validation-2026-10-02-round15.md)。
-
-新增可选定向检查：`node tests/submit-feedback.cjs`（始终为内存页面，复用上述 Playwright／浏览器环境变量，`DESIGN_QA_DIR` 必须是源外新目录）。它检查真实样张，不是表单框架适配或模型评测。原样张 CSS 与 HTML 需一并更新，其他页面不变。
-
-### 第十六轮：长内容详情的阅读与退出
-
-[规则与源码依据](references/research-2026-10-02-round16.md) · [本轮验证记录](evals/validation-2026-10-02-round16.md)。本轮在上一轮本地表单修订上继续；第十五轮曾被写入工具拦截，历史记录保留，远端是否包含两轮以第十六轮提交结果为准。
-
-`preview.html` 的只读详情从标题开始，正文局部滚动，关闭操作保持可达；短内容不强制全屏。原生关闭状态、焦点返回与上一轮的提交／草稿区分保留。不是所有弹窗都必须采用此布局或初始焦点。可选检查使用已有 Playwright：
-
-```sh
-node --test tests/dialog-reading.test.cjs
-node tests/dialog-reading.cjs
-```
-
-新脚本只支持内存HTML/CSS；`DESIGN_PREVIEW_DIR` 可指向同结构资产，`DESIGN_QA_DIR` 必须为源外尚不存在的目录。长正文是明确注入的压力数据，不是实际服务记录。
-
-本轮架构修复及实际执行范围见 [第十七轮验证](evals/validation-2026-10-02-round17.md)。
+本轮范围：补生成方向与字阶、明确样例文案身份、改善移动清单、收敛README。历史文件物理归档、独立模型评测和真实框架集成仍是分开的维护任务。

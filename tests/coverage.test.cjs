@@ -3,7 +3,7 @@ const test=require('node:test'),assert=require('node:assert/strict');
 const {validateCoverage,current}=require('../evals/coverage.cjs');
 const coverage=require('../evals/coverage.json'),cases=require('../evals/cases.json'),suites=require('./suites.json');
 test('all cases and sample suites are mapped without claiming execution',()=>{
- assert.deepEqual(current(),{capabilities:11,defined_model_cases:52,mapped_sample_suites:7,model_status:'not_run',integration_status:'not_run'});
+ assert.deepEqual(current(),{capabilities:11,defined_model_cases:52,mapped_sample_suites:suites.suites.length,model_status:'not_run',integration_status:'not_run'});
 });
 for(const kind of ['missing-case','missing-suite','fake-pass','unsafe-owner','orphan'])test(`coverage rejects ${kind}`,()=>{
  const data=structuredClone(coverage),c=data.capabilities[0];

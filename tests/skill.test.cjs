@@ -66,7 +66,9 @@ test('CSS references defined variables', () => {
   }
 });
 test('sample has local stylesheets and syntactically valid inline scripts', () => {
-  for (const name of ['preview.html', 'patterns.html']) {
+  const samples = fs.readdirSync(path.join(root, 'assets')).filter(name => name.endsWith('.html')).sort();
+  assert.ok(samples.length > 0, 'No HTML samples discovered');
+  for (const name of samples) {
   const html = read('assets/' + name);
   for (const [, href] of html.matchAll(/<link\b[^>]*href="([^"]+)"/g)) {
     assert.ok(!/^(?:\w+:|\/)/.test(href), `Nonlocal stylesheet: ${href}`);
