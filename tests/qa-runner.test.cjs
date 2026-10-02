@@ -29,3 +29,12 @@ test('runner records selected blocked suites and leaves the rest not_run',()=>{
   assert.deepEqual(fs.readFileSync(file),before);
  }finally{fs.rmSync(dir,{recursive:true,force:true});}
 });
+test('contradictory or error-bearing browser reports fail closed',()=>{
+ for(const report of [
+  {status:'pass',passed:false},{status:'passed',passed:'true'},
+  {status:'pass',error:'partial failure'},{passed:true,failure:'incomplete'},
+  {status:'running',passed:true},{status:'unknown',passed:true}
+ ])assert.equal(classify({status:0},report).status,'fail');
+ for(const report of [{status:'pass'},{status:'passed'},{passed:true},{status:'pass',passed:true}])
+  assert.equal(classify({status:0},report).status,'pass');
+});
