@@ -4,6 +4,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
+const {readFixture, copyFixture} = require('./fixtures.cjs');
 const root = path.resolve(__dirname, '..');
 const digest = bytes => crypto.createHash('sha256').update(bytes).digest('hex');
 const inside = (parent, child) => child === parent || child.startsWith(parent + path.sep);
@@ -60,6 +61,8 @@ function prepare({sourceRoot = root, outDir, ids = []} = {}) {
   const suite = validateSuite(JSON.parse(fs.readFileSync(suiteFile,'utf8')));
   for (const id of ids) if (!suite.cases.some(c => c.id === id)) throw new Error(`Unknown case: ${id}`);
   const selected = ids.length ? ids.map(id => suite.cases.find(c => c.id === id)) : suite.cases;
+  // Validate and snapshot selected fixtures before creating any output.
+  const fixtures = new Map(selected.map(c => [c.id, readFixture(sourceRoot, c.id)]));
   const requested = path.resolve(outDir);
   // Resolve existing parent to catch a symlink into the source tree. Parent must exist.
   const target = path.join(fs.realpathSync(path.dirname(requested)), path.basename(requested));
@@ -70,25 +73,32 @@ function prepare({sourceRoot = root, outDir, ids = []} = {}) {
   // mkdir is exclusive; do not overwrite an existing directory even in a concurrent invocation.
   fs.mkdirSync(target, {mode:0o700});
   try {
-    for (const dir of ['inputs','review']) fs.mkdirSync(path.join(target,dir));
+    for (const dir of ['inputs','workspaces','review']) fs.mkdirSync(path.join(target,dir));
     const write = (file,value) => fs.writeFileSync(path.join(target,file),JSON.stringify(value,null,2)+'\n',{flag:'wx'});
     for (const c of selected) {
-      // Only these two fields are execution input. No expected routing or rubric.
+      // JSON inputs retain exactly prompt/context. Workspaces never contain review metadata.
+      const fixture = fixtures.get(c.id);
+      if (fixture) copyFixture(fixture, path.join(target, 'workspaces', c.id));
       write(`inputs/${c.id}.json`, {prompt:c.prompt, context:c.context});
       write(`review/${c.id}.json`, {case_id:c.id, expected:{should_trigger:c.should_trigger,mode:c.mode,evidence:c.evidence},
-        status:'not_run', model:null, host:null, fixture_status:'not_prepared',
+        status:'not_run', model:null, host:null, fixture_status:fixture ? 'prepared' : 'not_prepared',
+        fixture:fixture ? {workspace:`workspaces/${c.id}`,runtime:fixture.metadata.runtime,
+          entrypoints:fixture.metadata.entrypoints,tree_sha256:fixture.tree_sha256,files:fixture.files,
+          checklist:fixture.metadata.checklist} : null,
         assertions:[...c.must.map(text => ({kind:'must',text,status:'not_run',evidence:[]})),
                     ...c.must_not.map(text => ({kind:'must_not',text,status:'not_run',evidence:[]}))],
         artifacts:[], limitations:[]});
     }
     write('manifest.json', {schema_version:1,purpose:'offline-evaluation-preparation',
       status:'not_run',created_at:new Date().toISOString(),source_commit:null,
-      case_ids:selected.map(c=>c.id),source:manifest});
+      case_ids:selected.map(c=>c.id),source:manifest,
+      fixtures:Object.fromEntries(selected.map(c => { const fixture=fixtures.get(c.id);
+        return [c.id,fixture ? {status:'prepared',workspace:`workspaces/${c.id}`,tree_sha256:fixture.tree_sha256,files:fixture.files} : {status:'not_prepared'}]; }))});
     fs.writeFileSync(path.join(target,'README.txt'),
-      'Prepared inputs only. No model, fixture, browser or product test has run.\n'+
-      'Give the executor only the selected inputs file; do not expose review, the original case rubric or result templates.\n'+
+      'Prepared inputs and available fixture copies only. No model, fixture code, browser or product test has run.\n'+
+      'Give the executor only the selected inputs file AND matching workspaces/<case-id> directory; do not expose review, manifest, the original case rubric or result templates.\n'+
       'This separation is not a sandbox or host access control. Set those boundaries yourself.\n'+
-      'Prepare matching isolated fixtures, freeze source files, and record the actual model/host/tools/budget.\n'+
+      'Cases without bundled fixtures remain not_prepared. Isolate the selected workspace, freeze bytes, and record the actual model/host/tools/budget.\n'+
       'Negative routing cases require real host routing, not a forced Skill load.\n'+
       'source_commit is intentionally null; file hashes identify the bytes, not an inferred Git revision.\n', {flag:'wx'});
   } catch (err) {

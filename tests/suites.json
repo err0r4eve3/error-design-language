@@ -134,6 +134,53 @@
         "examples/panel/build.cjs"
       ],
       "level": "sample"
+    },
+    {
+      "id": "pilot-fixtures",
+      "script": "tests/pilot-fixtures.cjs",
+      "report": "pilot-fixtures.json",
+      "modes": [
+        "inline"
+      ],
+      "assets": [],
+      "resources": [
+        "evals/prepare.cjs",
+        "evals/fixtures.cjs",
+        "evals/cases.json",
+        "tests/color.cjs",
+        "evals/fixtures/backend-negative/review.json",
+        "evals/fixtures/backend-negative/workspace/README.md",
+        "evals/fixtures/backend-negative/workspace/explain.txt",
+        "evals/fixtures/backend-negative/workspace/query.sql",
+        "evals/fixtures/backend-negative/workspace/schema.sql",
+        "evals/fixtures/build-dense-console/review.json",
+        "evals/fixtures/build-dense-console/workspace/README.md",
+        "evals/fixtures/build-dense-console/workspace/instances.json",
+        "evals/fixtures/copy-dev-brief-leak/review.json",
+        "evals/fixtures/copy-dev-brief-leak/workspace/README.md",
+        "evals/fixtures/copy-dev-brief-leak/workspace/app.js",
+        "evals/fixtures/copy-dev-brief-leak/workspace/index.html",
+        "evals/fixtures/copy-dev-brief-leak/workspace/styles.css",
+        "evals/fixtures/fix-hover-only/review.json",
+        "evals/fixtures/fix-hover-only/workspace/README.md",
+        "evals/fixtures/fix-hover-only/workspace/app.js",
+        "evals/fixtures/fix-hover-only/workspace/components.css",
+        "evals/fixtures/fix-hover-only/workspace/index.html",
+        "evals/fixtures/fix-hover-only/workspace/page.css",
+        "evals/fixtures/fix-hover-only/workspace/tokens.css",
+        "evals/fixtures/payment-unknown/review.json",
+        "evals/fixtures/payment-unknown/workspace/README.md",
+        "evals/fixtures/payment-unknown/workspace/app.js",
+        "evals/fixtures/payment-unknown/workspace/index.html",
+        "evals/fixtures/payment-unknown/workspace/service.js",
+        "evals/fixtures/payment-unknown/workspace/styles.css",
+        "evals/fixtures/peer-same-style/review.json",
+        "evals/fixtures/peer-same-style/workspace/README.md",
+        "evals/fixtures/peer-same-style/workspace/app.js",
+        "evals/fixtures/peer-same-style/workspace/index.html",
+        "evals/fixtures/peer-same-style/workspace/styles.css"
+      ],
+      "level": "fixture-reproduction"
     }
   ]
 }
