@@ -1,0 +1,5 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>实例</title><link rel="stylesheet" href="styles.css"></head>
+<body><main><h1>实例</h1><p id="intro">支持搜索、筛选和 CSV 导出的实例管理页面。</p><p class="demo">本地演示数据，刷新会恢复。</p>
+<div class="toolbar"><label>搜索 <input id="search" type="search"></label><label>地区 <select id="region"><option value="">全部</option><option>东京</option><option>香港</option></select></label><button id="export" title="提供搜索、筛选、CSV 导出的管理能力" aria-label="支持搜索筛选及 CSV 导出的实例页面：导出">导出 CSV</button></div>
+<table><thead><tr><th>实例</th><th>地区</th></tr></thead><tbody id="rows"></tbody></table><p id="result" role="status"></p>
+<footer>为你提供搜索、筛选与导出的完整管理体验。</footer></main><script src="app.js"></script></body></html>

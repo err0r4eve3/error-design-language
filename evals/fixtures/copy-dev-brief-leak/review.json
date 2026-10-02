@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "case_id": "copy-dev-brief-leak",
+  "runtime": "browser",
+  "entrypoints": [
+    "index.html"
+  ],
+  "checklist": [
+    "原始副标题、tooltip、无障碍名称和页脚包含开发功能清单，检查不局限于可见副标题。",
+    "修改后保留语义 h1、演示与刷新提示、可访问控件名称；能力由控件表达，不转移开场白。",
+    "搜索、地区筛选与导出当前筛选集合都能操作；检查 CSV 内容而非只看下载按钮。"
+  ]
+}

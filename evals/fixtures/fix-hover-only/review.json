@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "case_id": "fix-hover-only",
+  "runtime": "browser",
+  "entrypoints": [
+    "index.html"
+  ],
+  "checklist": [
+    "原始深色主按钮 hover 对比失效，浅色主按钮不受影响；保存两主题相邻状态。",
+    "最小修复应落在负责的样式层，业务、导航、浅色风格及 token 契约不迁移。",
+    "修后检查键盘焦点、点击、新建反馈与选择状态，不能只截图默认状态。"
+  ]
+}

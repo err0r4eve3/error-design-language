@@ -1,0 +1,2 @@
+button:hover { color: #fff; }
+.actions { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }

@@ -39,7 +39,7 @@ node examples/panel/build.cjs /tmp/relay-panel.html
 
 ## 维护检查
 
-使用`.nvmrc`的Node基线；Node测试无需npm依赖。浏览器复用已有Playwright与Chromium，不自动安装。
+使用`.nvmrc`的Node基线；Node测试无需npm依赖。本地浏览器检查复用已有Playwright与Chromium，不自动安装。
 
 ```sh
 node tests/run.cjs --list
@@ -52,6 +52,6 @@ node evals/coverage.cjs
 
 `run.json`区分pass、fail、blocked、not_run，并保留源文件哈希和环境；Node结构化累计摘要另存。零退出无完整结果不能通过。套件数、断言、布局采样与模型场景不相加。inline不验证真实URL或资源加载；合成输入法与模拟偏好不替代实体设备。
 
-[Skill QA工作流](.github/workflows/qa.yml)只运行完整Node与覆盖定义检查，不运行浏览器或模型。52个模型场景仍是定义，样例回归不能提升它们的状态。历史CI成功不替代当前提交检查。
+[Skill QA工作流](.github/workflows/qa.yml)运行完整Node与覆盖定义检查；新增的[完整浏览器QA](.github/workflows/browser-qa.yml)在临时目录安装固定版本Playwright 1.56.0，执行全部注册套件和支持的file入口，保存源码、报告、日志与截图。两个工作流都不运行模型。52个模型场景仍是定义，样例回归不能提升它们的状态。历史CI成功不替代当前提交检查。
 
-本轮从getdesign.md的24份设计档案与Libraries.dev的7类效果提炼[参考方法与取舍](history/research-2026-10-02-reference-transfer.md)，加入按需规则、文档结构检查及人工挑战题。没有改动现有页面、token、依赖或模型场景目录；文档结构通过不代表设计质量或模型效果已验证。历史文件物理归档、独立模型评测和真实框架集成仍是分开的维护任务。
+此前的参考研究轮从getdesign.md的24份设计档案与Libraries.dev的7类效果提炼[参考方法与取舍](history/research-2026-10-02-reference-transfer.md)，加入按需规则、文档结构检查及人工挑战题。该参考研究轮没有改动现有页面、token、依赖或模型场景目录；文档结构通过不代表设计质量或模型效果已验证。历史文件物理归档、独立模型评测和真实框架集成仍是分开的维护任务。

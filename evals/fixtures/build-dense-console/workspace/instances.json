@@ -1,0 +1,90 @@
+{
+  "kind": "local-demo",
+  "as_of": "2026-10-01T00:00:00Z",
+  "instances": [
+    {
+      "id": "vm-001",
+      "name": "tokyo-01",
+      "region": "东京",
+      "status": "running",
+      "expires_at": "2026-11-01T00:00:00Z"
+    },
+    {
+      "id": "vm-002",
+      "name": "hongkong-02",
+      "region": "香港",
+      "status": "maintenance",
+      "expires_at": "2026-11-02T00:00:00Z"
+    },
+    {
+      "id": "vm-003",
+      "name": "singapore-03",
+      "region": "新加坡",
+      "status": null,
+      "expires_at": "2026-11-03T00:00:00Z"
+    },
+    {
+      "id": "vm-004",
+      "name": "tokyo-04",
+      "region": "东京",
+      "status": "running",
+      "expires_at": "2026-11-04T00:00:00Z"
+    },
+    {
+      "id": "vm-005",
+      "name": "hongkong-05",
+      "region": "香港",
+      "status": "maintenance",
+      "expires_at": "2026-11-05T00:00:00Z"
+    },
+    {
+      "id": "vm-006",
+      "name": "singapore-06",
+      "region": "新加坡",
+      "status": null,
+      "expires_at": "2026-11-06T00:00:00Z"
+    },
+    {
+      "id": "vm-007",
+      "name": "tokyo-07",
+      "region": "东京",
+      "status": "running",
+      "expires_at": "2026-11-07T00:00:00Z"
+    },
+    {
+      "id": "vm-008",
+      "name": "hongkong-08",
+      "region": "香港",
+      "status": "maintenance",
+      "expires_at": "2026-11-08T00:00:00Z"
+    },
+    {
+      "id": "vm-009",
+      "name": "singapore-09",
+      "region": "新加坡",
+      "status": null,
+      "expires_at": "2026-11-09T00:00:00Z"
+    },
+    {
+      "id": "vm-010",
+      "name": "tokyo-10",
+      "region": "东京",
+      "status": "running",
+      "expires_at": "2026-11-10T00:00:00Z"
+    },
+    {
+      "id": "vm-011",
+      "name": "hongkong-11",
+      "region": "香港",
+      "status": "maintenance",
+      "expires_at": "2026-11-11T00:00:00Z"
+    },
+    {
+      "id": "vm-012",
+      "name": "singapore-12",
+      "region": "新加坡",
+      "status": null,
+      "expires_at": null
+    }
+  ]
+}

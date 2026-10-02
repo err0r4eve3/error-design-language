@@ -4,7 +4,7 @@
 
 ## 覆盖索引
 
-运行 `node evals/coverage.cjs` 检查 [coverage.json](coverage.json)：52个模型场景均有能力归属，7个浏览器样例套件均有关联；新增6项针对样式归属、局部主题、提交草稿、长文阅读、独立请求域和嵌套浮层。场景定义、样例回归与真实应用／模型运行分别记录，不能因关联套件通过就把模型状态改成pass。真实双面板或框架Portal fixture缺失时仍是blocked，不用参考模型代替。
+运行 `node evals/coverage.cjs` 检查 [coverage.json](coverage.json)：52个模型场景均有能力归属，9个注册浏览器套件（8个样例、1个fixture复现）均有关联；新增6项针对样式归属、局部主题、提交草稿、长文阅读、独立请求域和嵌套浮层。场景定义、样例回归与真实应用／模型运行分别记录，不能因关联套件通过就把模型状态改成pass。真实双面板或框架Portal fixture缺失时仍是blocked，不用参考模型代替。
 
 索引没有执行器，也没有解决宿主权限隔离；52项仍是未执行的模型场景。独立基准应先冻结应用输入和运行预算，再保留原始输出、轨迹和判定结果。套件统一入口与规则所有者见 [维护边界](../references/maintenance.md)。
 
@@ -43,11 +43,13 @@ node evals/prepare.cjs --out /tmp/edl-run-01 \
 
 输出目录的父目录须已存在，目标必须在本 Skill 之外且尚不存在。省略 `--cases` 会准备全部 52 个场景。原文件不改动，已有结果不覆盖；错误的 ID、重复选择、越界目标及源码符号链接会被拒绝。运行前自行检查源目录只含准备纳入哈希的 Skill 文件，工具不会识别任意命名的私人文件。
 
-`inputs/<id>.json` 只有 `prompt` 与 `context`；`review/<id>.json` 单独保存预期触发、判定条目和结果空表。全部结果为 `not_run`，fixture 为 `not_prepared`，不预置通过。`manifest.json` 记录实际文件 SHA-256 与稳定文件树摘要；`source_commit` 为 null，不能用未验证的 Git HEAD 冒充当前文件版本。点目录／点文件、依赖和指定本地测试产物目录不计入，规则写入 manifest。
+`inputs/<id>.json` 只有 `prompt` 与 `context`；`review/<id>.json` 单独保存预期触发、判定条目和结果空表。全部模型结果仍为 `not_run`。六个 pilot 场景的离线起点复制到 `workspaces/<id>/`，只有复制和哈希完成后才标 `fixture_status: prepared`；没有随仓库提供起点的其余场景仍为 `not_prepared`，不预置通过。`manifest.json` 记录实际文件 SHA-256 与稳定文件树摘要；`source_commit` 为 null，不能用未验证的 Git HEAD 冒充当前文件版本。点目录／点文件、依赖和指定本地测试产物目录不计入，规则写入 manifest。
 
-**这是输入文件分离，不是宿主权限隔离或盲测保证。** 执行器不得访问 `review/`、原 `cases.json` 或判定记录；操作者需要在独立会话／目录中设置真实工具权限与相同 fixture。不要把完整准备包发给被评模型；不触发场景仍必须经过宿主的真实路由。源文件准备后应冻结，运行前核对哈希，baseline 与 candidate 独立建包。
+**这是输入文件分离，不是宿主权限隔离或盲测保证。** 执行器只拿选中的 `inputs/<id>.json` 和 `workspaces/<id>/`，不得访问 `review/`、`manifest.json`、原 `cases.json` 或判定记录；操作者需要在独立会话／目录中设置真实工具权限与相同 fixture。不要把完整准备包发给被评模型；不触发场景仍必须经过宿主的真实路由。源文件准备后应冻结，运行前核对哈希，baseline 与 candidate 独立建包。
 
-准备器不复制测试应用，不构建截图，不调用模型或统计成绩。单元测试只检查分离、哈希、拒绝覆盖及异常处理，不能证明这 52 个场景通过或模型生成质量改善。
+准备器会复制已有的离线 fixture，但不执行代码、不构建截图、不调用模型或统计成绩。每个工作区之外的 `review.json` 只供审查者使用；准备时拒绝缺失入口、损坏元数据、隐藏文件与符号链接。原始故障特意保留，浏览器套件验证故障复现与校准对照，而不是替模型完成修复。这些检查不能证明 52 个模型场景通过或生成质量改善。
+
+六个起点、服务模拟条件与审查边界见 [fixture 说明](fixtures/README.md)。运行 `node tests/run.cjs --suite pilot-fixtures --mode inline` 可单独验证这些起点；`--suite all --mode inline` 自动包含它。
 
 ## 确定性只读列表契约（不是模型评测）
 
