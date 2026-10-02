@@ -16,11 +16,11 @@ description: "设计、实现、修复或只读评审产品前端 UI/UX。Design
 | 打磨／优化 | 保留身份、信息架构和业务语义，改善授权页面 |
 | 新建／明确重设计 | 从主任务选择骨架，实现完整路径与移动策略 |
 
-先读有效仓库指令、现有 diff、相关组件／token 和检查命令。小改动只读必要调用链，沿用框架与依赖。简述目标、保留项与验证；可逆缺项用显式假设推进。只读与禁止执行的要求优先。复杂范围按 [任务工作流](references/task-workflows.md)。
+先读有效仓库指令、现有 diff、相关组件／token 和检查命令。小改动只读必要调用链，沿用框架与依赖。简述目标、保留项与验证；可逆缺项用显式假设推进。只读与禁止执行的要求优先。复杂任务按 [工作流](references/task-workflows.md)。
 
 ## 先给页面一个可见方向
 
-根据任务选骨架与一到两种签名手法，既有确认稿优先。
+根据任务选骨架与签名手法，确认稿优先。外部案例按 [参考转译](references/reference-transfer.md) 提取关系，不拼贴品牌。
 
 | 任务骨架 | 具体组织与识别手法 |
 |---|---|
@@ -31,7 +31,7 @@ description: "设计、实现、修复或只读评审产品前端 UI/UX。Design
 
 **识别度来自反复一致的关系。** 大数值用稳定的数字字形，单位降低一级但保持可读；主要内容面实色，相关内容聚拢、独立对象留出间隔。已知状态用清楚标签与形状，未知和估计有不同轮廓。高对比只给当前决定所需的锚点，留白由内容关系决定。
 
-先用 [tokens](assets/tokens.css) 的 page／section／body／meta 字阶、数字样式与表面角色建立起点，再在页面边界按内容调整；语义HTML标题级别独立选择。签名是组织方式，不是固定装饰：没有有效容量数据就不用额度轨；估算不冒充预测模型，更不凭超额推断真实限速政策。组件参考的讲解也不是产品副标题。
+先用 [tokens](assets/tokens.css) 的 page／section／body／meta 字阶、数字样式与表面角色建立起点，再在页面边界按内容调整；语义HTML标题级别独立选择。签名不是固定装饰：无容量数据不用额度轨，估计不冒充预测或限速政策。组件讲解不作产品副标题。
 
 ## 保留六条底线
 
@@ -44,7 +44,7 @@ description: "设计、实现、修复或只读评审产品前端 UI/UX。Design
 
 ## 实现与验证
 
-“太平／太乱”先按 [视觉校准](references/visual-calibration.md) 定位主次、同级边界、状态或操作线索，再增强或降噪。整页用 [页面综合](references/design-synthesis.md)；复用用 [组件契约](references/component-contracts.md)；跨区域状态用 [应用工程](references/application-engineering.md)。先修阻塞，再调排版，最后处理材质。共享修改核对调用方。
+“太平／太乱”先按 [视觉校准](references/visual-calibration.md) 定位主次、同级边界、状态或操作线索，再增强或降噪。整页用 [页面综合](references/design-synthesis.md)，复用用 [组件契约](references/component-contracts.md)，跨区状态用 [应用工程](references/application-engineering.md)，动效用 [效果选择](references/motion-and-effects.md)。先修阻塞，再调排版与材质；共享修改核对调用方。
 
 按风险选 [验收与证据](references/verification.md)：同数据、尺寸和状态对照改前改后，查看真实渲染，走主路径及恢复。整页包括下半页、动态文案和相邻对象。必要时去色／去装饰线检查，但保留输入、焦点、对象轮廓与数据线。分栏切换保留业务上下文，返回恢复可见焦点；连续操作不挪点击目标，键盘先让输入法和当前控件处理。
 
