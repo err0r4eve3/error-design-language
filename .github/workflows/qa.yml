@@ -22,8 +22,6 @@ jobs:
     defaults:
       run:
         working-directory: error-design-language
-    env:
-      QA_OUTPUT: ${{ runner.temp }}/edl-qa-${{ github.run_id }}-${{ github.run_attempt }}
     steps:
       - name: Check out tested revision
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
@@ -36,6 +34,8 @@ jobs:
           node-version-file: error-design-language/.nvmrc
           package-manager-cache: false
       - name: Run every discovered Node test
+        env:
+          QA_OUTPUT: ${{ runner.temp }}/edl-qa-${{ github.run_id }}-${{ github.run_attempt }}
         run: node tests/run.cjs --suite unit --out "$QA_OUTPUT"
       - name: Validate coverage definitions
         if: ${{ !cancelled() }}
@@ -45,6 +45,6 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: node-qa-${{ github.run_id }}-${{ github.run_attempt }}
-          path: ${{ env.QA_OUTPUT }}/
+          path: ${{ runner.temp }}/edl-qa-${{ github.run_id }}-${{ github.run_attempt }}/
           if-no-files-found: ignore
           retention-days: 7

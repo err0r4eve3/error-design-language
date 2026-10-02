@@ -36,3 +36,7 @@ node tests/run.cjs --suite preview,patterns,regions,style-composition,choice-lay
 [Node 22.16 test:summary](https://nodejs.org/download/release/v22.16.0/docs/api/test.html#event-testsummary)：读取累计／每文件事件、counts和success语义；使用结构化事件，不依赖TAP文本版式。没有运行上游Node测试。
 
 [GitHub Actions安全使用](https://docs.github.com/en/actions/reference/security/secure-use)：读取最小权限、完整SHA固定与不可信输入处理。核对actions/checkout v5、actions/setup-node v5、actions/upload-artifact v4对应Git ref；setup-node固定提交的action.yml确认node-version-file和package-manager-cache输入。固定版本为复现而非宣称最新。
+
+## 首次远端执行后的修正
+
+初始提交 `7535749f26e7b7fae35c5978da24b48278fc4617` 的工作流运行 `36967666096` 在启动任务前失败，Jobs API 返回0个任务。复核发现job级env引用了该位置不可用的runner上下文；GitHub官方[上下文可用性表](https://docs.github.com/en/actions/reference/workflows-and-actions/contexts#context-availability)只在步骤env／with等位置允许runner。将输出目录移到执行步骤的env，上传路径在步骤with中使用相同表达式，不扩大权限或改变触发范围。初次YAML静态解析只验证语法与结构，未发现上下文限制，不能被称为有效工作流验证。修正后的远端执行结果另按真实run记录，不预先判通过。
