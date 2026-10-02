@@ -6,6 +6,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const {pathToFileURL} = require('node:url');
 const {parseSRGB, composite, contrastRatio} = require('./color.cjs');
+const {selectionAppearance, toolbarExpansionProbe} = require('./support/selection-probes.cjs');
 const root = path.resolve(__dirname, '..');
 const assets = path.resolve(process.env.DESIGN_PREVIEW_DIR || path.join(root,'assets'));
 const mode = process.env.DESIGN_QA_MODE || 'file';
@@ -102,6 +103,10 @@ async function peerLayout(page) {
       assert.ok(await page.locator('#selection-bar').isHidden());
       const copy=await page.locator('main').innerText();
       assert.ok(!/按原始数值排序|窄屏可横向滚动比较|筛选决定出现哪些|状态用文字表达|功能验收|响应式控制台/.test(copy));
+    });
+    await check('persistent-selection-distinguishes-static-hover-and-inspected-states',async()=>{
+      await selectionAppearance(page, sampleContrast);
+      await load();
     });
     await check('mobile-facts-and-scroll-help-visible-before-scrolling',async()=>{
       for(const width of [320,390]) {
@@ -435,11 +440,8 @@ async function peerLayout(page) {
         assert.ok(await first.evaluate(el=>el===document.activeElement),'Selection must not move focus into its toolbar');
       }
       await load();await page.setViewportSize({width:390,height:1200});await settle(page);
-      const first=row('demo-01').locator('input');
-      const broken=await page.addStyleTag({content:'.dl-context-toolbar[data-selection-active="true"]{padding-block:40px!important}'});
-      await settle(page);const brokenTop=(await first.boundingBox()).y;await first.check();await settle(page);
-      assert.ok(Math.abs((await first.boundingBox()).y-brokenTop)>20,'Negative probe must detect state-dependent toolbar expansion');
-      await broken.evaluate(el=>el.remove());await load();
+      result.toolbarNegativeProbe = await toolbarExpansionProbe(page);
+      await load();
     });
     await check('continuous-keyboard-navigation-retains-trigger-without-reversing-at-boundaries',async()=>{
       for(const width of [390,1440]) {
