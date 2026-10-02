@@ -3,7 +3,10 @@
 [data-design="error"] {
   color-scheme: light;
   --dl-canvas: #f4f4f4;
-  --dl-workspace: #ededed;
+  /* Roles, not a promise that every theme has the same luminance ordering. */
+  --dl-surface-rail: #ededed;
+  --dl-surface-inset: #e9e9e9;
+  --dl-workspace: var(--dl-surface-rail); /* legacy alias */
   --dl-surface: #ffffff;
   --dl-strong: #1c1c1c;
   --dl-text: #383838;
@@ -30,13 +33,25 @@
   --dl-input-text: #262626;
   --dl-placeholder: #707070;
   --dl-focus: #262626;
-  --dl-danger: #262626;
-  --dl-success: #262626;
+  /* Monochrome foreground only: names/symbols carry status meaning.
+     Legacy aliases are not red/green palettes or proof of a state. */
+  --dl-status-foreground: #262626;
+  --dl-danger: var(--dl-status-foreground);
+  --dl-success: var(--dl-status-foreground);
   --dl-feedback: #eeeeee;
   --dl-glass: rgb(255 255 255 / 82%);
-  --dl-glass-line: rgb(255 255 255 / 90%);
+  --dl-glass-line: rgb(0 0 0 / 12%);
   --dl-glass-highlight: rgb(255 255 255 / 70%);
-  --dl-shadow: 0 8px 28px rgb(0 0 0 / 5%);
+  --dl-elevation-flat: none;
+  --dl-elevation-popover: 0 8px 28px rgb(0 0 0 / 5%);
+  --dl-elevation-dialog: 0 20px 60px rgb(0 0 0 / 20%);
+  --dl-shadow: var(--dl-elevation-popover); /* legacy alias */
+  /* Relative to the component stacking context; native dialog uses the top layer. */
+  --dl-layer-base: 0;
+  --dl-layer-sticky: 10;
+  --dl-layer-popover: 20;
+  --dl-layer-notice: 30;
+  --dl-layer-skip: 40;
   --dl-radius-structure: 0;
   --dl-radius-control: 8px;
   --dl-radius-overlay: 14px;
@@ -50,11 +65,27 @@
   --dl-fast: 150ms;
   --dl-ease: cubic-bezier(.2,.8,.2,1);
   --dl-font: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --dl-font-mono: ui-monospace, SFMono-Regular, Consolas, monospace;
+  /* Semantic type roles are independent of HTML heading levels. rem respects root size. */
+  --dl-type-page: 1.875rem;
+  --dl-type-section: 1.1875rem;
+  --dl-type-title: 1rem;
+  --dl-type-body: .9375rem;
+  --dl-type-ui: .875rem;
+  --dl-type-meta: .75rem;
+  --dl-type-metric: 2.3125rem;
+  --dl-leading-heading: 1.3;
+  --dl-leading-body: 1.65;
+  --dl-weight-heading: 650;
+  --dl-weight-label: 600;
+  --dl-numerals: tabular-nums lining-nums;
+  --dl-tracking-metric: -.025em;
 }
 [data-design="error"][data-theme="dark"] {
   color-scheme: dark;
   --dl-canvas: #141414;
-  --dl-workspace: #1b1b1b;
+  --dl-surface-rail: #1b1b1b;
+  --dl-surface-inset: #141414;
   --dl-surface: #232323;
   --dl-strong: #f5f5f5;
   --dl-text: #dedede;
@@ -81,13 +112,13 @@
   --dl-input-text: #f0f0f0;
   --dl-placeholder: #aaaaaa;
   --dl-focus: #f5f5f5;
-  --dl-danger: #f5f5f5;
-  --dl-success: #f5f5f5;
+  --dl-status-foreground: #f5f5f5;
   --dl-feedback: #2b2b2b;
   --dl-glass: rgb(38 38 38 / 88%);
   --dl-glass-line: rgb(255 255 255 / 14%);
   --dl-glass-highlight: rgb(255 255 255 / 12%);
-  --dl-shadow: 0 12px 30px rgb(0 0 0 / 18%);
+  --dl-elevation-popover: 0 12px 30px rgb(0 0 0 / 18%);
+  --dl-elevation-dialog: 0 20px 60px rgb(0 0 0 / 45%);
 }
 @media (prefers-reduced-motion: reduce) {
   [data-design="error"] { --dl-fast: 0ms; }
