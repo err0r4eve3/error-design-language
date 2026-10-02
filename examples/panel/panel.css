@@ -130,11 +130,11 @@ html,body {
   display:block
 }
 #relay-panel .workspace div>span {
-  font-size:10px;
+  font-size:11px;
   color:var(--dl-muted)
 }
 #relay-panel .workspace-mark {
-  font-size:9px;
+  font-size:11px;
   margin-left:auto;
   letter-spacing:.5px;
   color:var(--dl-muted)
@@ -190,7 +190,7 @@ html,body {
   background:currentColor
 }
 #relay-panel .sidebar-bottom>p {
-  font-size:10px;
+  font-size:11px;
   line-height:1.9;
   color:var(--dl-muted);
   padding:9px 12px 16px
@@ -220,7 +220,7 @@ html,body {
   display:block
 }
 #relay-panel .identity small {
-  font-size:10px;
+  font-size:11px;
   color:var(--dl-muted)
 }
 #relay-panel .app-body {
@@ -256,7 +256,7 @@ html,body {
   max-width:160px
 }
 #relay-panel .demo-tag {
-  font-size:9px;
+  font-size:11px;
   letter-spacing:1px;
   border:1px solid var(--dl-line);
   padding:2px 5px;
@@ -452,9 +452,10 @@ html,body {
 }
 #relay-panel .metric-foot {
   display:flex;
+  flex-wrap:wrap;
   justify-content:space-between;
-  gap:12px;
-  font-size:10px;
+  gap:4px 12px;
+  font-size:11px;
   color:var(--dl-muted)
 }
 #relay-panel .usage-track {
@@ -475,10 +476,11 @@ html,body {
 }
 #relay-panel .cost-foot {
   display:flex;
+  flex-wrap:wrap;
   align-items:center;
   justify-content:space-between;
-  gap:10px;
-  font-size:10px;
+  gap:6px 10px;
+  font-size:11px;
   color:var(--dl-muted)
 }
 #relay-panel .loading-card strong {
@@ -506,7 +508,7 @@ html,body {
   gap:15px
 }
 #relay-panel .section-heading p {
-  font-size:10px;
+  font-size:11px;
   color:var(--dl-muted);
   margin-top:4px
 }
@@ -524,7 +526,7 @@ html,body {
   color:var(--dl-muted);
   border:0;
   padding:4px 10px;
-  font-size:10px;
+  font-size:11px;
   border-radius:4px;
   min-height:27px
 }
@@ -543,7 +545,7 @@ html,body {
   font-variant-numeric:tabular-nums
 }
 #relay-panel .chart-number>span {
-  font-size:10px;
+  font-size:11px;
   font-weight:400;
   color:var(--dl-muted);
   margin-left:12px;
@@ -570,7 +572,7 @@ html,body {
   stroke-width:.8
 }
 #relay-panel .chart-data {
-  font-size:10px;
+  font-size:11px;
   color:var(--dl-muted);
   margin-top:1px
 }
@@ -583,7 +585,7 @@ html,body {
   width:100%;
   font-variant-numeric:tabular-nums;
   border-collapse:collapse;
-  font-size:10px
+  font-size:11px
 }
 #relay-panel .chart-data td,#relay-panel .chart-data th {
   padding:7px 0;
@@ -643,7 +645,8 @@ html,body {
   border:1px solid var(--dl-line)
 }
 #relay-panel .attention-content {
-  min-width:0
+  min-width:0;
+  overflow-wrap:anywhere
 }
 #relay-panel .attention-content h3 {
   font-size:12px
@@ -657,7 +660,7 @@ html,body {
 }
 #relay-panel .attention-content>span {
   display:block;
-  font-size:10px;
+  font-size:11px;
   color:var(--dl-muted);
   margin-top:5px;
   line-height:1.7
@@ -725,7 +728,7 @@ html,body {
   display:flex;
   gap:14px;
   align-items:center;
-  font-size:10px;
+  font-size:11px;
   color:var(--dl-muted);
   flex-wrap:wrap;
   padding:5px 0
@@ -809,7 +812,7 @@ html,body {
 }
 #relay-panel .record-meta {
   display:block;
-  font-size:9px;
+  font-size:12px;
   color:var(--dl-muted);
   margin-top:4px;
   font-weight:400
@@ -823,7 +826,7 @@ html,body {
   align-items:center;
   gap:5px;
   white-space:nowrap;
-  font-size:10px;
+  font-size:11px;
   line-height:1.5;
   padding:3px 6px;
   border-radius:4px;
@@ -889,7 +892,7 @@ html,body {
   padding:25px
 }
 #relay-panel .inspector .section-heading .muted {
-  font-size:10px
+  font-size:11px
 }
 #relay-panel .inspector h2 {
   margin-top:6px;
@@ -966,7 +969,7 @@ html,body {
   justify-content:space-between;
   gap:15px;
   color:var(--dl-muted);
-  font-size:9px;
+  font-size:11px;
   margin-top:20px
 }
 #relay-panel .error-banner {
@@ -1048,7 +1051,7 @@ html,body {
   font-size:13px
 }
 #relay-panel .field-help {
-  font-size:10px!important;
+  font-size:11px!important;
   color:var(--dl-muted);
   line-height:1.7;
   margin-top:6px!important
@@ -1100,7 +1103,7 @@ html,body {
   font-size:12px
 }
 #relay-panel .plans small {
-  font-size:10px;
+  font-size:11px;
   color:var(--dl-muted);
   margin-top:4px
 }
@@ -1110,7 +1113,7 @@ html,body {
   color:var(--dl-strong)
 }
 #relay-panel .plans em {
-  font-size:10px;
+  font-size:11px;
   color:var(--dl-muted);
   font-style:normal;
   font-weight:400
@@ -1244,7 +1247,7 @@ html,body {
     left:calc(50% + 33px)
   }
   #relay-panel .metric-foot {
-    font-size:9px
+    font-size:11px
   }
   #relay-panel .metric-value {
     font-size:29px
@@ -1280,7 +1283,7 @@ html,body {
     margin-top:2px
   }
   #relay-panel .cost-foot {
-    font-size:9px
+    font-size:11px
   }
   #relay-panel .collection-heading {
     align-items:flex-start;
@@ -1376,7 +1379,7 @@ html,body {
   }
   #relay-panel .mobile-snapshot {
     display:block;
-    font-size:9px;
+    font-size:11px;
     color:var(--dl-muted);
     margin-top:7px
   }
@@ -1434,7 +1437,7 @@ html,body {
   }
   #relay-panel .metric-primary .metric-foot {
     grid-column:2;
-    font-size:9px;
+    font-size:11px;
     align-self:start
   }
   #relay-panel .metric {
@@ -1462,14 +1465,14 @@ html,body {
     height:14px
   }
   #relay-panel .metric-foot {
-    font-size:9px;
+    font-size:11px;
     gap:4px
   }
   #relay-panel .cost-foot>span {
-    font-size:9px
+    font-size:11px
   }
   #relay-panel .cost-foot button {
-    font-size:10px;
+    font-size:11px;
     margin-top:0;
     padding:3px 0
   }
@@ -1490,7 +1493,7 @@ html,body {
     margin-top:20px
   }
   #relay-panel .chart-number>span {
-    font-size:9px;
+    font-size:11px;
     margin-left:9px
   }
   #relay-panel .overview-panels {
@@ -1513,14 +1516,14 @@ html,body {
     height:15px
   }
   #relay-panel .attention-content p {
-    font-size:10px
+    font-size:11px
   }
   #relay-panel .attention-content>span {
-    font-size:9px;
+    font-size:11px;
     line-height:1.8
   }
   #relay-panel .attention-content button {
-    font-size:10px
+    font-size:11px
   }
   #relay-panel .collection-heading {
     padding:18px 16px 10px;
@@ -1533,7 +1536,7 @@ html,body {
     align-content:center
   }
   #relay-panel .selection-cost {
-    font-size:9px
+    font-size:11px
   }
   #relay-panel .selection-actions {
     margin-left:0;
@@ -1562,7 +1565,7 @@ html,body {
     font-size:11px
   }
   #relay-panel .page-foot {
-    font-size:8px
+    font-size:11px
   }
   #relay-panel .page-foot>span:last-child {
     display:none
@@ -1589,7 +1592,7 @@ html,body {
     font-size:11px
   }
   #relay-panel .plans small {
-    font-size:9px
+    font-size:11px
   }
   #relay-panel .skip-link {
     left:16px
@@ -1597,7 +1600,7 @@ html,body {
 }
 @media(max-width:359px) {
   #relay-panel .main-nav .nav-item {
-    font-size:10px;
+    font-size:11px;
     padding:8px 6px;
     gap:4px
   }
@@ -1608,13 +1611,13 @@ html,body {
     font-size:24px
   }
   #relay-panel .metric-value>span {
-    font-size:10px
+    font-size:11px
   }
   #relay-panel .metric {
     padding:13px
   }
   #relay-panel .metric-label {
-    font-size:10px
+    font-size:11px
   }
   #relay-panel .metric-foot {
     flex-direction:column;
@@ -1685,7 +1688,7 @@ html,body {
   font-size:12px
 }
 #relay-panel .record-meta {
-  font-size:10px
+  font-size:11px
 }
 #relay-panel .state {
   font-size:11px
@@ -1704,7 +1707,7 @@ html,body {
     min-height:126px
   }
   #relay-panel .metric-foot,#relay-panel .cost-foot {
-    font-size:10px
+    font-size:11px
   }
   #relay-panel .metric-label {
     font-size:11px
@@ -1722,14 +1725,14 @@ html,body {
     min-height:72px
   }
   #relay-panel .section-heading p {
-    font-size:10px
+    font-size:11px
   }
   #relay-panel .metric-primary .metric-foot {
-    font-size:9px
+    font-size:11px
   }
 }
 #relay-panel .chart-unit {
-  font-size:10px;
+  font-size:11px;
   color:var(--dl-muted);
   margin-top:8px
 }
@@ -1741,13 +1744,118 @@ html,body {
 }
 @media(max-width:600px) {
   #relay-panel .chart-unit {
-    font-size:10px;
+    font-size:11px;
     margin:10px 0 0
   }
   #relay-panel .attention-content>span {
-    font-size:10px
+    font-size:11px
   }
   #relay-panel .attention-content p {
     font-size:11px
+  }
+}
+
+/* Unknown values are labels, not zero-valued tabular numerals. */
+#relay-panel .value-unknown {
+  color:var(--dl-muted);
+  font-family:var(--dl-font);
+  font-size:12px;
+  font-variant-numeric:normal
+}
+#relay-panel .metric-value.metric-value-empty {
+  font-size:20px;
+  letter-spacing:0;
+  line-height:1.6
+}
+#relay-panel .measure {
+  white-space:nowrap
+}
+#relay-panel .mobile-record-summary {
+  display:none
+}
+#relay-panel .table-scroll-help {
+  margin:0 23px 12px;
+  color:var(--dl-muted);
+  font-size:12px;
+  line-height:1.6
+}
+#relay-panel .billing-panel .section-heading {
+  flex-wrap:wrap
+}
+#relay-panel .bill-total {
+  white-space:nowrap
+}
+@media(max-width:600px) {
+  #relay-panel .mobile-record-summary {
+    display:grid;
+    justify-items:start;
+    gap:6px;
+    margin-top:6px
+  }
+  #relay-panel .record-price {
+    display:flex;
+    align-items:baseline;
+    gap:6px;
+    color:var(--dl-strong);
+    font-size:12px;
+    font-variant-numeric:tabular-nums
+  }
+  #relay-panel .price-period {
+    color:var(--dl-muted);
+    font-size:11px
+  }
+  #relay-panel .record-name {
+    display:block;
+    max-width:176px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    text-align:left
+  }
+  #relay-panel .table-scroll-help {
+    margin-inline:16px
+  }
+  #relay-panel .metric-foot,
+  #relay-panel .cost-foot,
+  #relay-panel .cost-foot>span,
+  #relay-panel .section-heading p,
+  #relay-panel .attention-content>span,
+  #relay-panel .record-meta {
+    font-size:12px
+  }
+  #relay-panel .metric-primary .metric-foot {
+    font-size:11px;
+    flex-direction:column;
+    gap:4px
+  }
+  #relay-panel .cost-foot>span {
+    display:block
+  }
+  /* Local comfortable targets, not a claim of whole-page WCAG compliance. */
+  #relay-panel .button,
+  #relay-panel .page-actions>.button,
+  #relay-panel .main-nav .nav-item,
+  #relay-panel .text-button,
+  #relay-panel .record-name,
+  #relay-panel .sort-button,
+  #relay-panel .segmented button,
+  #relay-panel .collection-tools select,
+  #relay-panel .breadcrumb select {
+    min-height:44px;
+    min-width:44px
+  }
+  #relay-panel .icon-button,
+  #relay-panel .sidebar-bottom .nav-item,
+  #relay-panel .page-actions #reload {
+    min-width:44px;
+    width:44px;
+    min-height:44px;
+    height:44px
+  }
+  #relay-panel .search-field {
+    min-height:44px
+  }
+  #relay-panel .chart-panel>.section-heading {
+    flex-wrap:wrap
   }
 }
