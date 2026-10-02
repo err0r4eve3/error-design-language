@@ -56,8 +56,11 @@
 :where([data-design="error"]) .dl-table thead th { font-weight:500; font-size:12px; padding-block:6px; }
 :where([data-design="error"]) .dl-table tbody th { font-weight:600; color:var(--dl-strong); max-inline-size:260px; }
 :where([data-design="error"]) .dl-table small { display:block; color:var(--dl-muted); font-size:12px; font-weight:400; margin-block-start:3px; }
-:where([data-design="error"]) .dl-table tbody tr:nth-child(even) { background:var(--dl-hover); }
-:where([data-design="error"]) .dl-table tbody tr[data-selected="true"] { background:var(--dl-selected); }
+/* Static rows use separators, not an interaction token. Reserve the same border
+   width in every state so selecting a row never changes table geometry. */
+:where([data-design="error"]) .dl-table tbody :is(th,td) { border-block:1px solid var(--dl-line); }
+:where([data-design="error"]) .dl-table tbody tr[data-selected="true"] { background:var(--dl-selected); color:var(--dl-selected-text); }
+:where([data-design="error"]) .dl-table tbody tr[data-selected="true"] > :is(th,td) { border-block-color:var(--dl-selected-indicator); }
 :where([data-design="error"]) .dl-table .dl-number { font-variant-numeric:var(--dl-numerals); text-align:end; white-space:nowrap; }
 :where([data-design="error"]) .dl-table .dl-row-action { text-align:end; }
 :where([data-design="error"]) .dl-table [data-detail] { scroll-margin:8px; min-block-size:44px; padding:8px 10px; border:1px solid transparent; border-radius:6px; background:transparent; color:var(--dl-strong); font:500 12px/1.5 var(--dl-font); cursor:pointer; }
@@ -110,6 +113,7 @@
 }
 @media (forced-colors:active) {
   :where([data-design="error"]) :is(.dl-panel,.dl-inspector,.dl-filter-chip,.dl-context-toolbar) { border-color:CanvasText; }
+  :where([data-design="error"]) .dl-table tr[data-selected="true"] > :is(th,td) { border-block-color:Highlight; }
   :where([data-design="error"]) .dl-table [data-detail][aria-expanded="true"] { border-color:Highlight; text-decoration:underline; }
   :where([data-design="error"]) .dl-pattern-page :is(button,input,select,[tabindex]):focus-visible { outline-color:Highlight; }
 }

@@ -10,11 +10,11 @@
   --dl-surface: #ffffff;
   --dl-strong: #1c1c1c;
   --dl-text: #383838;
-  --dl-muted: #666666;
+  --dl-muted: #606060;
   --dl-line: #e0e0e0;
   --dl-control-border: #888888;
   --dl-hover: #f5f5f5;
-  --dl-selected: #eeeeee;
+  --dl-selected: #dddddd;
   --dl-selected-text: #1c1c1c;
   --dl-selected-indicator: #262626;
   --dl-primary: #262626;
@@ -93,7 +93,7 @@
   --dl-line: #383838;
   --dl-control-border: #808080;
   --dl-hover: #2a2a2a;
-  --dl-selected: #333333;
+  --dl-selected: #3d3d3d;
   --dl-selected-text: #f5f5f5;
   --dl-selected-indicator: #f5f5f5;
   --dl-primary: #f5f5f5;
