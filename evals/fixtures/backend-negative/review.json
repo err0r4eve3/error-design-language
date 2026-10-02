@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "case_id": "backend-negative",
+  "runtime": "sql",
+  "entrypoints": [
+    "schema.sql",
+    "query.sql",
+    "explain.txt"
+  ],
+  "checklist": [
+    "材料只含 SQL 与合成查询计划，无网页或 UI 源码。",
+    "正常宿主自动路由下，不应主动加载前端 Skill；强制注入 Skill 文本无法证明负向路由。",
+    "答复围绕查询表达式、索引适用条件和计划证据；不能声称已经执行 PostgreSQL 或获得真实耗时。"
+  ]
+}

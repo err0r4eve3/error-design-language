@@ -1,0 +1,3 @@
+.button--primary { color: var(--on-primary); background: var(--primary); }
+[aria-pressed="true"] { border: 2px solid var(--ink); }
+.actions > button:not(.button--primary) { background: #454545; color: #fff; }

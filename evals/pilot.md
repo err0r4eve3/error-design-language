@@ -19,7 +19,7 @@
 node evals/prepare.cjs --out <new-directory> --cases fix-hover-only,peer-same-style,copy-dev-brief-leak,payment-unknown,build-dense-console,backend-negative
 ```
 
-准备器仅生成输入与审查资料。执行器只拿 `inputs/` 中对应文件，不拿 `review/`、原场景 rubric 或判定模板；目录分开本身不是访问隔离。
+准备器生成输入、六个离线起点的逐字节副本及独立审查资料。执行器只拿 `inputs/<id>.json` 和对应 `workspaces/<id>/`，不拿 `review/`、`manifest.json`、原场景 rubric 或判定模板；目录分开本身不是访问隔离。`fixture_status: prepared` 只表示起点已复制与核验，不代表已运行模型。详见 [fixture 说明](fixtures/README.md)。
 
 ## 先冻结，再执行
 
