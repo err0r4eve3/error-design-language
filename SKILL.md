@@ -20,7 +20,7 @@ description: "设计、实现、修复或只读评审产品前端 UI/UX。Design
 
 ## 先给页面一个可见方向
 
-根据任务选骨架与一到两种签名手法，既有确认稿优先。
+根据任务选骨架与一到两种签名手法，既有确认稿优先。外部案例按 [参考转译](references/reference-transfer.md) 提取关系，不拼贴品牌。
 
 | 任务骨架 | 具体组织与识别手法 |
 |---|---|
@@ -44,7 +44,7 @@ description: "设计、实现、修复或只读评审产品前端 UI/UX。Design
 
 ## 实现与验证
 
-“太平／太乱”先按 [视觉校准](references/visual-calibration.md) 定位主次、同级边界、状态或操作线索，再增强或降噪。整页用 [页面综合](references/design-synthesis.md)；复用用 [组件契约](references/component-contracts.md)；跨区域状态用 [应用工程](references/application-engineering.md)。先修阻塞，再调排版，最后处理材质。共享修改核对调用方。
+“太平／太乱”先按 [视觉校准](references/visual-calibration.md) 定位主次、同级边界、状态或操作线索，再增强或降噪。整页用 [页面综合](references/design-synthesis.md)；复用用 [组件契约](references/component-contracts.md)；跨区域状态用 [应用工程](references/application-engineering.md)；动效用 [效果选择](references/motion-and-effects.md)。先修阻塞，再调排版，最后处理材质。共享修改核对调用方。
 
 在授权范围按 [验收与证据](references/verification.md) 验证并交付：同数据、主题、尺寸和状态对照改前改后，覆盖主路径及恢复；区分静态、构建、浏览器、真实业务与模型证据，未运行就明说。截图须实际查看；详细回归清单以该参考为准。
 
